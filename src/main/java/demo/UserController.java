@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@RestController
 public class UserController {
 
 	// Sapir - User related API - Login valid user 	
@@ -32,10 +32,7 @@ public class UserController {
 			}else {
 				throw new NameNotFoundException("Invalid user name/email");
 			}
-		}
-
-		
-		
+		}		
 	//Sapir - User related API - Create a new user
 		@RequestMapping(path = "/acs/users",
 				method = RequestMethod.POST,
