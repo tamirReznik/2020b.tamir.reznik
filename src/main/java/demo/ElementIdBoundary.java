@@ -1,8 +1,8 @@
 package demo;
 
 public class ElementIdBoundary {
-	String domain;
-	int id;
+	private String domain;
+	private int id;
 
 	public ElementIdBoundary() {
 

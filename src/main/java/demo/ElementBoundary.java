@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class ElementBoundary {
 	ElementIdBoundary elementId;
+
 	TypeEnum type;
 	String name;
 	Boolean active;
@@ -75,4 +76,11 @@ public class ElementBoundary {
 		this.elemntAttributes = elemntAttributes;
 	}
 
+	public ElementIdBoundary getElementId() {
+		return elementId;
+	}
+
+	public void setElementId(ElementIdBoundary elementId) {
+		this.elementId = elementId;
+	}
 }
