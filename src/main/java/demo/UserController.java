@@ -25,9 +25,9 @@ public class UserController {
 			// return new UserBoundary();
 			UserBoundary ub = new UserBoundary();
 			ub.setUserId(new UserIdBoundary(userDomain, userEmail));
-			ub.setTypeRole(TypeEnumRole.PLAYER); // ???
-			ub.setUsername("Demo User"); // ???
-			ub.setAvater(";-)"); // ???
+			ub.setTypeRole(TypeEnumRole.PLAYER); 
+			ub.setUsername("Demo User"); 
+			ub.setAvater(";-)"); 
 			return ub;
 		} else {
 			throw new NameNotFoundException("Invalid user name/email");
@@ -38,11 +38,23 @@ public class UserController {
 	@RequestMapping(path = "/acs/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary CreateNewUser(@RequestBody NewUserDetailsBoundary userDetails) {
 		UserBoundary ub = new UserBoundary();
-		ub.setUserId(new UserIdBoundary("2020b.demo", userDetails.getEmail())); // ???
+		ub.setUserId(new UserIdBoundary("2020b.demo", userDetails.getEmail())); 
 		ub.setTypeRole(userDetails.getTypeRole());
 		ub.setUsername(userDetails.getUsername());
 		ub.setAvater(userDetails.getAvater());
 		return ub;
 	}
+	
+	
+	//Sapir - User related API - Update user details
+	@RequestMapping(path = "/acs/users/{userDomain}/{userEmail}",
+			method = RequestMethod.PUT,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
+	public void updateUserDetails (@PathVariable("userDomain") String userDomain,
+			@PathVariable("userEmail") String userEmail,
+			@RequestBody UserBoundary update) {
+		//TODO implement this method to update message details
+	}
+	
 	
 }
