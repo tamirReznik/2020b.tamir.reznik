@@ -11,6 +11,18 @@ public class ActionBoundary {
 	private Map<String, Object> invokedBy;
 	private ActionAttributes actionAttributes;
 	
+	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
+			Map<String, Object> invokedBy, ActionAttributes actionAttributes) {
+		this.actionId = actionId;
+		this.type = type;
+		this.element = element;
+		this.timeStap = timeStap;
+		this.invokedBy = invokedBy;
+		this.actionAttributes = actionAttributes;
+	}
+
+	
+	
 	public ActionIdBoundary getActionId() {
 		return actionId;
 	}

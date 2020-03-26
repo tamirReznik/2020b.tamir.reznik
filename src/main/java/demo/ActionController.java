@@ -18,13 +18,13 @@ public class ActionController {
 			produces = MediaType.APPLICATION_JSON_VALUE,
 			consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ActionBoundary invokeAnAction(@RequestBody ActionBoundary actionDetails) {
-		ActionBoundary ab = new ActionBoundary();
-		ab.setActionId(new ActionIdBoundary("2020b.demo",0));
-		ab.setType(TypeEnum.NON_CRITICAL);
-		ab.setElement(Collections.singletonMap("elementId", new ElementIdBoundary("2020b.demo", 0)));
-		ab.setTimeStap(new Date());
-		ab.setInvokedBy(Collections.singletonMap("userId",new UserIdBoundary("2020b.demo", "test@gmail.com")));
-		ab.setActionAttributes(new ActionAttributes("Rotchsild","Tel Aviv",false,"TLVParking"));
-		return ab;
+//		ActionBoundary ab = new ActionBoundary();
+		actionDetails.setActionId(new ActionIdBoundary("2020b.demo",0));
+		actionDetails.setType(TypeEnum.NON_CRITICAL);
+		actionDetails.setElement(Collections.singletonMap("elementId", new ElementIdBoundary("2020b.demo", 0)));
+		actionDetails.setTimeStap(new Date());
+		actionDetails.setInvokedBy(Collections.singletonMap("userId",new UserIdBoundary("2020b.demo", "test@gmail.com")));
+		actionDetails.setActionAttributes(new ActionAttributes("Rotchsild","Tel Aviv",false,"TLVParking"));
+		return actionDetails;
 	}
 }
