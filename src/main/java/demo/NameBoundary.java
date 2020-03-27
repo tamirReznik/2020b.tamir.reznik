@@ -1,4 +1,5 @@
 package demo;
+
 /*
 	{
 		"first":"User",
@@ -9,7 +10,7 @@ package demo;
 public class NameBoundary {
 	private String first;
 	private String last;
-	
+
 	public NameBoundary() {
 	}
 
