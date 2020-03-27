@@ -8,9 +8,8 @@ import demo.TypeEnum;
 
 /*
 {
-
- 	{
-	"domain": "tamir",
+ 	"actionId":{
+		"domain": "tamir",
 		"id": "54"	
 	}, 	
 	"type":"CRITICAL",
@@ -21,11 +20,11 @@ import demo.TypeEnum;
  	"invokedBy":{
 	
 	},
-	{
-	"streetName": "Sheshet Hayamim",
-	"cityName": "Binyamina",	
-	"isParkingEmpty": false,
-	"nameOfParking": "parking name"
+	"actionAttributes":{
+		"streetName": "Sheshet Hayamim",
+		"cityName": "Binyamina",	
+		"isParkingEmpty": false,
+		"nameOfParking": "parking name"
 	} 	
 }
  		
@@ -40,6 +39,9 @@ public class ActionBoundary {
 	private Date timestamp;
 	private Map<String, Object> invokedBy;
 	private ActionAttributes actionAttributes;
+
+	public ActionBoundary() {
+	}
 
 	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
 			Map<String, Object> invokedBy, ActionAttributes actionAttributes) {

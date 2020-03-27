@@ -1,5 +1,12 @@
 package demo.element;
 
+/*
+{
+	"domain":"User",
+	"id": 456
+}
+
+*/
 public class ElementIdBoundary {
 	private String domain;
 	private int id;
