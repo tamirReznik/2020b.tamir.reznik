@@ -1,13 +1,14 @@
 package demo;
 
 public class Location {
+
+	private double coordinate_X, coordinate_Y;
+
 	public Location(double coordinate_X, double coordinate_Y) {
 
 		this.coordinate_X = coordinate_X;
 		this.coordinate_Y = coordinate_Y;
 	}
-
-	private double coordinate_X, coordinate_Y;
 
 	public double getCoordinate_X() {
 		return coordinate_X;

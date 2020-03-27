@@ -3,6 +3,26 @@ package demo;
 import java.sql.Date;
 import java.util.Map;
 
+/*
+{
+    "elementId": {
+        "domain": null,
+        "id": 0
+    },
+    "type": "CRITICAL",
+    "name": "Parking Lot",
+    "active": true,
+    "timeStamp": "1970-01-01",
+    "Location": {
+        "coordinate_X":35.3256,
+        "coordinate_Y":46.0234
+    },
+    "elemntAttributes": {
+        "test": "great test",
+        "parking type": "CRITICAL"
+    }
+}
+ */
 public class ElementBoundary {
 	ElementIdBoundary elementId;
 

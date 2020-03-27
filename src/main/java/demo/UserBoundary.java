@@ -1,6 +1,5 @@
 package demo;
 
-
 /*
 {
 	"userId":{
@@ -19,7 +18,7 @@ public class UserBoundary {
 	private TypeEnumRole typeRole;
 	private String username;
 	private String avater;
-	
+
 	public UserBoundary() {
 	}
 
@@ -55,8 +54,4 @@ public class UserBoundary {
 		this.avater = avater;
 	}
 
-	
-	
-	
-	
 }

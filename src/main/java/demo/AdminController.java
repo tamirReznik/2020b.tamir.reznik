@@ -16,6 +16,7 @@ public class AdminController {
 	// Anna -Admin API -Export all users
 	UserController uc = new UserController();
 	ActionController ac = new ActionController();
+
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary[] exportAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
@@ -24,16 +25,40 @@ public class AdminController {
 				.collect(Collectors.toList()) // List of UserBoundry
 				.toArray(new UserBoundary[0]); // ComplexMessagBoundary[]
 	}
-	
+
 	// Anna -Admin API -Export all actions
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ActionBoundary[] exportAllActions(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		return IntStream.range(0, 5) // Stream of Integer
-				.mapToObj(i -> ac.invokeAnAction(new ActionBoundary(new ActionIdBoundary(adminDomain,i),TypeEnum.CRITICAL, Collections.singletonMap("elementId", new ElementIdBoundary("2020b.demo",i)),
-						new Date(),Collections.singletonMap("userId",new UserIdBoundary("2020b.demo", "test@gmail.com")), 
-								new ActionAttributes("Rotchsild","Tel Aviv",false,"TLVParking")))) // Stream of UserBoundry
+				.mapToObj(i -> ac.invokeAnAction(new ActionBoundary(new ActionIdBoundary(adminDomain, i),
+						TypeEnum.CRITICAL,
+						Collections.singletonMap("elementId", new ElementIdBoundary("2020b.demo", i)), new Date(),
+						Collections.singletonMap("userId", new UserIdBoundary("2020b.demo", "test@gmail.com")),
+						new ActionAttributes("Rotchsild", "Tel Aviv", false, "TLVParking")))) // Stream of UserBoundry
 				.collect(Collectors.toList()) // List of UserBoundry
 				.toArray(new ActionBoundary[0]);// ComplexMessagBoundary[]
 	}
+
+//	http DELETE method - delete all users(tamir)
+	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
+	public void deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
+			@PathVariable("adminEmail") String adminEmail) {
+		// TODO implement this stub later
+	}
+
+//	http DELETE method - delete all elements(tamir)
+	@RequestMapping(path = "/acs/admin/elements/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
+	public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
+			@PathVariable("adminEmail") String adminEmail) {
+		// TODO implement this stub later
+	}
+
+//	http DELETE method - delete all actions(tamir)
+	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
+	public void deleteAllActions(@PathVariable("adminDomain") String adminDomain,
+			@PathVariable("adminEmail") String adminEmail) {
+		// TODO implement this stub later
+	}
+
 }
