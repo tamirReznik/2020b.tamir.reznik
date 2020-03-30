@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import demo.MessageBoundary;
 import demo.NameNotFoundException;
 import demo.TypeEnumRole;
 
@@ -16,7 +17,7 @@ public class UserController {
 
 	// Sapir - User related API - Login valid user
 	@RequestMapping(path = "/acs/users/login/{userDomain}/{userEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-
+	
 	public UserBoundary loginValidUser(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
 		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
@@ -39,15 +40,15 @@ public class UserController {
 		ub.setUserId(new UserIdBoundary("2020b.demo", userDetails.getEmail()));
 		ub.setTypeRole(userDetails.getTypeRole());
 		ub.setUsername(userDetails.getUsername());
-		ub.setAvater(userDetails.getAvater());
+		ub.setAvater(userDetails.getAvatar());
 		return ub;
 	}
 
 	// Sapir - User related API - Update user details
 	@RequestMapping(path = "/acs/users/{userDomain}/{userEmail}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void updateUserDetails(@PathVariable("userDomain") String userDomain,
+	public MessageBoundary updateUserDetails(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @RequestBody UserBoundary update) {
-		// TODO implement this method to update user details
+		return new MessageBoundary("invoked PUT method : updateUserDetails");
 	}
 
 }
