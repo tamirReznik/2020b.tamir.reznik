@@ -4,6 +4,9 @@ public class Location {
 
 	private double coordinate_X, coordinate_Y;
 
+	public Location() {
+	}
+
 	public Location(double coordinate_X, double coordinate_Y) {
 
 		this.coordinate_X = coordinate_X;
