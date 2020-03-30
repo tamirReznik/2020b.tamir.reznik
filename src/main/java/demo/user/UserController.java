@@ -17,7 +17,7 @@ public class UserController {
 
 	// Sapir - User related API - Login valid user
 	@RequestMapping(path = "/acs/users/login/{userDomain}/{userEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-
+	
 	public UserBoundary loginValidUser(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
 		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
@@ -40,7 +40,7 @@ public class UserController {
 		ub.setUserId(new UserIdBoundary("2020b.demo", userDetails.getEmail()));
 		ub.setTypeRole(userDetails.getTypeRole());
 		ub.setUsername(userDetails.getUsername());
-		ub.setAvater(userDetails.getAvater());
+		ub.setAvater(userDetails.getAvatar());
 		return ub;
 	}
 
@@ -48,7 +48,7 @@ public class UserController {
 	@RequestMapping(path = "/acs/users/{userDomain}/{userEmail}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public MessageBoundary updateUserDetails(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @RequestBody UserBoundary update) {
-		return new MessageBoundary("Update");
+		return new MessageBoundary("invoked PUT method : updateUserDetails");
 	}
 
 }

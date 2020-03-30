@@ -16,7 +16,7 @@ public class NewUserDetailsBoundary {
 	private String email;
 	private TypeEnumRole typeRole;
 	private String username;
-	private String avater;
+	private String avatar;
 	
 	public NewUserDetailsBoundary() {
 	}
@@ -45,12 +45,12 @@ public class NewUserDetailsBoundary {
 		this.username = username;
 	}
 
-	public String getAvater() {
-		return avater;
+	public String getAvatar() {
+		return avatar;
 	}
 
-	public void setAvater(String avater) {
-		this.avater = avater;
+	public void setAvatar(String avater) {
+		this.avatar = avater;
 	}
 
 	

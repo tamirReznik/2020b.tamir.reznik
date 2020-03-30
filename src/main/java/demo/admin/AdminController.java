@@ -55,21 +55,23 @@ public class AdminController {
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
 	public MessageBoundary deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
-		return new MessageBoundary("Delete commited!!");
+		// return type is void - change after proper method implementation!
+		return new MessageBoundary("invoked DELETE method : deleteAllUsers");
 	}
 
 //	http DELETE method - delete all elements(tamir)
 	@RequestMapping(path = "/acs/admin/elements/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
-	public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
+	public MessageBoundary deleteAllElements(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
-		// TODO implement this stub later
+		// return type is void - change after proper method implementation!
+		return new MessageBoundary("invoked DELETE method : deleteAllElements");
 	}
 
 //	http DELETE method - delete all actions(tamir)
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
-	public void deleteAllActions(@PathVariable("adminDomain") String adminDomain,
+	public MessageBoundary deleteAllActions(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
-		// TODO implement this stub later
+		// return type is void - change after proper method implementation!
+		return new MessageBoundary("invoked DELETE method : deleteAllActions");
 	}
-
 }
