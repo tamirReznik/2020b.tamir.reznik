@@ -1,6 +1,7 @@
 package demo.element;
 
 import java.sql.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import demo.TypeEnum;
+import demo.user.UserBoundary;
+import demo.user.UserIdBoundary;
 
 @RestController
 public class ElementController {
@@ -30,6 +33,7 @@ public class ElementController {
 		eb.setName("Parking Lot");
 		eb.setTimeStamp(new Date(0));
 		eb.setType(TypeEnum.CRITICAL);
+		eb.setCreateBy(Collections.singletonMap("user id", new UserIdBoundary("2020b.demo", "demo@gmail.com")));
 		Map<String, Object> tempMap = new HashMap<String, Object>();
 		tempMap.put("parking type", TypeEnum.CRITICAL.toString());
 		tempMap.put("test", "great test");
