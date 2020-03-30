@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import demo.MessageBoundary;
 import demo.NameNotFoundException;
 import demo.TypeEnumRole;
 
@@ -45,9 +46,9 @@ public class UserController {
 
 	// Sapir - User related API - Update user details
 	@RequestMapping(path = "/acs/users/{userDomain}/{userEmail}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void updateUserDetails(@PathVariable("userDomain") String userDomain,
+	public MessageBoundary updateUserDetails(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @RequestBody UserBoundary update) {
-		// TODO implement this method to update user details
+		return new MessageBoundary("Update");
 	}
 
 }
