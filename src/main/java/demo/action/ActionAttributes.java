@@ -16,7 +16,7 @@ package demo.action;
 public class ActionAttributes {
 	private String streetName;
 	private String cityName;
-	private Boolean isParkingEmpty;
+	private boolean isParkingEmpty;
 	private String nameOfParking;
 
 	public ActionAttributes() {

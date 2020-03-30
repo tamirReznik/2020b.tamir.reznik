@@ -5,6 +5,7 @@ import java.util.Map;
 //Anna
 
 import demo.TypeEnum;
+import demo.element.ElementIdBoundary;
 
 /*
 {
@@ -14,11 +15,16 @@ import demo.TypeEnum;
 	}, 	
 	"type":"CRITICAL",
 	"element":{
-	
+		"elementId": {
+            "domain": "2020b.demo",
+            "id": 0
+        }
 	},
-	"timestamp":"20200327T161001",
  	"invokedBy":{
-	
+ 		"userId": {
+            "domain": "2020b.demo",
+            "email": "anna@gmail.com"
+        }
 	},
 	"actionAttributes":{
 		"streetName": "Sheshet Hayamim",
@@ -27,13 +33,11 @@ import demo.TypeEnum;
 		"nameOfParking": "parking name"
 	} 	
 }
- 		
- 		
- 		
  */
 
 public class ActionBoundary {
 	private ActionIdBoundary actionId;
+	private ElementIdBoundary elementId;
 	private TypeEnum type;
 	private Map<String, Object> element;
 	private Date timestamp;
@@ -44,13 +48,22 @@ public class ActionBoundary {
 	}
 
 	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
-			Map<String, Object> invokedBy, ActionAttributes actionAttributes) {
+			Map<String, Object> invokedBy, ActionAttributes actionAttributes,ElementIdBoundary elementId) {
+		this.elementId = elementId;
 		this.actionId = actionId;
 		this.type = type;
 		this.element = element;
 		this.timestamp = timeStap;
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
+	}
+	
+public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public ActionIdBoundary getActionId() {
@@ -77,12 +90,12 @@ public class ActionBoundary {
 		this.element = element;
 	}
 
-	public Date getTimeStap() {
-		return timestamp;
+	public ElementIdBoundary getElementId() {
+		return elementId;
 	}
 
-	public void setTimeStap(Date timeStap) {
-		this.timestamp = timeStap;
+	public void setElementId(ElementIdBoundary elementId) {
+		this.elementId = elementId;
 	}
 
 	public Map<String, Object> getInvokedBy() {

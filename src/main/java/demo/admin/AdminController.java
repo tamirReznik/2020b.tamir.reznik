@@ -46,32 +46,32 @@ public class AdminController {
 						TypeEnum.CRITICAL,
 						Collections.singletonMap("elementId", new ElementIdBoundary("2020b.demo", i)), new Date(),
 						Collections.singletonMap("userId", new UserIdBoundary("2020b.demo", "test@gmail.com")),
-						new ActionAttributes("Rotchsild", "Tel Aviv", false, "TLVParking")))) // Stream of UserBoundry
+						new ActionAttributes("Rotchsild", "Tel Aviv", false, "TLVParking"),new ElementIdBoundary()))) // Stream of UserBoundry
 				.collect(Collectors.toList()) // List of UserBoundry
 				.toArray(new ActionBoundary[0]);// ComplexMessagBoundary[]
 	}
 
 //	http DELETE method - delete all users(tamir)
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
-	public MessageBoundary deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
+	public void deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		// return type is void - change after proper method implementation!
-		return new MessageBoundary("invoked DELETE method : deleteAllUsers");
+		//TODO implement delete all users method
 	}
 
 //	http DELETE method - delete all elements(tamir)
 	@RequestMapping(path = "/acs/admin/elements/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
-	public MessageBoundary deleteAllElements(@PathVariable("adminDomain") String adminDomain,
+	public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		// return type is void - change after proper method implementation!
-		return new MessageBoundary("invoked DELETE method : deleteAllElements");
+
 	}
 
 //	http DELETE method - delete all actions(tamir)
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
-	public MessageBoundary deleteAllActions(@PathVariable("adminDomain") String adminDomain,
+	public void deleteAllActions(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		// return type is void - change after proper method implementation!
-		return new MessageBoundary("invoked DELETE method : deleteAllActions");
+		//TODO implement delete all actions method
 	}
 }

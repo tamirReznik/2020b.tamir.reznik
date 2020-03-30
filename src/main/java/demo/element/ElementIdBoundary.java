@@ -16,7 +16,7 @@ public class ElementIdBoundary {
 	}
 
 	public ElementIdBoundary(String domain, int id) {
-		super();
+		
 		this.domain = domain;
 		this.id = id;
 	}

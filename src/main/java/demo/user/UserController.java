@@ -46,9 +46,9 @@ public class UserController {
 
 	// Sapir - User related API - Update user details
 	@RequestMapping(path = "/acs/users/{userDomain}/{userEmail}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public MessageBoundary updateUserDetails(@PathVariable("userDomain") String userDomain,
+	public void updateUserDetails(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @RequestBody UserBoundary update) {
-		return new MessageBoundary("invoked PUT method : updateUserDetails");
+		//TODO emplement updateUserDetails method
 	}
 
 }

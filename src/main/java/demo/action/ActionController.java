@@ -16,16 +16,14 @@ import demo.user.UserIdBoundary;
 @RestController
 public class ActionController {
 //Anna - actions related API - invoke an action
+	ElementIdBoundary eb = new ElementIdBoundary();
+
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ActionBoundary invokeAnAction(@RequestBody ActionBoundary actionDetails) {
-//		ActionBoundary ab = new ActionBoundary();
-		actionDetails.setActionId(new ActionIdBoundary("2020b.demo", 0));
-		actionDetails.setType(TypeEnum.NON_CRITICAL);
-		actionDetails.setElement(Collections.singletonMap("elementId", new ElementIdBoundary("2020b.demo", 0)));
-		actionDetails.setTimeStap(new Date());
-		actionDetails
-				.setInvokedBy(Collections.singletonMap("userId", new UserIdBoundary("2020b.demo", "test@gmail.com")));
-		actionDetails.setActionAttributes(new ActionAttributes("Rotchsild", "Tel Aviv", false, "TLVParking"));
+
+		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), 31567));
+		actionDetails.getElement().put("elementId", new ElementIdBoundary("test",0));
+		// actionDetails.setTimestamp(new Date());
 		return actionDetails;
 	}
 }
