@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import demo.MessageBoundary;
 import demo.TypeEnum;
 import demo.action.ActionAttributes;
 import demo.action.ActionBoundary;
@@ -52,9 +53,9 @@ public class AdminController {
 
 //	http DELETE method - delete all users(tamir)
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
-	public void deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
+	public MessageBoundary deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
-		// TODO implement this stub later
+		return new MessageBoundary("Delete commited!!");
 	}
 
 //	http DELETE method - delete all elements(tamir)
