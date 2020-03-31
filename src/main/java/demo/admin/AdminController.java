@@ -32,7 +32,7 @@ public class AdminController {
 	public UserBoundary[] exportAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		return IntStream.range(0, 5) // Stream of Integer
-				.mapToObj(i -> uc.loginValidUser(adminDomain, adminEmail)) // Stream of UserBoundry
+				.mapToObj(i -> uc.loginValidUser(adminDomain, adminEmail)) // Stream of UserBoundry @yonatan -  Not used i ?
 				.collect(Collectors.toList()) // List of UserBoundry
 				.toArray(new UserBoundary[0]); // ComplexMessagBoundary[]
 	}
