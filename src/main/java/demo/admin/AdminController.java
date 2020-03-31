@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.MessageBoundary;
 import demo.TypeEnum;
 import demo.action.ActionAttributes;
 import demo.action.ActionBoundary;
@@ -32,7 +31,7 @@ public class AdminController {
 	public UserBoundary[] exportAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		return IntStream.range(0, 5) // Stream of Integer
-				.mapToObj(i -> uc.loginValidUser(adminDomain, adminEmail)) // Stream of UserBoundry @yonatan -  Not used i ?
+				.mapToObj(i -> uc.loginValidUser(adminDomain, adminEmail)) // Stream of UserBoundry
 				.collect(Collectors.toList()) // List of UserBoundry
 				.toArray(new UserBoundary[0]); // ComplexMessagBoundary[]
 	}
@@ -46,7 +45,9 @@ public class AdminController {
 						TypeEnum.CRITICAL,
 						Collections.singletonMap("elementId", new ElementIdBoundary("2020b.demo", i)), new Date(),
 						Collections.singletonMap("userId", new UserIdBoundary("2020b.demo", "test@gmail.com")),
-						new ActionAttributes("Rotchsild", "Tel Aviv", false, "TLVParking"),new ElementIdBoundary()))) // Stream of UserBoundry
+						new ActionAttributes("Rotchsild", "Tel Aviv", false, "TLVParking"), new ElementIdBoundary()))) // Stream
+																														// of
+																														// UserBoundry
 				.collect(Collectors.toList()) // List of UserBoundry
 				.toArray(new ActionBoundary[0]);// ComplexMessagBoundary[]
 	}
@@ -56,7 +57,7 @@ public class AdminController {
 	public void deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		// return type is void - change after proper method implementation!
-		//TODO implement delete all users method
+		// TODO implement delete all users method
 	}
 
 //	http DELETE method - delete all elements(tamir)
@@ -72,6 +73,6 @@ public class AdminController {
 	public void deleteAllActions(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		// return type is void - change after proper method implementation!
-		//TODO implement delete all actions method
+		// TODO implement delete all actions method
 	}
 }

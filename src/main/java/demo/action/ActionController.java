@@ -1,17 +1,11 @@
 package demo.action;
 
-import java.util.Collections;
-import java.util.Date;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import demo.TypeEnum;
 import demo.element.ElementIdBoundary;
-import demo.user.UserIdBoundary;
 
 @RestController
 public class ActionController {
@@ -22,8 +16,8 @@ public class ActionController {
 	public ActionBoundary invokeAnAction(@RequestBody ActionBoundary actionDetails) {
 
 		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), 31567));
-		actionDetails.getElement().put("elementId", new ElementIdBoundary("test",0));
-		// actionDetails.setTimestamp(new Date());
+		actionDetails.getElement().put("elementId", new ElementIdBoundary("test", 0));
+
 		return actionDetails;
 	}
 }

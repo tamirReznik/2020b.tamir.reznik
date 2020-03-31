@@ -17,7 +17,7 @@ public class NewUserDetailsBoundary {
 	private TypeEnumRole typeRole;
 	private String username;
 	private String avatar;
-	
+
 	public NewUserDetailsBoundary() {
 	}
 
@@ -53,9 +53,4 @@ public class NewUserDetailsBoundary {
 		this.avatar = avater;
 	}
 
-	
-	
-	
-	
-	
 }

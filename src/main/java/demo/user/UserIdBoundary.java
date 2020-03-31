@@ -10,7 +10,7 @@ package demo.user;
 public class UserIdBoundary {
 	private String domain;
 	private String email;
-	
+
 	public UserIdBoundary() {
 	}
 
@@ -41,5 +41,4 @@ public class UserIdBoundary {
 		return "UserIdBoundary [domain=" + domain + ", email=" + email + "]";
 	}
 
-	
 }

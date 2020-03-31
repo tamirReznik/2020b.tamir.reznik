@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.MessageBoundary;
 import demo.NameNotFoundException;
 import demo.TypeEnumRole;
 
@@ -17,7 +16,7 @@ public class UserController {
 
 	// Sapir - User related API - Login valid user
 	@RequestMapping(path = "/acs/users/login/{userDomain}/{userEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
+
 	public UserBoundary loginValidUser(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
 		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
@@ -48,7 +47,7 @@ public class UserController {
 	@RequestMapping(path = "/acs/users/{userDomain}/{userEmail}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void updateUserDetails(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @RequestBody UserBoundary update) {
-		//TODO emplement updateUserDetails method
+		// TODO emplement updateUserDetails method
 	}
 
 }

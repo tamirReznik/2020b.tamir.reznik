@@ -48,7 +48,7 @@ public class ActionBoundary {
 	}
 
 	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
-			Map<String, Object> invokedBy, ActionAttributes actionAttributes,ElementIdBoundary elementId) {
+			Map<String, Object> invokedBy, ActionAttributes actionAttributes, ElementIdBoundary elementId) {
 		this.elementId = elementId;
 		this.actionId = actionId;
 		this.type = type;
@@ -57,8 +57,8 @@ public class ActionBoundary {
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
 	}
-	
-public Date getTimestamp() {
+
+	public Date getTimestamp() {
 		return timestamp;
 	}
 
