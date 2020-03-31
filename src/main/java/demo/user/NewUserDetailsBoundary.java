@@ -5,9 +5,9 @@ import demo.TypeEnumRole;
 /*
 {
 	"email":"demo@us.er",
-	"role":"PLAYER",
+ 	"typeRole": "PLAYER",
 	"username":"Demo User",
-	"avater":";-)"
+	"avatar":";-)"
 }
 
 

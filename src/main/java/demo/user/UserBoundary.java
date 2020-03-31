@@ -4,13 +4,10 @@ import demo.TypeEnumRole;
 
 /*
 {
-	"userId":{
-			"domain":"2020b.demo",
-			"email":"demo@us.er"
-		},
-	"role":"PLAYER",
+	"email":"demo@us.er",
+ 	"typeRole": "PLAYER",
 	"username":"Demo User",
-	"avater":";-)"
+	"avatar":";-)"
 }
 
 
@@ -19,7 +16,7 @@ public class UserBoundary {
 	private UserIdBoundary userId;
 	private TypeEnumRole typeRole;
 	private String username;
-	private String avater;
+	private String avatar;
 
 	public UserBoundary() {
 	}
@@ -49,11 +46,11 @@ public class UserBoundary {
 	}
 
 	public String getAvater() {
-		return avater;
+		return avatar;
 	}
 
 	public void setAvater(String avater) {
-		this.avater = avater;
+		this.avatar = avater;
 	}
 
 }

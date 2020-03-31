@@ -35,6 +35,7 @@ public class UserController {
 	// Sapir - User related API - Create a new user
 	@RequestMapping(path = "/acs/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary CreateNewUser(@RequestBody NewUserDetailsBoundary userDetails) {
+		System.out.println(userDetails.getEmail());
 		UserBoundary ub = new UserBoundary();
 		ub.setUserId(new UserIdBoundary("2020b.demo", userDetails.getEmail()));
 		ub.setTypeRole(userDetails.getTypeRole());
