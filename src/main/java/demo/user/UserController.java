@@ -23,9 +23,9 @@ public class UserController {
 			// return new UserBoundary();
 			UserBoundary ub = new UserBoundary();
 			ub.setUserId(new UserIdBoundary(userDomain, userEmail));
-			ub.setTypeRole(TypeEnumRole.PLAYER);
+			ub.setRole(TypeEnumRole.PLAYER);
 			ub.setUsername("Demo User");
-			ub.setAvater(";-)");
+			ub.setAvatar(";-)");
 			return ub;
 		} else {
 			throw new NameNotFoundException("Invalid user name/email");
@@ -38,9 +38,9 @@ public class UserController {
 		System.out.println(userDetails.getEmail());
 		UserBoundary ub = new UserBoundary();
 		ub.setUserId(new UserIdBoundary("2020b.demo", userDetails.getEmail()));
-		ub.setTypeRole(userDetails.getTypeRole());
+		ub.setRole(userDetails.getRole());
 		ub.setUsername(userDetails.getUsername());
-		ub.setAvater(userDetails.getAvatar());
+		ub.setAvatar(userDetails.getAvatar());
 		return ub;
 	}
 

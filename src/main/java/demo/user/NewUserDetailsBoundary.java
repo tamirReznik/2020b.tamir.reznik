@@ -5,7 +5,7 @@ import demo.TypeEnumRole;
 /*
 {
 	"email":"demo@us.er",
- 	"typeRole": "PLAYER",
+ 	"role": "PLAYER",
 	"username":"Demo User",
 	"avatar":";-)"
 }
@@ -14,7 +14,7 @@ import demo.TypeEnumRole;
 */
 public class NewUserDetailsBoundary {
 	private String email;
-	private TypeEnumRole typeRole;
+	private TypeEnumRole role;
 	private String username;
 	private String avatar;
 
@@ -29,12 +29,14 @@ public class NewUserDetailsBoundary {
 		this.email = email;
 	}
 
-	public TypeEnumRole getTypeRole() {
-		return typeRole;
+	
+
+	public TypeEnumRole getRole() {
+		return role;
 	}
 
-	public void setTypeRole(TypeEnumRole typeRole) {
-		this.typeRole = typeRole;
+	public void setRole(TypeEnumRole role) {
+		this.role = role;
 	}
 
 	public String getUsername() {
