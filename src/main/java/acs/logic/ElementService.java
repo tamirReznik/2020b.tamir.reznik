@@ -7,10 +7,10 @@ import acs.rest.boundaries.UserBoundary;
 
 public interface ElementService {
 
-	public ElementBoundary createUser();
-	public ElementBoundary update();
-	public List<ElementBoundary> getAllUsers();
-	public ElementBoundary getSpecificElements();
-	public void deleteAllActions();
+	public ElementBoundary create(String managerDomain , String managerEmail, ElementBoundary element);
+	public ElementBoundary update(String managerDomain , String managerEmail,String elementDomain ,String elementId,ElementBoundary update);
+	public List<ElementBoundary> getAll(String userDomain,String userEmail);
+	public ElementBoundary getSpecificElement(String userDomain,String userEmail,String elemantDomain ,String elementId);
+	public void deleteAllElements(String adminDomain ,String adminEmail);
 	
 }
