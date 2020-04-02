@@ -1,15 +1,23 @@
 package acs.logic;
 
-import java.util.List;
+import java.sql.Date;
+import java.util.Collections;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import acs.TypeEnum;
 import acs.rest.boundaries.ElementBoundary;
+import acs.rest.boundaries.ElementIdBoundary;
+import acs.rest.boundaries.Location;
 
 public class ElementServiceImplementation implements ElementService {
 
 	@Override
-	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary element) {
-		// TODO Auto-generated method stub
-		return null;
+	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
+		elementDetails.setElementId(new ElementIdBoundary("avichai", 3083462));
+		return elementDetails;
 	}
 
 	@Override
@@ -21,14 +29,24 @@ public class ElementServiceImplementation implements ElementService {
 
 	@Override
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
-		// TODO Auto-generated method stub
-		return null;
+		return IntStream.range(0, 5) // Stream of Integer
+				.mapToObj(i -> create("managerDomain", "managerEmail",
+				new ElementBoundary(new ElementIdBoundary(userDomain, i), TypeEnum.CRITICAL, "avichai",
+						true, new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
+						Collections.singletonMap("created by", "user")))) // Stream
+																			// of
+																			// ElementBoundary
+		.collect(Collectors.toList()); // List of ElementBoundry
+		
 	}
 
 	@Override
-	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elemantDomain,
+	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
-		// TODO Auto-generated method stub
+		create("managerDomain", "managerEmail",
+				new ElementBoundary(new ElementIdBoundary(userDomain, Integer.parseInt(elementId)), TypeEnum.CRITICAL, "avichai", true,
+						new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
+						Collections.singletonMap("created by", "user")));
 		return null;
 	}
 
