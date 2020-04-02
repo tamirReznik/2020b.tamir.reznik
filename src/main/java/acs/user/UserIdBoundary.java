@@ -1,4 +1,4 @@
-package demo.user;
+package acs.user;
 /*
 	{
 		"first":"User",

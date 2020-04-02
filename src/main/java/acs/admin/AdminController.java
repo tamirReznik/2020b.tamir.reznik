@@ -1,4 +1,4 @@
-package demo.admin;
+package acs.admin;
 
 import java.util.Collections;
 import java.util.Date;
@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.TypeEnum;
-import demo.action.ActionAttributes;
-import demo.action.ActionBoundary;
-import demo.action.ActionController;
-import demo.action.ActionIdBoundary;
-import demo.element.ElementIdBoundary;
-import demo.user.UserBoundary;
-import demo.user.UserController;
-import demo.user.UserIdBoundary;
+import acs.TypeEnum;
+import acs.action.ActionAttributes;
+import acs.action.ActionBoundary;
+import acs.action.ActionController;
+import acs.action.ActionIdBoundary;
+import acs.element.ElementIdBoundary;
+import acs.user.UserBoundary;
+import acs.user.UserController;
+import acs.user.UserIdBoundary;
 
 @RestController
 public class AdminController {

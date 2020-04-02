@@ -1,6 +1,6 @@
-package demo.user;
+package acs.user;
 
-import demo.TypeEnumRole;
+import acs.TypeEnumRole;
 
 /*
 {

@@ -1,4 +1,4 @@
-package demo.user;
+package acs.user;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.NameNotFoundException;
-import demo.TypeEnumRole;
+import acs.NameNotFoundException;
+import acs.TypeEnumRole;
 
 @RestController
 public class UserController {

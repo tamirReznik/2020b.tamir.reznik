@@ -1,4 +1,4 @@
-package demo.element;
+package acs.element;
 
 import java.sql.Date;
 import java.util.Collections;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.TypeEnum;
-import demo.TypeEnumRole;
-import demo.user.UserBoundary;
-import demo.user.UserIdBoundary;
+import acs.TypeEnum;
+import acs.TypeEnumRole;
+import acs.user.UserBoundary;
+import acs.user.UserIdBoundary;
 
 @RestController
 public class ElementController {

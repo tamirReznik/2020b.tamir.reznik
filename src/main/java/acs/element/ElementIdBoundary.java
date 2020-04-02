@@ -1,25 +1,22 @@
-package demo.action;
-//Anna
+package acs.element;
 
 /*
- 	
- 	
 {
-	"domain": "tamir",
-		"id": "54"	
-} 	
- */
+	"domain":"User",
+	"id": 456
+}
 
-public class ActionIdBoundary {
+*/
+public class ElementIdBoundary {
 	private String domain;
 	private int id;
 
-	public ActionIdBoundary() {
+	public ElementIdBoundary() {
 
 	}
 
-	public ActionIdBoundary(String domain, int id) {
-		super();
+	public ElementIdBoundary(String domain, int id) {
+		
 		this.domain = domain;
 		this.id = id;
 	}
@@ -39,5 +36,4 @@ public class ActionIdBoundary {
 	public void setId(int id) {
 		this.id = id;
 	}
-
 }

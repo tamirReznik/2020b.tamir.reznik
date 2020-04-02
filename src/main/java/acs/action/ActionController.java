@@ -1,11 +1,12 @@
-package demo.action;
+package acs.action;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import demo.element.ElementIdBoundary;
+
+import acs.element.ElementIdBoundary;
 
 @RestController
 public class ActionController {
