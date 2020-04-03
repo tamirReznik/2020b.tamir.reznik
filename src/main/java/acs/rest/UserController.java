@@ -37,6 +37,7 @@ public class UserController {
 	public UserBoundary loginValidUser(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
 		return this.userService.login(userDomain, userEmail);
+		
 //		return userService.login(userDomain, userEmail);
 //		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
 //			// return new UserBoundary();

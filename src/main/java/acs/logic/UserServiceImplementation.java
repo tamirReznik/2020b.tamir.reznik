@@ -15,7 +15,7 @@ public class UserServiceImplementation implements UserService {
 
 	////Anna&Sapir - done
 	public UserBoundary createUser(UserBoundary user) {
-		user.setUserId(new UserIdBoundary("2020b.demo", user.getUserId().getEmail()));
+		user.setUserId(new UserIdBoundary("", user.getUserId().getEmail()));
 		user.getRole();//user.setRole(user.getRole());
 		user.getUsername();//user.setUsername(user.getUsername());
 		user.getAvatar();//user.setAvatar(user.getAvatar());
