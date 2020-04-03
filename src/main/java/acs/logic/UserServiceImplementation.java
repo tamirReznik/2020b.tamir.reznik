@@ -15,10 +15,10 @@ public class UserServiceImplementation implements UserService {
 
 	////Anna&Sapir - done
 	public UserBoundary createUser(UserBoundary user) {
-		user.setUserId(new UserIdBoundary("", user.getUserId().getEmail()));
-		user.getRole();//user.setRole(user.getRole());
-		user.getUsername();//user.setUsername(user.getUsername());
-		user.getAvatar();//user.setAvatar(user.getAvatar());
+//		user.setUserId(new UserIdBoundary("", user.getUserId().getEmail()));
+//		user.getRole();//user.setRole(user.getRole());
+//		user.getUsername();//user.setUsername(user.getUsername());
+//		user.getAvatar();//user.setAvatar(user.getAvatar());
 		return user;
 	}
 	

@@ -18,6 +18,13 @@ public class NewUserDetailsBoundary {
 	private String username;
 	private String avatar;
 
+	public NewUserDetailsBoundary(String email, TypeEnumRole role, String username, String avatar) {
+		this.email = email;
+		this.role = role;
+		this.username = username;
+		this.avatar = avatar;
+	}
+
 	public NewUserDetailsBoundary() {
 	}
 

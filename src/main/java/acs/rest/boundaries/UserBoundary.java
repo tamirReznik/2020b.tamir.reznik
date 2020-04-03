@@ -21,6 +21,14 @@ public class UserBoundary {
 	public UserBoundary() {
 	}
 
+
+	public UserBoundary(UserIdBoundary userId, TypeEnumRole role, String username, String avatar) {
+		this.userId = userId;
+		this.role = role;
+		this.username = username;
+		this.avatar = avatar;
+	}
+
 	public UserIdBoundary getUserId() {
 		return userId;
 	}
@@ -28,8 +36,6 @@ public class UserBoundary {
 	public void setUserId(UserIdBoundary userId) {
 		this.userId = userId;
 	}
-
-
 
 	public TypeEnumRole getRole() {
 		return role;
