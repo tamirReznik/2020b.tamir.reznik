@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.TypeEnum;
+import acs.logic.UserService;
 import acs.rest.boundaries.ActionAttributes;
 import acs.rest.boundaries.ActionBoundary;
 import acs.rest.boundaries.ActionIdBoundary;
@@ -25,13 +27,30 @@ public class AdminController {
 	UserController uc = new UserController();
 	ActionController ac = new ActionController();
 
+	private UserService userService;
+	
+	@Autowired
+	public AdminController() {
+	}
+	
+	public AdminController(UserService userService) {
+		super();
+		this.userService = userService;
+	}
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+	
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary[] exportAllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
-		return IntStream.range(0, 5) // Stream of Integer
-				.mapToObj(i -> uc.loginValidUser(adminDomain, adminEmail)) // Stream of UserBoundry
-				.collect(Collectors.toList()) // List of UserBoundry
-				.toArray(new UserBoundary[0]); // ComplexMessagBoundary[]
+		return this.userService.getAllUsers(adminDomain, adminEmail).toArray(new UserBoundary[0]);
+		
+//		return IntStream.range(0, 5) // Stream of Integer
+//				.mapToObj(i -> uc.loginValidUser(adminDomain, adminEmail)) // Stream of UserBoundry
+//				.collect(Collectors.toList()) // List of UserBoundry
+//				.toArray(new UserBoundary[0]); // ComplexMessagBoundary[]
 	}
 
 	// Anna -Admin API -Export all actions
