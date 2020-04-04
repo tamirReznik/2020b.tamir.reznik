@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
-
 import acs.logic.UserService;
 import acs.rest.boundaries.NewUserDetailsBoundary;
 import acs.rest.boundaries.UserBoundary;
@@ -18,16 +17,16 @@ import acs.rest.boundaries.UserIdBoundary;
 @RestController
 public class UserController {
 	private UserService userService;
-	
-	
+
 	@Autowired
 	public UserController() {
 	}
-	
+
 	public UserController(UserService userService) {
 		super();
 		this.userService = userService;
 	}
+
 	@Autowired
 	public void setUserService(UserService userService) {
 		this.userService = userService;
@@ -38,7 +37,7 @@ public class UserController {
 	public UserBoundary loginValidUser(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
 		return this.userService.login(userDomain, userEmail);
-		
+
 //		return userService.login(userDomain, userEmail);
 //		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
 //			// return new UserBoundary();
@@ -57,8 +56,10 @@ public class UserController {
 	@RequestMapping(path = "/acs/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary CreateNewUser(@RequestBody NewUserDetailsBoundary userDetails) {
 //		UserBoundary ub = new UserBoundary();
-		return this.userService.createUser(new UserBoundary(new UserIdBoundary("",userDetails.getEmail()),userDetails.getRole(),userDetails.getUsername(),userDetails.getAvatar()));
-		//new UserBoundary(new UserIdBoundary("",userDetails.getEmail()),userDetails.getRole(),userDetails.getUsername(),userDetails.getAvatar())
+		return this.userService.createUser(new UserBoundary(new UserIdBoundary("", userDetails.getEmail()),
+				userDetails.getRole(), userDetails.getUsername(), userDetails.getAvatar()));
+		// new UserBoundary(new
+		// UserIdBoundary("",userDetails.getEmail()),userDetails.getRole(),userDetails.getUsername(),userDetails.getAvatar())
 //		System.out.println(userDetails.getEmail());
 //		UserBoundary ub = new UserBoundary();
 //		ub.setUserId(new UserIdBoundary("2020b.demo", userDetails.getEmail()));

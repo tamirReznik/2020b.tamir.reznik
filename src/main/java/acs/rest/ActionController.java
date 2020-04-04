@@ -1,26 +1,43 @@
 package acs.rest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import acs.logic.ActionService;
 import acs.rest.boundaries.ActionBoundary;
 import acs.rest.boundaries.ActionIdBoundary;
-import acs.rest.boundaries.ElementIdBoundary;
 
 @RestController
 public class ActionController {
-//Anna - actions related API - invoke an action
-	ElementIdBoundary eb = new ElementIdBoundary();
+	private ActionService actionService;
 
+	public ActionController(ActionService actionService) {
+		super();
+		this.actionService = actionService;
+
+	}
+
+	@Autowired
+	public ActionController() {
+
+	}
+
+	@Autowired
+	public void setActionService(ActionService actionService) {
+		this.actionService = actionService;
+	}
+
+	// This method need to return any object relate to the action... for now it
+	// returns message object notifying on invoke (temporary)
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ActionBoundary invokeAnAction(@RequestBody ActionBoundary actionDetails) {
+	public Object invokeAnAction(@RequestBody ActionBoundary actionDetails) {
 
 		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), 31567));
-		actionDetails.getElement().put("elementId", new ElementIdBoundary("test", 0));
+		return actionService.invokeAction(actionDetails);
 
-		return actionDetails;
 	}
 }

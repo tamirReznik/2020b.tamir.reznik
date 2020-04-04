@@ -31,21 +31,21 @@ public class ElementServiceImplementation implements ElementService {
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
 		return IntStream.range(0, 5) // Stream of Integer
 				.mapToObj(i -> create("managerDomain", "managerEmail",
-				new ElementBoundary(new ElementIdBoundary(userDomain, i), TypeEnum.CRITICAL, "avichai",
-						true, new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
-						Collections.singletonMap("created by", "user")))) // Stream
-																			// of
-																			// ElementBoundary
-		.collect(Collectors.toList()); // List of ElementBoundry
-		
+						new ElementBoundary(new ElementIdBoundary(userDomain, i), TypeEnum.CRITICAL, "avichai", true,
+								new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
+								Collections.singletonMap("created by", "user")))) // Stream
+																					// of
+																					// ElementBoundary
+				.collect(Collectors.toList()); // List of ElementBoundry
+
 	}
 
 	@Override
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
 		create("managerDomain", "managerEmail",
-				new ElementBoundary(new ElementIdBoundary(userDomain, Integer.parseInt(elementId)), TypeEnum.CRITICAL, "avichai", true,
-						new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
+				new ElementBoundary(new ElementIdBoundary(userDomain, Integer.parseInt(elementId)), TypeEnum.CRITICAL,
+						"avichai", true, new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
 						Collections.singletonMap("created by", "user")));
 		return null;
 	}
@@ -53,7 +53,7 @@ public class ElementServiceImplementation implements ElementService {
 	@Override
 	public void deleteAllElements(String adminDomain, String adminEmail) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

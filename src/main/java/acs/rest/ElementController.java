@@ -1,32 +1,17 @@
 package acs.rest;
 
-import java.sql.Date;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import acs.TypeEnum;
-import acs.TypeEnumRole;
 import acs.logic.ElementServiceImplementation;
 import acs.rest.boundaries.ElementBoundary;
-import acs.rest.boundaries.ElementIdBoundary;
-import acs.rest.boundaries.Location;
-import acs.rest.boundaries.UserBoundary;
-import acs.rest.boundaries.UserIdBoundary;
 
 @RestController
 public class ElementController {
-	public ElementServiceImplementation es= new ElementServiceImplementation(); 
-//	http POST method - Create (& returns) new element (avichai & tamir)
+	public ElementServiceImplementation es = new ElementServiceImplementation();
 
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary CreateNewElement(@PathVariable("managerDomain") String managerDomain,
@@ -36,12 +21,11 @@ public class ElementController {
 //		return elementDetails;
 	}
 
-//	http GET method - returns element via domain & id(tamir)
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary RetreiveElement(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
-			@PathVariable("elementId") int elementId) { 
-		
+			@PathVariable("elementId") int elementId) {
+
 		return es.getSpecificElement(userDomain, userEmail, elementDomain, String.valueOf(elementId));
 //		return CreateNewElement("managerDomain", "managerEmail",
 //				new ElementBoundary(new ElementIdBoundary(userDomain, elementId), TypeEnum.CRITICAL, "avichai", true,
@@ -49,7 +33,6 @@ public class ElementController {
 //						Collections.singletonMap("created by", "user")));
 	}
 
-//	http GET method - returns Array Of Elements(tamir)
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary[] RetreiveElementArr(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
@@ -66,7 +49,6 @@ public class ElementController {
 
 	}
 
-//	http PUT method - update element(tamir)
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void updateUserDetails(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @PathVariable("elementDomain") String elementDomain,
