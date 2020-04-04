@@ -1,18 +1,39 @@
 package acs.rest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import acs.logic.ElementService;
 import acs.logic.ElementServiceImplementation;
+import acs.logic.UserService;
 import acs.rest.boundaries.ElementBoundary;
 
 @RestController
 public class ElementController {
 	public ElementServiceImplementation es = new ElementServiceImplementation();
+	private ElementService elementService;
+	
+	@Autowired
+	public ElementController () {
+		
+	}
+	
+	public ElementController(ElementService elementService) {
+		super();
+		this.elementService = elementService;
+	}
+	
 
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.elementService = elementService;
+	}
+	
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary CreateNewElement(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @RequestBody ElementBoundary elementDetails) {
