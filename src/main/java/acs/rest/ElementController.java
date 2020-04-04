@@ -15,7 +15,6 @@ import acs.rest.boundaries.ElementBoundary;
 
 @RestController
 public class ElementController {
-	public ElementServiceImplementation es = new ElementServiceImplementation();
 	private ElementService elementService;
 	
 	@Autowired
@@ -37,7 +36,7 @@ public class ElementController {
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary CreateNewElement(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @RequestBody ElementBoundary elementDetails) {
-		return es.create(managerDomain, managerEmail, elementDetails);
+		return this.elementService.create(managerDomain, managerEmail, elementDetails);
 //		elementDetails.setElementId(new ElementIdBoundary("avichai", 3083462));
 //		return elementDetails;
 	}
@@ -47,7 +46,7 @@ public class ElementController {
 			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
 			@PathVariable("elementId") int elementId) {
 
-		return es.getSpecificElement(userDomain, userEmail, elementDomain, String.valueOf(elementId));
+		return this.elementService.getSpecificElement(userDomain, userEmail, elementDomain, String.valueOf(elementId));
 //		return CreateNewElement("managerDomain", "managerEmail",
 //				new ElementBoundary(new ElementIdBoundary(userDomain, elementId), TypeEnum.CRITICAL, "avichai", true,
 //						new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
@@ -57,7 +56,7 @@ public class ElementController {
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary[] RetreiveElementArr(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
-		return es.getAll(userDomain, userEmail).toArray(new ElementBoundary[0]);
+		return this.elementService.getAll(userDomain, userEmail).toArray(new ElementBoundary[0]);
 //		return IntStream.range(0, 5) // Stream of Integer
 //				.mapToObj(i -> CreateNewElement("managerDomain", "managerEmail",
 //						new ElementBoundary(new ElementIdBoundary(userDomain, i), TypeEnum.CRITICAL, "avichai",
