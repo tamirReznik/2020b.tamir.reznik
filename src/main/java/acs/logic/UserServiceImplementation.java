@@ -15,6 +15,7 @@ import acs.rest.boundaries.UserIdBoundary;
 public class UserServiceImplementation implements UserService {
 
 	public UserBoundary createUser(UserBoundary user) {
+		// save user to mockup
 		return user;
 	}
 

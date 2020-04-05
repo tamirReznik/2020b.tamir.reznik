@@ -9,30 +9,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.ElementService;
-import acs.logic.ElementServiceImplementation;
-import acs.logic.UserService;
 import acs.rest.boundaries.ElementBoundary;
 
 @RestController
 public class ElementController {
 	private ElementService elementService;
-	
+
 	@Autowired
-	public ElementController () {
-		
+	public ElementController() {
+
 	}
-	
+
 	public ElementController(ElementService elementService) {
 		super();
 		this.elementService = elementService;
 	}
-	
 
 	@Autowired
-	public void setUserService(UserService userService) {
+	public void setElementService(ElementService elementService) {
 		this.elementService = elementService;
 	}
-	
+
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary CreateNewElement(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @RequestBody ElementBoundary elementDetails) {
@@ -73,6 +70,6 @@ public class ElementController {
 	public void updateUserDetails(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @PathVariable("elementDomain") String elementDomain,
 			@PathVariable("elementId") String elementId, @RequestBody ElementBoundary update) {
-		// TODO implement this method to update element details
+		elementService.update(managerDomain, managerEmail, elementDomain, elementId, update);
 	}
 }

@@ -23,8 +23,9 @@ public class ElementServiceImplementation implements ElementService {
 	@Override
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
-		// TODO Auto-generated method stub
-		return null;
+		update.getElementId().setDomain(elementDomain);
+		update.getElementId().setId(Integer.parseInt(elementId));
+		return update;
 	}
 
 	@Override
