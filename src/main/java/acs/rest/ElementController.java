@@ -34,36 +34,20 @@ public class ElementController {
 	public ElementBoundary CreateNewElement(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @RequestBody ElementBoundary elementDetails) {
 		return this.elementService.create(managerDomain, managerEmail, elementDetails);
-//		elementDetails.setElementId(new ElementIdBoundary("avichai", 3083462));
-//		return elementDetails;
 	}
 
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary RetreiveElement(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
-			@PathVariable("elementId") int elementId) {
+			@PathVariable("elementId") String elementId) {
 
 		return this.elementService.getSpecificElement(userDomain, userEmail, elementDomain, String.valueOf(elementId));
-//		return CreateNewElement("managerDomain", "managerEmail",
-//				new ElementBoundary(new ElementIdBoundary(userDomain, elementId), TypeEnum.CRITICAL, "avichai", true,
-//						new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
-//						Collections.singletonMap("created by", "user")));
 	}
 
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary[] RetreiveElementArr(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail) {
 		return this.elementService.getAll(userDomain, userEmail).toArray(new ElementBoundary[0]);
-//		return IntStream.range(0, 5) // Stream of Integer
-//				.mapToObj(i -> CreateNewElement("managerDomain", "managerEmail",
-//						new ElementBoundary(new ElementIdBoundary(userDomain, i), TypeEnum.CRITICAL, "avichai",
-//								true, new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
-//								Collections.singletonMap("created by", "user")))) // Stream
-//																					// of
-//																					// ElementBoundary
-//				.collect(Collectors.toList()) // List of ElementBoundry
-//				.toArray(new ElementBoundary[0]);
-
 	}
 
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)

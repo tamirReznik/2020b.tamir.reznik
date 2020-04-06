@@ -16,7 +16,7 @@ public class ElementServiceImplementation implements ElementService {
 
 	@Override
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
-		elementDetails.setElementId(new ElementIdBoundary("avichai", 3083462));
+		elementDetails.setElementId(new ElementIdBoundary("avichai", "3083462"));
 		return elementDetails;
 	}
 
@@ -24,7 +24,7 @@ public class ElementServiceImplementation implements ElementService {
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 		update.getElementId().setDomain(elementDomain);
-		update.getElementId().setId(Integer.parseInt(elementId));
+		update.getElementId().setId(elementId);
 		return update;
 	}
 
@@ -32,7 +32,7 @@ public class ElementServiceImplementation implements ElementService {
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
 		return IntStream.range(0, 5) // Stream of Integer
 				.mapToObj(i -> create("managerDomain", "managerEmail",
-						new ElementBoundary(new ElementIdBoundary(userDomain, i), TypeEnum.CRITICAL, "avichai", true,
+						new ElementBoundary(new ElementIdBoundary(userDomain, String.valueOf(i)), TypeEnum.CRITICAL, "avichai", true,
 								new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
 								Collections.singletonMap("created by", "user")))) // Stream
 																					// of
@@ -45,7 +45,7 @@ public class ElementServiceImplementation implements ElementService {
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
 		create("managerDomain", "managerEmail",
-				new ElementBoundary(new ElementIdBoundary(userDomain, Integer.parseInt(elementId)), TypeEnum.CRITICAL,
+				new ElementBoundary(new ElementIdBoundary(userDomain, elementId), TypeEnum.CRITICAL,
 						"avichai", true, new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
 						Collections.singletonMap("created by", "user")));
 		return null;
