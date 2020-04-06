@@ -26,13 +26,12 @@ import acs.TypeEnum;
 }
  */
 public class ElementBoundary {
-	ElementIdBoundary elementId;
-
-	TypeEnum type;
-	String name;
-	Boolean active;
-	Date timeStamp;
-	Map<String, Object> createBy;
+	private ElementIdBoundary elementId;
+	private TypeEnum type;
+	private String name;
+	private Boolean active;
+	private Date timeStamp;
+	private Map<String, Object> createBy;
 	private Location location;
 	private Map<String, Object> elemntAttributes;
 
