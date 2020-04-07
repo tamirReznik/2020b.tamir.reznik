@@ -1,4 +1,4 @@
-package acs.logic;
+package acs.logic.implementation;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import acs.data.Converter;
 import acs.data.UserEntity;
-import acs.rest.boundaries.UserBoundary;
+import acs.logic.ObjectNotFoundException;
+import acs.logic.UserService;
+import acs.rest.boundaries.user.UserBoundary;
 
 
 

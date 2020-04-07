@@ -1,24 +1,27 @@
-package acs.rest.boundaries;
+package acs.rest.boundaries.action;
 
 /*
+ 	
+ 	
 {
-	"domain":"User",
-	"id": 456
-}
+	"domain": "tamir",
+		"id": "54"	
+} 	
+ */
 
-*/
-public class ElementIdBoundary {
+public class ActionIdBoundary {
+
 	private String domain;
 	private String id;
 
-	public ElementIdBoundary() {
-
-	}
-
-	public ElementIdBoundary(String domain, String id) {
-		
+	public ActionIdBoundary(String domain, String id) {
+		super();
 		this.domain = domain;
 		this.id = id;
+	}
+
+	public ActionIdBoundary() {
+
 	}
 
 	public String getDomain() {

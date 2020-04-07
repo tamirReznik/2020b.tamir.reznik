@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import acs.logic.ActionService;
 import acs.logic.ElementService;
 import acs.logic.UserService;
-
-import acs.rest.boundaries.ActionBoundary;
-
-import acs.rest.boundaries.UserBoundary;
+import acs.rest.boundaries.action.ActionBoundary;
+import acs.rest.boundaries.user.UserBoundary;
 
 @RestController
 public class AdminController {

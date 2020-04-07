@@ -1,10 +1,11 @@
-package acs.rest.boundaries;
+package acs.rest.boundaries.action;
 
 import java.util.Date;
 import java.util.Map;
 //Anna
 
-import acs.TypeEnum;
+import acs.data.TypeEnum;
+import acs.rest.boundaries.element.ElementIdBoundary;
 
 /*
 {
@@ -37,17 +38,18 @@ import acs.TypeEnum;
 public class ActionBoundary {
 	private ActionIdBoundary actionId;
 	private ElementIdBoundary elementId;
-	private TypeEnum type;
+	private String type;
 	private Map<String, Object> element;
 	private Date timestamp;
 	private Map<String, Object> invokedBy;
-	private ActionAttributes actionAttributes;
+//	private ActionAttributes actionAttributes;
+	private Map<String, Object> actionAttributes;
 
 	public ActionBoundary() {
 	}
 
-	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
-			Map<String, Object> invokedBy, ActionAttributes actionAttributes, ElementIdBoundary elementId) {
+	public ActionBoundary(ActionIdBoundary actionId, String type, Map<String, Object> element, Date timeStap,
+			Map<String, Object> invokedBy, Map<String, Object> actionAttributes, ElementIdBoundary elementId) {
 		this.elementId = elementId;
 		this.actionId = actionId;
 		this.type = type;
@@ -73,11 +75,11 @@ public class ActionBoundary {
 		this.actionId = actionId;
 	}
 
-	public TypeEnum getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(TypeEnum type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 
@@ -105,11 +107,11 @@ public class ActionBoundary {
 		this.invokedBy = invokedBy;
 	}
 
-	public ActionAttributes getActionAttributes() {
+	public Map<String, Object> getActionAttributes() {
 		return actionAttributes;
 	}
 
-	public void setActionAttributes(ActionAttributes actionAttributes) {
+	public void setActionAttributes(Map<String, Object> actionAttributes) {
 		this.actionAttributes = actionAttributes;
 	}
 

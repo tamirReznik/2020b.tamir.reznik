@@ -1,4 +1,4 @@
-package acs.rest.boundaries;
+package acs.rest.boundaries.user;
 /*
 	{
 		"domain":"2020b.tamir.reznik",

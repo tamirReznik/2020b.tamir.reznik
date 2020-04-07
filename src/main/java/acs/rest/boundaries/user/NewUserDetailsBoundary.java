@@ -1,6 +1,6 @@
-package acs.rest.boundaries;
+package acs.rest.boundaries.user;
 
-import acs.TypeEnumRole;
+import acs.data.UserRole;
 
 /*
 {
@@ -14,11 +14,11 @@ import acs.TypeEnumRole;
 */
 public class NewUserDetailsBoundary {
 	private String email;
-	private TypeEnumRole role;
+	private UserRole role;
 	private String username;
 	private String avatar;
 
-	public NewUserDetailsBoundary(String email, TypeEnumRole role, String username, String avatar) {
+	public NewUserDetailsBoundary(String email, UserRole role, String username, String avatar) {
 		this.email = email;
 		this.role = role;
 		this.username = username;
@@ -36,13 +36,11 @@ public class NewUserDetailsBoundary {
 		this.email = email;
 	}
 
-	
-
-	public TypeEnumRole getRole() {
+	public UserRole getRole() {
 		return role;
 	}
 
-	public void setRole(TypeEnumRole role) {
+	public void setRole(UserRole role) {
 		this.role = role;
 	}
 

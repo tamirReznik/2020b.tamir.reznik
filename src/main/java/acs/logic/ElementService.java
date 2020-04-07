@@ -2,7 +2,7 @@ package acs.logic;
 
 import java.util.List;
 
-import acs.rest.boundaries.ElementBoundary;
+import acs.rest.boundaries.element.ElementBoundary;
 
 public interface ElementService {
 

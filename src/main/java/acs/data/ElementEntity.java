@@ -1,11 +1,10 @@
 package acs.data;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.Map;
 
-import acs.TypeEnum;
-import acs.rest.boundaries.ElementIdBoundary;
-import acs.rest.boundaries.Location;
+import acs.rest.boundaries.element.ElementIdBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 public class ElementEntity {
 	private ElementIdBoundary elementId;
@@ -13,16 +12,16 @@ public class ElementEntity {
 	private String name;
 	private Boolean active;
 	private Date timeStamp;
-	private Map<String, Object> createBy;
-	private Location location;
+	private Map<String, UserIdBoundary> createBy;
+	private Map<String, Double> location;
 	private Map<String, Object> elemntAttributes;
-	
-	public ElementEntity () {
-		
+
+	public ElementEntity() {
+
 	}
-	
+
 	public ElementEntity(ElementIdBoundary elementId, TypeEnum type, String name, Boolean active, Date timeStamp,
-			Location location, Map<String, Object> elemntAttributes, Map<String, Object> createBy) {
+			Map<String, Double> location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -32,6 +31,14 @@ public class ElementEntity {
 		this.createBy = createBy;
 		this.location = location;
 		this.elemntAttributes = elemntAttributes;
+	}
+
+	public Map<String, Double> getLocation() {
+		return location;
+	}
+
+	public void setLocation(Map<String, Double> location) {
+		this.location = location;
 	}
 
 	public ElementIdBoundary getElementId() {
@@ -74,20 +81,12 @@ public class ElementEntity {
 		this.timeStamp = timeStamp;
 	}
 
-	public Map<String, Object> getCreateBy() {
+	public Map<String, UserIdBoundary> getCreateBy() {
 		return createBy;
 	}
 
-	public void setCreateBy(Map<String, Object> createBy) {
+	public void setCreateBy(Map<String, UserIdBoundary> createBy) {
 		this.createBy = createBy;
-	}
-
-	public Location getLocation() {
-		return location;
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
 	}
 
 	public Map<String, Object> getElemntAttributes() {
@@ -97,6 +96,5 @@ public class ElementEntity {
 	public void setElemntAttributes(Map<String, Object> elemntAttributes) {
 		this.elemntAttributes = elemntAttributes;
 	}
-	
-	
+
 }

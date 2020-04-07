@@ -1,4 +1,4 @@
-package acs.rest.boundaries;
+package acs.rest.boundaries.action;
 
 /*
 	
@@ -14,14 +14,14 @@ package acs.rest.boundaries;
 public class ActionAttributes {
 	private String streetName;
 	private String cityName;
-	private boolean isParkingEmpty;
+	private Boolean isParkingEmpty;
 	private String nameOfParking;
 
 	public ActionAttributes() {
 
 	}
 
-	public ActionAttributes(String streetName, String cityName, boolean isParkingEmpty, String nameOfParking) {
+	public ActionAttributes(String streetName, String cityName, Boolean isParkingEmpty, String nameOfParking) {
 		super();
 		this.streetName = streetName;
 		this.cityName = cityName;
@@ -45,11 +45,11 @@ public class ActionAttributes {
 		this.cityName = cityName;
 	}
 
-	public boolean isParkingEmpty() {
+	public Boolean isParkingEmpty() {
 		return isParkingEmpty;
 	}
 
-	public void setParkingEmpty(boolean isParkingEmpty) {
+	public void setParkingEmpty(Boolean isParkingEmpty) {
 		this.isParkingEmpty = isParkingEmpty;
 	}
 

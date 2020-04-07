@@ -2,7 +2,7 @@ package acs.logic;
 
 import java.util.List;
 
-import acs.rest.boundaries.ActionBoundary;
+import acs.rest.boundaries.action.ActionBoundary;
 
 public interface ActionService {
 

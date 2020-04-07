@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.ActionService;
-import acs.rest.boundaries.ActionBoundary;
-import acs.rest.boundaries.ActionIdBoundary;
+import acs.rest.boundaries.action.ActionBoundary;
+import acs.rest.boundaries.action.ActionIdBoundary;
 
 @RestController
 public class ActionController {
@@ -36,7 +36,7 @@ public class ActionController {
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public Object invokeAnAction(@RequestBody ActionBoundary actionDetails) {
 
-		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), 31567));
+		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), "31567"));
 		return actionService.invokeAction(actionDetails);
 
 	}

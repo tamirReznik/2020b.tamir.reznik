@@ -1,25 +1,27 @@
-package acs.rest.boundaries;
+package acs.rest.boundaries.element;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.Map;
 
-import acs.TypeEnum;
+import acs.data.TypeEnum;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 /*
 {
     "elementId": {
-        "domain": null,
-        "id": 0
+        "domain": "{managerDomain}",
+        "id": "5303776d-87d8-4d84-b8c3-b1240787e2a8"
     },
-    "type": "CRITICAL",
+    "type": "demoElement",
     "name": "Parking Lot",
     "active": true,
     "timeStamp": "1970-01-01",
-    "Location": {
-        "coordinate_X":35.3256,
-        "coordinate_Y":46.0234
+    "createBy": null,
+    "location": {
+        "lat": 35.3256,
+        "lng": 46.0234
     },
-    "elemntAttributes": {
+    "elementAttributes": {
         "test": "great test",
         "parking type": "CRITICAL"
     }
@@ -31,12 +33,12 @@ public class ElementBoundary {
 	private String name;
 	private Boolean active;
 	private Date timeStamp;
-	private Map<String, Object> createBy;
-	private Location location;
-	private Map<String, Object> elemntAttributes;
+	private Map<String, UserIdBoundary> createBy;
+	private Map<String, Double> location;
+	private Map<String, Object> elementAttributes;
 
 	public ElementBoundary(ElementIdBoundary elementId, TypeEnum type, String name, Boolean active, Date timeStamp,
-			Location location, Map<String, Object> elemntAttributes, Map<String, Object> createBy) {
+			Map<String, Double> location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -45,7 +47,7 @@ public class ElementBoundary {
 		this.timeStamp = timeStamp;
 		this.createBy = createBy;
 		this.location = location;
-		this.elemntAttributes = elemntAttributes;
+		this.elementAttributes = elemntAttributes;
 	}
 
 	public ElementBoundary() {
@@ -83,20 +85,12 @@ public class ElementBoundary {
 		this.timeStamp = timeStamp;
 	}
 
-	public Location getLocation() {
-		return location;
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
 	public Map<String, Object> getElemntAttributes() {
-		return elemntAttributes;
+		return elementAttributes;
 	}
 
 	public void setElemntAttributes(Map<String, Object> elemntAttributes) {
-		this.elemntAttributes = elemntAttributes;
+		this.elementAttributes = elemntAttributes;
 	}
 
 	public ElementIdBoundary getElementId() {
@@ -107,11 +101,27 @@ public class ElementBoundary {
 		this.elementId = elementId;
 	}
 
-	public Map<String, Object> getCreateBy() {
+	public Map<String, Double> getLocation() {
+		return location;
+	}
+
+	public Map<String, UserIdBoundary> getCreateBy() {
 		return createBy;
 	}
 
-	public void setCreateBy(Map<String, Object> createBy) {
+	public void setCreateBy(Map<String, UserIdBoundary> createBy) {
 		this.createBy = createBy;
+	}
+
+	public Map<String, Object> getElementAttributes() {
+		return elementAttributes;
+	}
+
+	public void setElementAttributes(Map<String, Object> elementAttributes) {
+		this.elementAttributes = elementAttributes;
+	}
+
+	public void setLocation(Map<String, Double> location) {
+		this.location = location;
 	}
 }

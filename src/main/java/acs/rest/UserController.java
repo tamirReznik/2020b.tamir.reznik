@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.UserService;
-import acs.rest.boundaries.NewUserDetailsBoundary;
-import acs.rest.boundaries.UserBoundary;
-import acs.rest.boundaries.UserIdBoundary;
+import acs.rest.boundaries.user.NewUserDetailsBoundary;
+import acs.rest.boundaries.user.UserBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 @RestController
 public class UserController {

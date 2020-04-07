@@ -3,7 +3,7 @@ package acs.logic;
 
 import java.util.List;
 
-import acs.rest.boundaries.UserBoundary;
+import acs.rest.boundaries.user.UserBoundary;
 
 public interface UserService {
 
