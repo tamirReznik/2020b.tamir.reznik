@@ -1,8 +1,8 @@
 package acs.rest.boundaries;
 /*
 	{
-		"first":"User",
-		"last":"Demo"
+		"domain":"2020b.tamir.reznik",
+		"email":"demo@us.er"
 	}
  
  */

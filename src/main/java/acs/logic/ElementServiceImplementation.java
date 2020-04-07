@@ -52,7 +52,7 @@ public class ElementServiceImplementation implements ElementService {
 			ElementBoundary update) {
 		ElementEntity existing = this.elementDatabase.get(elementId);
 		if(existing==null)
-			throw new ElementNotFoundException("could not find object by id:" + elementId);
+			throw new ObjectNotFoundException("could not find object by id:" + elementId);
 		else {
 			if(update.getActive()!=null)
 				existing.setActive(update.getActive());
@@ -96,7 +96,7 @@ public class ElementServiceImplementation implements ElementService {
 				.fromEntity(
 					existing);
 		}else {
-			throw new ElementNotFoundException("could not find object by id: " + elementId);
+			throw new ObjectNotFoundException("could not find object by id: " + elementId);
 		}
 		
 //		create("managerDomain", "managerEmail",

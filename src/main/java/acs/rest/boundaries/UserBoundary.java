@@ -3,8 +3,11 @@ package acs.rest.boundaries;
 import acs.TypeEnumRole;
 
 /*
-{
-	"email":"demo@us.er",
+{	
+	"userId":{
+	"domain":"2020b.tamir.reznik",
+	"email":"demo@us.er"
+	},
  	"role": "PLAYER",
 	"username":"Demo User",
 	"avatar":";-)"
