@@ -1,50 +1,72 @@
 package acs.logic.implementation;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import acs.data.TypeEnum;
+import acs.data.ActionEntity;
+import acs.data.Converter;
 import acs.logic.ActionService;
-import acs.rest.boundaries.action.ActionAttributes;
 import acs.rest.boundaries.action.ActionBoundary;
-import acs.rest.boundaries.action.ActionIdBoundary;
-import acs.rest.boundaries.element.ElementIdBoundary;
 
 @Service
 public class ActionServiceImplementation implements ActionService {
 
+	String projectName;
+	private Map<String, ActionEntity> actionDatabase;
+	private Converter converter;
+
+	@Autowired
+	public ActionServiceImplementation(Converter converter) {
+		this.converter = converter;
+	}
+
+	// injection of project name from the spring boot configuration
+	@Value("${spring.application.name: generic}")
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	@PostConstruct
+	public void init() {
+		this.actionDatabase = Collections.synchronizedMap(new TreeMap<>());
+	}
+
 	@Override
 	public Object invokeAction(ActionBoundary action) {
+		action.setTimestamp(new Date());
+		action.getActionId().setDomain(projectName);
+		action.getActionId().setId(UUID.randomUUID().toString());
+		actionDatabase.put(action.getActionId().getId(), converter.toEntity(action));
 		return "Action ID:" + action.getActionId().getId() + " invoked by - " + action.getInvokedBy().toString();
 	}
 
 	@Override
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail) {
-		// TODO Auto-generated method stub
-		Map<String, Object> invokeBy = new HashMap<String, Object>();
-		invokeBy.put(adminDomain, adminEmail);
+		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
+				&& !adminEmail.trim().isEmpty()) {
+			return this.actionDatabase.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
+		} else {
+			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
+		}
 
-//		return Arrays.asList(
-//				new ActionBoundary(new ActionIdBoundary("Yonatan", "1"), TypeEnum.demoElement,
-//						new HashMap<String, Object>(), new Date(), invokeBy, new Map<String, Object>(),
-//						new ElementIdBoundary()),
-//				new ActionBoundary(new ActionIdBoundary("Anna", "2"), TypeEnum.demoElement,
-//						new HashMap<String, Object>(), new Date(), invokeBy, null, new ElementIdBoundary()),
-//				new ActionBoundary(new ActionIdBoundary("Sapir", "3"), TypeEnum.demoElement,
-//						new HashMap<String, Object>(), new Date(), invokeBy, null, new ElementIdBoundary()),
-//				new ActionBoundary(new ActionIdBoundary("Avichai", "4"), TypeEnum.demoElement,
-//						new HashMap<String, Object>(), new Date(), invokeBy, null, new ElementIdBoundary()),
-//				new ActionBoundary(new ActionIdBoundary("Tamir", "5"), TypeEnum.demoElement,
-//						new HashMap<String, Object>(), new Date(), invokeBy, null, new ElementIdBoundary()));
-		return null;
 	}
 
 	@Override
 	public void deleteAllActions(String adminDomain, String adminEmail) {
-		// TODO Auto-generated Delete method stub
+		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
+				&& !adminEmail.trim().isEmpty()) {
+			this.actionDatabase.clear();
+		} else {
+			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
+		}
 
 	}
 

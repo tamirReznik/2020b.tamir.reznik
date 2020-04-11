@@ -1,12 +1,13 @@
 package acs.data;
 
 import org.springframework.stereotype.Component;
-
+import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.user.UserBoundary;
 
 @Component
 public class Converter {
+
 	public ElementBoundary fromEntity(ElementEntity entity) {
 		ElementBoundary eb = new ElementBoundary(entity.getElementId(), entity.getType(), entity.getName(),
 				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
@@ -33,4 +34,27 @@ public class Converter {
 				boundary.getAvatar());
 		return ue;
 	}
+
+	public ActionEntity toEntity(ActionBoundary actionBoundary) {
+
+		String type = actionBoundary.getType() == null ? null : actionBoundary.getType().name();
+
+		return new ActionEntity(actionBoundary.getActionId(), actionBoundary.getElementId(), type,
+				actionBoundary.getElement(), actionBoundary.getTimestamp(), actionBoundary.getInvokedBy(),
+				actionBoundary.getActionAttributes());
+
+	}
+
+	public ActionBoundary fromEntity(ActionEntity entity) {
+
+		ActionBoundary boundary = new ActionBoundary(entity.getActionId(), null, entity.getElement(),
+				entity.getTimestamp(), entity.getInvokedBy(), entity.getActionAttributes(), entity.getElementId());
+
+		if (entity.getType() != null)
+			boundary.setType(TypeEnum.valueOf(entity.getType()));
+
+		return boundary;
+
+	}
+
 }

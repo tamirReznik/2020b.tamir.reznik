@@ -3,7 +3,7 @@ package acs.rest.boundaries.element;
 /*
 {
 	"domain":"User",
-	"id": 456
+	"id": "456"
 }
 
 */
@@ -16,7 +16,7 @@ public class ElementIdBoundary {
 	}
 
 	public ElementIdBoundary(String domain, String id) {
-		
+
 		this.domain = domain;
 		this.id = id;
 	}

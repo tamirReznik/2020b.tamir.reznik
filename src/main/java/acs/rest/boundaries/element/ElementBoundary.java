@@ -32,7 +32,7 @@ public class ElementBoundary {
 	private TypeEnum type;
 	private String name;
 	private Boolean active;
-	private Date timeStamp;
+	private Date createdTimestamp;
 	private Map<String, UserIdBoundary> createBy;
 	private Map<String, Double> location;
 	private Map<String, Object> elementAttributes;
@@ -44,7 +44,7 @@ public class ElementBoundary {
 		this.type = type;
 		this.name = name;
 		this.active = active;
-		this.timeStamp = timeStamp;
+		this.createdTimestamp = timeStamp;
 		this.createBy = createBy;
 		this.location = location;
 		this.elementAttributes = elemntAttributes;
@@ -78,11 +78,11 @@ public class ElementBoundary {
 	}
 
 	public Date getTimeStamp() {
-		return timeStamp;
+		return createdTimestamp;
 	}
 
 	public void setTimeStamp(Date timeStamp) {
-		this.timeStamp = timeStamp;
+		this.createdTimestamp = timeStamp;
 	}
 
 	public Map<String, Object> getElemntAttributes() {

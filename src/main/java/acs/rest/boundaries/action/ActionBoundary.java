@@ -2,7 +2,6 @@ package acs.rest.boundaries.action;
 
 import java.util.Date;
 import java.util.Map;
-//Anna
 
 import acs.data.TypeEnum;
 import acs.rest.boundaries.element.ElementIdBoundary;
@@ -13,7 +12,11 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 		"domain": "tamir",
 		"id": "54"	
 	}, 	
-	"type":"CRITICAL",
+	"elementId":{
+	"domain":"User",
+	"id": 456
+	}
+	"type":"actionType",
 	"element":{
 		"elementId": {
             "domain": "2020b.demo",
@@ -38,33 +41,32 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 public class ActionBoundary {
 	private ActionIdBoundary actionId;
 	private ElementIdBoundary elementId;
-	private String type;
+	private TypeEnum type;
 	private Map<String, Object> element;
-	private Date timestamp;
+	private Date createdTimestamp;
 	private Map<String, Object> invokedBy;
-//	private ActionAttributes actionAttributes;
 	private Map<String, Object> actionAttributes;
 
 	public ActionBoundary() {
 	}
 
-	public ActionBoundary(ActionIdBoundary actionId, String type, Map<String, Object> element, Date timeStap,
+	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
 			Map<String, Object> invokedBy, Map<String, Object> actionAttributes, ElementIdBoundary elementId) {
 		this.elementId = elementId;
 		this.actionId = actionId;
 		this.type = type;
 		this.element = element;
-		this.timestamp = timeStap;
+		this.createdTimestamp = timeStap;
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
 	}
 
 	public Date getTimestamp() {
-		return timestamp;
+		return createdTimestamp;
 	}
 
 	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
+		this.createdTimestamp = timestamp;
 	}
 
 	public ActionIdBoundary getActionId() {
@@ -75,11 +77,11 @@ public class ActionBoundary {
 		this.actionId = actionId;
 	}
 
-	public String getType() {
+	public TypeEnum getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(TypeEnum type) {
 		this.type = type;
 	}
 
