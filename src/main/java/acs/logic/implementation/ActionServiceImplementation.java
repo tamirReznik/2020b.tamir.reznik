@@ -19,7 +19,7 @@ import acs.rest.boundaries.action.ActionBoundary;
 @Service
 public class ActionServiceImplementation implements ActionService {
 
-	String projectName;
+	private String projectName;
 	private Map<String, ActionEntity> actionDatabase;
 	private Converter converter;
 

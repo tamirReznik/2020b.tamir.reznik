@@ -51,10 +51,6 @@ public class AdminController {
 			@PathVariable("adminEmail") String adminEmail) {
 		return this.userService.getAllUsers(adminDomain, adminEmail).toArray(new UserBoundary[0]);
 
-//		return IntStream.range(0, 5) // Stream of Integer
-//				.mapToObj(i -> uc.loginValidUser(adminDomain, adminEmail)) // Stream of UserBoundry
-//				.collect(Collectors.toList()) // List of UserBoundry
-//				.toArray(new UserBoundary[0]); // ComplexMessagBoundary[]
 	}
 
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -7,19 +7,15 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import acs.data.Converter;
 import acs.data.ElementEntity;
 import acs.logic.ElementService;
 import acs.logic.ObjectNotFoundException;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
-import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
 public class ElementServiceImplementation implements ElementService {
@@ -39,8 +35,10 @@ public class ElementServiceImplementation implements ElementService {
 
 	@Override
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
-//		elementDetails.setElementId(new ElementIdBoundary(managerDomain, UUID.randomUUID().toString()));??
-		elementDetails.getCreateBy().put(managerDomain + managerEmail, new UserIdBoundary(managerDomain, managerEmail));
+		elementDetails.setElementId(new ElementIdBoundary(managerDomain, UUID.randomUUID().toString()));// replace
+																										// managerdomain
+																										// with project
+																										// name
 		ElementEntity entity = this.converter.toEntity(elementDetails);
 		entity.setTimeStamp(new Date());
 		this.elementDatabase.put(entity.getElementId().getId(), entity);
@@ -68,26 +66,12 @@ public class ElementServiceImplementation implements ElementService {
 	}
 
 	@Override
-	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
+	public List<ElementBoundary> getAll(String userDomain, String userEmail) {// check for null in arguments
 
-		return this.elementDatabase // Map<String, DummyEntity>
-				.values() // Collection<DummyEntity>
-				.stream() // Stream<DummyEntity>
-				.map(this.converter::fromEntity) // Stream<DummyBoundaries>
-//				.map(e->this.converter.fromEntity(e))	// Stream<DummyBoundaries>		
-				.collect(Collectors.toList()); // List<DummyBoundaries>
-//		return IntStream.range(0, 5) // Stream of Integer
-//				.mapToObj(i -> create("managerDomain", "managerEmail",
-//						new ElementBoundary(new ElementIdBoundary(userDomain, String.valueOf(i)), TypeEnum.CRITICAL, "avichai", true,
-//								new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
-//								Collections.singletonMap("created by", "user")))) // Stream
-//																					// of
-//																					// ElementBoundary
-//				.collect(Collectors.toList()); // List of ElementBoundry
-
+		return this.elementDatabase.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
 	}
 
-	@Override
+	@Override // check for null in arguments
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
 		ElementEntity existing = this.elementDatabase.get(elementId);
@@ -97,13 +81,9 @@ public class ElementServiceImplementation implements ElementService {
 			throw new ObjectNotFoundException("could not find object by id: " + elementId);
 		}
 
-//		create("managerDomain", "managerEmail",
-//				new ElementBoundary(new ElementIdBoundary(userDomain, elementId), TypeEnum.CRITICAL,
-//						"avichai", true, new Date(0), new Location(4.5, 3.6), Collections.singletonMap("key", "value"),
-//						Collections.singletonMap("created by", "user")));
 	}
 
-	@Override
+	@Override // check for null in arguments
 	public void deleteAllElements(String adminDomain, String adminEmail) {
 		this.elementDatabase.clear();
 

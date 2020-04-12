@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import acs.data.Converter;
 import acs.data.UserEntity;
@@ -17,7 +18,8 @@ import acs.rest.boundaries.user.UserBoundary;
 @Service
 public class UserServiceImplementation implements UserService {
 
-	private Map<String, UserEntity> usersDatabase; // String / object / userIdBoundary ???
+	private String projectName;
+	private Map<String, UserEntity> usersDatabase;
 	private Converter converter;
 
 	@Autowired
@@ -25,7 +27,11 @@ public class UserServiceImplementation implements UserService {
 		this.converter = converter;
 	}
 
-	// injection ???
+	// injection of project name from the spring boot configuration
+	@Value("${spring.application.name: generic}")
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -34,7 +40,9 @@ public class UserServiceImplementation implements UserService {
 	}
 
 	public UserBoundary createUser(UserBoundary user) {
+
 		UserEntity entity = this.converter.toEntity(user);
+
 		this.usersDatabase.put(user.getUserId().getEmail(), entity); // ??
 
 		return this.converter.fromEntity(entity);
@@ -51,20 +59,9 @@ public class UserServiceImplementation implements UserService {
 					"could not find object by UserDomain: " + userDomain + "or userEmail: " + userEmail);
 		}
 
-		// if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null
-		// && !userEmail.trim().isEmpty()) {
-		// UserBoundary ub = new UserBoundary();
-		// ub.setUserId(new UserIdBoundary(userDomain, userEmail));
-		// ub.setRole(TypeEnumRole.PLAYER);
-		// ub.setUsername("Demo User");
-		// ub.setAvatar(";-)");
-		// return ub;
-		// } else {
-		// throw new NameNotFoundException("Invalid user name/email");
-		// }
 	}
 
-	@Override
+	@Override // represent enum as string in entity
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update) {
 		UserEntity existing = this.usersDatabase.get(userEmail); // ??
 
@@ -92,7 +89,7 @@ public class UserServiceImplementation implements UserService {
 
 	}
 
-	@Override
+	@Override // check for null in arguments
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
 		return this.usersDatabase // Map<String, UserEntity>
 				.values() // Collection<UserEntity>
@@ -101,7 +98,7 @@ public class UserServiceImplementation implements UserService {
 				.collect(Collectors.toList()); // List<UserBoundary>
 	}
 
-	@Override
+	@Override // check for null in arguments
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
 		this.usersDatabase.clear();
 	}
