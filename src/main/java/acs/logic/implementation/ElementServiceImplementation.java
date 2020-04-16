@@ -72,9 +72,14 @@ public class ElementServiceImplementation implements ElementService {
 	}
 
 	@Override
-	public List<ElementBoundary> getAll(String userDomain, String userEmail) {// check for null in arguments
-
-		return this.elementDatabase.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
+	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
+		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null
+				&& !userEmail.trim().isEmpty()) {
+			return this.elementDatabase.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
+		}
+		else {
+			throw new RuntimeException("User Domain and User Email must not be empty or null");
+		}
 	}
 
 	@Override // check for null in arguments
@@ -91,8 +96,13 @@ public class ElementServiceImplementation implements ElementService {
 
 	@Override // check for null in arguments
 	public void deleteAllElements(String adminDomain, String adminEmail) {
-		this.elementDatabase.clear();
-
+		
+		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
+				&& !adminEmail.trim().isEmpty()) {
+			this.elementDatabase.clear();
+		} else {
+			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
+		}
 	}
 
 }
