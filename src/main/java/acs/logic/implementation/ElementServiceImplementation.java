@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import acs.data.Converter;
 import acs.data.ElementEntity;
@@ -21,11 +22,19 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 public class ElementServiceImplementation implements ElementService {
 	private Map<String, ElementEntity> elementDatabase;
 	private Converter converter;
-
+	private String projectName;
+	
+	
 	@Autowired
 	public ElementServiceImplementation(Converter converter) {
 		this.converter = converter;
 	}
+	
+	// injection of project name from the spring boot configuration
+		@Value("${spring.application.name: generic}")
+		public void setProjectName(String projectName) {
+			this.projectName = projectName;
+		}
 
 	@PostConstruct
 	public void init() {
@@ -35,10 +44,7 @@ public class ElementServiceImplementation implements ElementService {
 
 	@Override
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
-		elementDetails.setElementId(new ElementIdBoundary(managerDomain, UUID.randomUUID().toString()));// replace
-																										// managerdomain
-																										// with project
-																										// name
+		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
 		ElementEntity entity = this.converter.toEntity(elementDetails);
 		entity.setTimeStamp(new Date());
 		this.elementDatabase.put(entity.getElementId().getId(), entity);
