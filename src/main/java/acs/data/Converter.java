@@ -43,9 +43,6 @@ public class Converter {
 
 		return new ActionEntity(actionId, actionBoundary.getElementId(), type, actionBoundary.getElement(),
 				actionBoundary.getTimestamp(), actionBoundary.getInvokedBy(), actionBoundary.getActionAttributes());
-//		return new ActionEntity(actionBoundary.getActionId(), actionBoundary.getElementId(), type,
-//				actionBoundary.getElement(), actionBoundary.getTimestamp(), actionBoundary.getInvokedBy(),
-//				actionBoundary.getActionAttributes());
 
 	}
 
