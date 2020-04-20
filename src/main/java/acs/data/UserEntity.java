@@ -3,7 +3,7 @@ package acs.data;
 
 
 public class UserEntity {
-	private UserIdEntity userId;
+	private String userId; //"Dmain#Email"
 	private String role;
 	private String username;
 	private String avatar;
@@ -11,7 +11,7 @@ public class UserEntity {
 	public UserEntity() {
 	}
 
-	public UserEntity(UserIdEntity userId, String role, String username, String avatar) {
+	public UserEntity(String userId, String role, String username, String avatar) {
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -19,11 +19,11 @@ public class UserEntity {
 		this.avatar = avatar;
 	}
 
-	public UserIdEntity getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(UserIdEntity userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 
@@ -50,5 +50,6 @@ public class UserEntity {
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
+
 
 }
