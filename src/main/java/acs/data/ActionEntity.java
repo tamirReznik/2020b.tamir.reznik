@@ -7,7 +7,8 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 
 public class ActionEntity {
 
-	private ActionIdBoundary actionId;
+//	private ActionIdBoundary actionId;
+	private String actionId;
 	private ElementIdBoundary elementId;
 	private String type;
 	private Map<String, Object> element;
@@ -15,32 +16,52 @@ public class ActionEntity {
 	private Map<String, Object> invokedBy;
 	private Map<String, Object> actionAttributes;
 
-	public ActionEntity(ActionIdBoundary actionId, ElementIdBoundary elementId, String type,
-			Map<String, Object> element, Date timestamp, Map<String, Object> invokedBy,
-			Map<String, Object> actionAttributes) {
-		super();
-		this.actionId = actionId;
-		this.elementId = elementId;
-		this.type = type;
-		this.element = element;
-		this.timestamp = timestamp;
-		this.invokedBy = invokedBy;
-		this.actionAttributes = actionAttributes;
-	}
+//	public ActionEntity(ActionIdBoundary actionId, ElementIdBoundary elementId, String type,
+//			Map<String, Object> element, Date timestamp, Map<String, Object> invokedBy,
+//			Map<String, Object> actionAttributes) {
+//		super();
+//		this.actionId = actionId;
+//		this.elementId = elementId;
+//		this.type = type;
+//		this.element = element;
+//		this.timestamp = timestamp;
+//		this.invokedBy = invokedBy;
+//		this.actionAttributes = actionAttributes;
+//	}
 
 	public ActionEntity() {
 	}
 
-	public ActionIdBoundary getActionId() {
-		return actionId;
-	}
+	public ActionEntity(String actionId, ElementIdBoundary elementId, String type, Map<String, Object> element,
+		Date timestamp, Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
+	super();
+	this.actionId = actionId;
+	this.elementId = elementId;
+	this.type = type;
+	this.element = element;
+	this.timestamp = timestamp;
+	this.invokedBy = invokedBy;
+	this.actionAttributes = actionAttributes;
+}
 
-	public void setActionId(ActionIdBoundary actionId) {
-		this.actionId = actionId;
-	}
+//	public ActionIdBoundary getActionId() {
+//		return actionId;
+//	}
+
+//	public void setActionId(ActionIdBoundary actionId) {
+//		this.actionId = actionId;
+//	}
 
 	public ElementIdBoundary getElementId() {
 		return elementId;
+	}
+
+	public String getActionId() {
+		return actionId;
+	}
+
+	public void setActionId(String actionId) {
+		this.actionId = actionId;
 	}
 
 	public void setElementId(ElementIdBoundary elementId) {

@@ -41,11 +41,15 @@ public class ActionServiceImplementation implements ActionService {
 
 	@Override
 	public Object invokeAction(ActionBoundary action) {
-		action.setTimestamp(new Date());
-		action.getActionId().setDomain(projectName);
-		action.getActionId().setId(UUID.randomUUID().toString());
-		actionDatabase.put(action.getActionId().getId(), converter.toEntity(action));
-		return "Action ID:" + action.getActionId().getId() + " invoked by - " + action.getInvokedBy().toString();
+		if (action == null) {
+			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
+		} else {
+			action.setTimestamp(new Date());
+			action.getActionId().setDomain(projectName);
+			action.getActionId().setId(UUID.randomUUID().toString());
+			actionDatabase.put(action.getActionId().getId(), converter.toEntity(action));
+			return "Action ID:" + action.getActionId().getId() + " invoked by - " + action.getInvokedBy().toString();
+		}
 	}
 
 	@Override

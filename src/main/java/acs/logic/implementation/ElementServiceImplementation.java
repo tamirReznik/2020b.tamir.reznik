@@ -42,7 +42,7 @@ public class ElementServiceImplementation implements ElementService {
 		this.elementDatabase = Collections.synchronizedMap(new TreeMap<>());
 	}
 
-	@Override
+	@Override//need to update manager for the element
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
 		ElementEntity entity = this.converter.toEntity(elementDetails);
