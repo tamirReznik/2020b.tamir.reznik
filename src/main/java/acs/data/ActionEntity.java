@@ -1,10 +1,10 @@
 package acs.data;
+
 import java.util.Date;
 import java.util.Map;
 
 public class ActionEntity {
 
-//	private ActionIdBoundary actionId;
 	private String actionId;
 	private String elementId;
 	private String type;
@@ -12,19 +12,6 @@ public class ActionEntity {
 	private Date timestamp;
 	private Map<String, Object> invokedBy;
 	private Map<String, Object> actionAttributes;
-
-//	public ActionEntity(ActionIdBoundary actionId, ElementIdBoundary elementId, String type,
-//			Map<String, Object> element, Date timestamp, Map<String, Object> invokedBy,
-//			Map<String, Object> actionAttributes) {
-//		super();
-//		this.actionId = actionId;
-//		this.elementId = elementId;
-//		this.type = type;
-//		this.element = element;
-//		this.timestamp = timestamp;
-//		this.invokedBy = invokedBy;
-//		this.actionAttributes = actionAttributes;
-//	}
 
 	public ActionEntity() {
 	}
@@ -40,14 +27,6 @@ public class ActionEntity {
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
 	}
-
-//	public ActionIdBoundary getActionId() {
-//		return actionId;
-//	}
-
-//	public void setActionId(ActionIdBoundary actionId) {
-//		this.actionId = actionId;
-//	}
 
 	public String getElementId() {
 		return elementId;
