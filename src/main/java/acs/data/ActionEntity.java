@@ -1,15 +1,12 @@
 package acs.data;
-
 import java.util.Date;
 import java.util.Map;
-import acs.rest.boundaries.action.ActionIdBoundary;
-import acs.rest.boundaries.element.ElementIdBoundary;
 
 public class ActionEntity {
 
 //	private ActionIdBoundary actionId;
 	private String actionId;
-	private ElementIdBoundary elementId;
+	private String elementId;
 	private String type;
 	private Map<String, Object> element;
 	private Date timestamp;
@@ -32,17 +29,17 @@ public class ActionEntity {
 	public ActionEntity() {
 	}
 
-	public ActionEntity(String actionId, ElementIdBoundary elementId, String type, Map<String, Object> element,
-		Date timestamp, Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
-	super();
-	this.actionId = actionId;
-	this.elementId = elementId;
-	this.type = type;
-	this.element = element;
-	this.timestamp = timestamp;
-	this.invokedBy = invokedBy;
-	this.actionAttributes = actionAttributes;
-}
+	public ActionEntity(String actionId, String elementId, String type, Map<String, Object> element, Date timestamp,
+			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
+		super();
+		this.actionId = actionId;
+		this.elementId = elementId;
+		this.type = type;
+		this.element = element;
+		this.timestamp = timestamp;
+		this.invokedBy = invokedBy;
+		this.actionAttributes = actionAttributes;
+	}
 
 //	public ActionIdBoundary getActionId() {
 //		return actionId;
@@ -52,7 +49,7 @@ public class ActionEntity {
 //		this.actionId = actionId;
 //	}
 
-	public ElementIdBoundary getElementId() {
+	public String getElementId() {
 		return elementId;
 	}
 
@@ -64,7 +61,7 @@ public class ActionEntity {
 		this.actionId = actionId;
 	}
 
-	public void setElementId(ElementIdBoundary elementId) {
+	public void setElementId(String elementId) {
 		this.elementId = elementId;
 	}
 
