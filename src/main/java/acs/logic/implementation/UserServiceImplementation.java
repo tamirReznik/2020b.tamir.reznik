@@ -48,7 +48,7 @@ public class UserServiceImplementation implements UserService {
 
 	@Override
 	public UserBoundary login(String userDomain, String userEmail) {
-		UserEntity existing = this.usersDatabase.get(userDomain+"#"+userEmail); // ???
+		UserEntity existing = this.usersDatabase.get(userDomain+"#"+userEmail); 
 		if (existing != null) {
 			return this.converter.fromEntity(existing);
 		} else {
@@ -61,8 +61,8 @@ public class UserServiceImplementation implements UserService {
 	@Override 
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update) {
 		
-//		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null
-//				&& !userEmail.trim().isEmpty()) {
+		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null
+				&& !userEmail.trim().isEmpty()) {
 
 			UserEntity existing = this.usersDatabase.get(userDomain+"#"+userEmail); 
 
@@ -93,11 +93,11 @@ public class UserServiceImplementation implements UserService {
 			}
 
 			return this.converter.fromEntity(existing);
-//		}
-//		else {
-//			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
-//
-//		}
+		}
+		else {
+			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
+
+		}
 	}
 
 	@Override 

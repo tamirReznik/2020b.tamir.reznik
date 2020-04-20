@@ -56,6 +56,20 @@ public class Converter {
 		}
 	}
 
+	public <T> String fromIdBoundary(T idBoundary) {
+
+		if (idBoundary.getClass().equals(ActionIdBoundary.class))
+			return ((ActionIdBoundary) idBoundary).getDomain() + "#" + ((ActionIdBoundary) idBoundary).getId();
+
+		if (idBoundary.getClass().equals(ElementIdBoundary.class))
+			return ((ElementIdBoundary) idBoundary).getDomain() + "#" + ((ElementIdBoundary) idBoundary).getId();
+
+		if (idBoundary.getClass().equals(UserIdBoundary.class))
+			return ((UserIdBoundary) idBoundary).getDomain() + "#" + ((UserIdBoundary) idBoundary).getEmail();
+
+		return null;
+	}
+
 	public ActionEntity toEntity(ActionBoundary actionBoundary) {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType().name();
