@@ -7,7 +7,7 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 public class ElementEntity {
-	private ElementIdBoundary elementId;
+	private String elementId;
 	private TypeEnum type;
 	private String name;
 	private Boolean active;
@@ -20,7 +20,7 @@ public class ElementEntity {
 
 	}
 
-	public ElementEntity(ElementIdBoundary elementId, TypeEnum type, String name, Boolean active, Date timeStamp,
+	public ElementEntity(String elementId, TypeEnum type, String name, Boolean active, Date timeStamp,
 			Map<String, Double> location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
@@ -41,11 +41,11 @@ public class ElementEntity {
 		this.location = location;
 	}
 
-	public ElementIdBoundary getElementId() {
+	public String getElementId() {
 		return elementId;
 	}
 
-	public void setElementId(ElementIdBoundary elementId) {
+	public void setElementId(String elementId) {
 		this.elementId = elementId;
 	}
 

@@ -3,13 +3,14 @@ package acs.data;
 import org.springframework.stereotype.Component;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.element.ElementBoundary;
+import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserBoundary;
 
 @Component
 public class Converter {
 
 	public ElementBoundary fromEntity(ElementEntity entity) {
-		ElementBoundary eb = new ElementBoundary(entity.getElementId(), entity.getType(), entity.getName(),
+		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(entity.getElementId().split("#")[0], entity.getElementId().split("#")[1]), entity.getType(), entity.getName(),
 				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
 				entity.getCreateBy());
 		return eb;
@@ -17,11 +18,12 @@ public class Converter {
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
 
-		ElementEntity eE = new ElementEntity(boundary.getElementId(), boundary.getType(), boundary.getName(),
+		ElementEntity eE = new ElementEntity(boundary.getElementId().getDomain() + "#" +  boundary.getElementId().getId(), boundary.getType(), boundary.getName(),
 				boundary.getActive(), boundary.getTimeStamp(), boundary.getLocation(), boundary.getElemntAttributes(),
 				boundary.getCreateBy());
 		return eE;
 	}
+	// domain :abc  id: 123 -- > abc#123
 
 	public UserBoundary fromEntity(UserEntity entity) {
 		UserBoundary ub = new UserBoundary(entity.getUserId(), entity.getRole(), entity.getUsername(),
