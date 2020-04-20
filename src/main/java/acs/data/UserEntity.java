@@ -1,17 +1,17 @@
 package acs.data;
 
-import acs.rest.boundaries.user.UserIdBoundary;
+
 
 public class UserEntity {
-	private UserIdBoundary userId;
-	private UserRole role;
+	private UserIdEntity userId;
+	private String role;
 	private String username;
 	private String avatar;
 
 	public UserEntity() {
 	}
 
-	public UserEntity(UserIdBoundary userId, UserRole role, String username, String avatar) {
+	public UserEntity(UserIdEntity userId, String role, String username, String avatar) {
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -19,19 +19,19 @@ public class UserEntity {
 		this.avatar = avatar;
 	}
 
-	public UserIdBoundary getUserId() {
+	public UserIdEntity getUserId() {
 		return userId;
 	}
 
-	public void setUserId(UserIdBoundary userId) {
+	public void setUserId(UserIdEntity userId) {
 		this.userId = userId;
 	}
 
-	public UserRole getRole() {
+	public String getRole() {
 		return role;
 	}
 
-	public void setRole(UserRole role) {
+	public void setRole(String role) {
 		this.role = role;
 	}
 

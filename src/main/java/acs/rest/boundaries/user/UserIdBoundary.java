@@ -39,6 +39,7 @@ public class UserIdBoundary {
 	@Override
 	public String toString() {
 		return "UserIdBoundary [domain=" + domain + ", email=" + email + "]";
+		
 	}
 
 }

@@ -5,6 +5,7 @@ import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.user.UserBoundary;
 
+
 @Component
 public class Converter {
 
@@ -24,17 +25,34 @@ public class Converter {
 	}
 
 	public UserBoundary fromEntity(UserEntity entity) {
-		UserBoundary ub = new UserBoundary(entity.getUserId(), entity.getRole(), entity.getUsername(),
-				entity.getAvatar());
+		UserBoundary ub = new UserBoundary(null, null, entity.getUsername(),
+				entity.getAvatar()); 
+		
+		if (entity.getRole() != null) 
+			ub.setRole(UserRole.valueOf(entity.getRole())); 
+		
 		return ub;
 	}
 
 	public UserEntity toEntity(UserBoundary boundary) {
-		UserEntity ue = new UserEntity(boundary.getUserId(), boundary.getRole(), boundary.getUsername(),
+		
+		String role = boundary.getRole() == null ? null : boundary.getRole().name(); 
+
+		UserEntity ue = new UserEntity(null, role, boundary.getUsername(), 
 				boundary.getAvatar());
 		return ue;
 	}
 
+	public String toEntity(UserRole type) { 
+		if (type != null) {
+			return type.name();
+		}else {
+			return null;
+		}
+	}
+	
+	
+	
 	public ActionEntity toEntity(ActionBoundary actionBoundary) {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType().name();
