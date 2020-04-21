@@ -19,7 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import acs.data.UserRole;
 import acs.rest.boundaries.user.NewUserDetailsBoundary;
 import acs.rest.boundaries.user.UserBoundary;
-import acs.rest.boundaries.user.UserIdBoundary;
+
+
 
 
 
@@ -135,7 +136,7 @@ public class UserTests {
 		// WHEN I POST new user with userName attribute: "anna"
 		
 		this.restTemplate.postForObject
-				(this.url + "/users", new NewUserDetailsBoundary("???", UserRole.NONE , "anna", "???"),
+				(this.url + "/users", new NewUserDetailsBoundary("???", UserRole.PLAYER , "anna", "???"),
 						UserBoundary.class);
 		
 		// THEN the database contains a user with userName attribute "anna"
@@ -164,7 +165,7 @@ public class UserTests {
 		// WHEN I POST new user with avatar attribute: ":-))"
 		
 		this.restTemplate.postForObject
-				(this.url + "/users", new NewUserDetailsBoundary("???", UserRole.NONE , "???", ":-))"),
+				(this.url + "/users", new NewUserDetailsBoundary("???", UserRole.PLAYER , "???", ":-))"),
 						UserBoundary.class);
 		
 		// THEN the database contains a user with user avatar attribute ":-))"
@@ -185,22 +186,24 @@ public class UserTests {
 		
 	}
 	
+
 //	@Test 
-//	public void test_Put_Update_User_Attribute_Role_Then_DataBase_Contains_User_With_The_Same_User_Attribute_Role() throws Exception{
+//	public void test_Put_Update_User_Attribute_Role_To_MANAGER_Then_Role_Is_Updated_In_The_DataBase() throws Exception{
 //	// GIVEN the server is up
 //		// do nothing
-//	// AND the database contains a single message with type: PLAYER	
-//	UserBoundary newUser = new UserBoundary(null,UserRole.PLAYER,"sapir",":-(");
-//	
+//		
+//	// AND the database contains a single user with role: PLAYER	
 //	UserBoundary boundaryOnServer=
 //			this.restTemplate.postForObject
-//			(this.url + "/users", newUser,
-//					UserBoundary.class);
+//			(this.url + "/users", new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER , "sapir", ":-))"),
+//			UserBoundary.class);
 //	
 //	String postedUserId = boundaryOnServer.getUserId().toString();
 //	String userDomain = postedUserId.substring(0, postedUserId.indexOf('#')); 
 //	String userEmail = postedUserId.substring(postedUserId.indexOf('#') + 1);
 //				
+//	UserIdBoundary uib = new UserIdBoundary(userDomain,userEmail);
+//	
 //	// WHEN I PUT with update of role to be "MANAGER"
 //	UserBoundary update = new UserBoundary();
 //	update.setRole(UserRole.MANAGER);
@@ -208,12 +211,13 @@ public class UserTests {
 //	.put(this.url + "/users/{userDomain}/{userEmail}", update, userDomain, userEmail);
 //	
 //	// THEN the database contains a user with same id and role: MANAGER
-//			assertThat(this.restTemplate
-//					.getForObject(this.url + "/users/login/{userDomain}/{userEmail}", UserBoundary.class , userDomain, userEmail))
-//				.extracting("userId","role")
-//				.containsExactly(boundaryOnServer, update.getRole());
+//	assertThat(this.restTemplate
+//		.getForObject(this.url + "/users/login/{userDomain}/{userEmail}", UserBoundary.class , userDomain, userEmail))
+//		.extracting("userId","role") //??
+//		.containsExactly(postedUserId, update.getRole()); //??
 //	}
-//	
+	
+	
 	
 	@Test
 	public void test_Init_Server_With_3_Users_When_We_Get_All_Users_We_Receive_The_Same_Users_Initialized() throws Exception {
@@ -221,7 +225,7 @@ public class UserTests {
 		// AND the server contains 3 users
 		List<UserBoundary> allUsersInDb = 
 		  IntStream.range(1, 4)
-		  .mapToObj(i -> ("user #" + i))
+		  .mapToObj(i -> ("email" + i))
 			.map(user->new NewUserDetailsBoundary(user, UserRole.PLAYER , "sapir", ":-)"))
 			.map(boundary-> this.restTemplate
 						.postForObject(
@@ -246,5 +250,18 @@ public class UserTests {
 			.hasSize(allUsersInDb.size())
 			.usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrderElementsOf(allUsersInDb);
+	}
+	
+	
+	@Test
+	public void test_The_Database_Is_Empty_By_Default() throws Exception {
+		// GIVEN the server is up
+		
+		// WHEN I GET for all users
+		UserBoundary[] actual = this.restTemplate
+				.getForObject(this.url+ "/admin/users/{adminDomain}/{adminEmail}", UserBoundary[].class, "???", "??");
+		
+		// THEN the returned value is an empty array
+		assertThat(actual).isEmpty();
 	}
 }
