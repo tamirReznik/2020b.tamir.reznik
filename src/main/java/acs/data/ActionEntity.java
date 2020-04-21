@@ -6,7 +6,6 @@ import java.util.Map;
 public class ActionEntity {
 
 	private String actionId;
-	private String elementId;
 	private String type;
 	private Map<String, Object> element;
 	private Date timestamp;
@@ -16,20 +15,15 @@ public class ActionEntity {
 	public ActionEntity() {
 	}
 
-	public ActionEntity(String actionId, String elementId, String type, Map<String, Object> element, Date timestamp,
+	public ActionEntity(String actionId, String type, Map<String, Object> element, Date timestamp,
 			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
-		this.elementId = elementId;
 		this.type = type;
 		this.element = element;
 		this.timestamp = timestamp;
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
-	}
-
-	public String getElementId() {
-		return elementId;
 	}
 
 	public String getActionId() {
@@ -38,10 +32,6 @@ public class ActionEntity {
 
 	public void setActionId(String actionId) {
 		this.actionId = actionId;
-	}
-
-	public void setElementId(String elementId) {
-		this.elementId = elementId;
 	}
 
 	public String getType() {

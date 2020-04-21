@@ -40,16 +40,16 @@ public class UserServiceImplementation implements UserService {
 	}
 
 	public UserBoundary createUser(UserBoundary user) {
-		
+
 		user.getUserId().setDomain(projectName);
 		UserEntity entity = this.converter.toEntity(user);
-		this.usersDatabase.put(entity.getUserId(), entity); 
+		this.usersDatabase.put(entity.getUserId(), entity);
 		return this.converter.fromEntity(entity);
 	}
 
 	@Override
 	public UserBoundary login(String userDomain, String userEmail) {
-		UserEntity existing = this.usersDatabase.get(userDomain+"#"+userEmail); 
+		UserEntity existing = this.usersDatabase.get(userDomain + "#" + userEmail);
 		if (existing != null) {
 			return this.converter.fromEntity(existing);
 		} else {
@@ -59,13 +59,12 @@ public class UserServiceImplementation implements UserService {
 
 	}
 
-	@Override 
+	@Override
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update) {
-		
-		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null
-				&& !userEmail.trim().isEmpty()) {
 
-			UserEntity existing = this.usersDatabase.get(userDomain+"#"+userEmail); 
+		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
+
+			UserEntity existing = this.usersDatabase.get(userDomain + "#" + userEmail);
 
 			if (existing == null) {
 				throw new ObjectNotFoundException(
@@ -75,13 +74,13 @@ public class UserServiceImplementation implements UserService {
 			boolean dirty = false;
 
 			if (update.getRole() != null) {
-				existing.setRole(this.converter.toEntity(update.getRole())); 
+				existing.setRole(this.converter.toEntity(update.getRole()));
 				dirty = true;
 			}
 
 			if (update.getUsername() != null) {
 				existing.setUsername(update.getUsername());
-				dirty = true;		
+				dirty = true;
 			}
 
 			if (update.getAvatar() != null) {
@@ -90,18 +89,17 @@ public class UserServiceImplementation implements UserService {
 			}
 
 			if (dirty) {
-				this.usersDatabase.put(userDomain+"#"+userEmail, existing);
+				this.usersDatabase.put(userDomain + "#" + userEmail, existing);
 			}
 
 			return this.converter.fromEntity(existing);
-		}
-		else {
+		} else {
 			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
 
 		}
 	}
 
-	@Override 
+	@Override
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
@@ -110,20 +108,18 @@ public class UserServiceImplementation implements UserService {
 					.stream() // Stream<UserEntity>
 					.map(e -> this.converter.fromEntity(e)) // Stream<UserBoundary>
 					.collect(Collectors.toList()); // List<UserBoundary>
-		}
-		else {
+		} else {
 			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
 
 		}
 	}
 
-	@Override 
+	@Override
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
 			this.usersDatabase.clear();
-		}
-		else {
+		} else {
 			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
 		}
 	}

@@ -36,7 +36,7 @@ public class ActionController {
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public Object invokeAnAction(@RequestBody ActionBoundary actionDetails) {
 
-		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), "31567"));
+		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), null));
 		return actionService.invokeAction(actionDetails);
 
 	}
