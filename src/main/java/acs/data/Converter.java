@@ -55,9 +55,7 @@ public class Converter {
 	public ActionEntity toEntity(ActionBoundary actionBoundary) {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType().name();
-
-		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()),
-				fromIdBoundary(actionBoundary.getElementId()), type, actionBoundary.getElement(),
+		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, actionBoundary.getElement(),
 				actionBoundary.getTimestamp(), actionBoundary.getInvokedBy(), actionBoundary.getActionAttributes());
 
 	}
@@ -82,10 +80,8 @@ public class Converter {
 
 		ActionIdBoundary actionIdBoundary = toActionIdBoundary(entity.getActionId());
 
-		ElementIdBoundary elementIdBoundary = toElementIdBoundary(entity.getElementId());
-
 		ActionBoundary boundary = new ActionBoundary(actionIdBoundary, null, entity.getElement(), entity.getTimestamp(),
-				entity.getInvokedBy(), entity.getActionAttributes(), elementIdBoundary);
+				entity.getInvokedBy(), entity.getActionAttributes());
 
 		if (entity.getType() != null)
 			boundary.setType(TypeEnum.valueOf(entity.getType()));

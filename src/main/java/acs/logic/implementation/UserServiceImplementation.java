@@ -39,9 +39,8 @@ public class UserServiceImplementation implements UserService {
 		this.usersDatabase = Collections.synchronizedMap(new TreeMap<>());
 	}
 
-	// need to set domain to project name
 	public UserBoundary createUser(UserBoundary user) {
-
+		user.getUserId().setDomain(projectName);
 		UserEntity entity = this.converter.toEntity(user);
 
 		this.usersDatabase.put(user.getUserId().getEmail(), entity); // ??
@@ -62,8 +61,7 @@ public class UserServiceImplementation implements UserService {
 
 	}
 
-	@Override // represent enum as string in entity + check for null in arguments(userDomain,
-				// userEmail)
+	@Override
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update) {
 		UserEntity existing = this.usersDatabase.get(userEmail); // ??
 

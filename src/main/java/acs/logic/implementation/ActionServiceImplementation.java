@@ -49,7 +49,7 @@ public class ActionServiceImplementation implements ActionService {
 			action.getActionId().setId(UUID.randomUUID().toString());
 			ActionEntity entity = converter.toEntity(action);
 			actionDatabase.put(converter.fromIdBoundary(action.getActionId()), entity);
-			return entity;
+			return action;
 		}
 	}
 
