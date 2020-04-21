@@ -27,15 +27,34 @@ public class Converter {
 	}
 
 	public UserBoundary fromEntity(UserEntity entity) {
-		UserBoundary ub = new UserBoundary(entity.getUserId(), entity.getRole(), entity.getUsername(),
-				entity.getAvatar());
+		
+		UserIdBoundary userId = new UserIdBoundary(entity.getUserId().substring(0, entity.getUserId().indexOf('#')),
+				entity.getUserId().substring(entity.getUserId().indexOf('#') + 1));
+
+		UserBoundary ub = new UserBoundary(userId, null, entity.getUsername(), entity.getAvatar());
+
+		if (entity.getRole() != null)
+			ub.setRole(UserRole.valueOf(entity.getRole()));
+
 		return ub;
 	}
 
 	public UserEntity toEntity(UserBoundary boundary) {
-		UserEntity ue = new UserEntity(boundary.getUserId(), boundary.getRole(), boundary.getUsername(),
-				boundary.getAvatar());
+
+		String role = boundary.getRole() == null ? null : boundary.getRole().name();
+		String userId = boundary.getUserId().toString();
+
+		UserEntity ue = new UserEntity(userId, role, boundary.getUsername(), boundary.getAvatar());
+
 		return ue;
+	}
+
+	public String toEntity(UserRole type) {
+		if (type != null) {
+			return type.name();
+		} else {
+			return null;
+		}
 	}
 
 	public <T> String fromIdBoundary(T idBoundary) {
