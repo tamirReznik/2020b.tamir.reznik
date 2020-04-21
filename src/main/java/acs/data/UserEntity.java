@@ -3,7 +3,7 @@ package acs.data;
 
 
 public class UserEntity {
-	private String userId; //"Dmain#Email"
+	private String userId; // "Dmain#Email"
 	private String role;
 	private String username;
 	private String avatar;

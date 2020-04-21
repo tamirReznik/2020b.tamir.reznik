@@ -27,6 +27,7 @@ public class Converter {
 	}
 
 	public UserBoundary fromEntity(UserEntity entity) {
+		
 		UserIdBoundary userId = new UserIdBoundary(entity.getUserId().substring(0, entity.getUserId().indexOf('#')),
 				entity.getUserId().substring(entity.getUserId().indexOf('#') + 1));
 

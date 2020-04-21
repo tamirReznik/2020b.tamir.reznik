@@ -40,6 +40,7 @@ public class UserServiceImplementation implements UserService {
 	}
 
 	public UserBoundary createUser(UserBoundary user) {
+		
 		user.getUserId().setDomain(projectName);
 		UserEntity entity = this.converter.toEntity(user);
 		this.usersDatabase.put(entity.getUserId(), entity); 
