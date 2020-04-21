@@ -16,6 +16,8 @@ import acs.data.UserRole;
 
 */
 public class UserBoundary {
+	
+
 	private UserIdBoundary userId;
 	private UserRole role;
 	private String username;
@@ -63,6 +65,10 @@ public class UserBoundary {
 		this.avatar = avatar;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "UserBoundary [userId=" + userId + ", role=" + role + ", username=" + username + ", avatar=" + avatar
+				+ "]";
+	}
 
 }

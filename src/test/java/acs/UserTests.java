@@ -2,8 +2,14 @@ package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import javax.annotation.PostConstruct;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -14,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import acs.data.UserRole;
 import acs.rest.boundaries.user.NewUserDetailsBoundary;
 import acs.rest.boundaries.user.UserBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 
 
@@ -32,6 +39,22 @@ public class UserTests {
 	public void init() {
 		this.restTemplate = new RestTemplate();
 		this.url = "http://localhost:" + this.port + "/acs";
+	}
+	
+	@BeforeEach
+	public void setup() {
+	
+	}
+	
+	@AfterEach
+	public void teardown() {
+		this.restTemplate
+			.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}","???","??");
+	}
+	
+	@Test
+	public void testContext() {
+		
 	}
 	
 	@Test
@@ -62,7 +85,7 @@ public class UserTests {
 	
 	
 	@Test
-	public void test_Post_New_User_Then_The_Database_Contains_As_Single_User() throws Exception {
+	public void test_Post_New_User_Then_The_Database_Contains_A_Single_User() throws Exception {
 		// GIVEN the server is up
 			// do nothing
 				
@@ -72,7 +95,7 @@ public class UserTests {
 		
 		//THEN the database contains a single message
 		assertThat(this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class,"???","????"))
+				UserBoundary[].class,"???","??"))
 		.hasSize(1);
 	}
 	
@@ -87,7 +110,7 @@ public class UserTests {
 				(this.url + "/users", new NewUserDetailsBoundary("???", UserRole.PLAYER , "???", "???"),
 						UserBoundary.class);
 		
-		// THEN the database contains a user with the user role attribute "PLAYER"
+		// THEN the database contains a user with user role attribute "PLAYER"
 		UserBoundary[] allUsers = 
 				this.restTemplate
 					.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}", UserBoundary[].class, "???", "??");
@@ -116,7 +139,7 @@ public class UserTests {
 				(this.url + "/users", new NewUserDetailsBoundary("???", UserRole.NONE , "anna", "???"),
 						UserBoundary.class);
 		
-		// THEN the database contains a user with the userName attribute "anna"
+		// THEN the database contains a user with userName attribute "anna"
 		UserBoundary[] allUsers = 
 				this.restTemplate
 					.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}", UserBoundary[].class, "???", "??");
@@ -132,5 +155,97 @@ public class UserTests {
 		}
 						
 		
+	}
+	
+	@Test
+	public void test_Post_New_User_Then_The_Database_Contains_User_With_The_Same_User_Attribute_Avatar() throws Exception{
+		// GIVEN the server is up
+			// do nothing
+		
+		// WHEN I POST new user with avatar attribute: ":-))"
+		
+		this.restTemplate.postForObject
+				(this.url + "/users", new NewUserDetailsBoundary("???", UserRole.NONE , "???", ":-))"),
+						UserBoundary.class);
+		
+		// THEN the database contains a user with user avatar attribute ":-))"
+		UserBoundary[] allUsers = 
+				this.restTemplate
+					.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}", UserBoundary[].class, "???", "??");
+		boolean containsAvatarAttribute = false;
+		for (UserBoundary m : allUsers) {
+			if (m.getAvatar().equals(":-))")) {
+				containsAvatarAttribute = true;
+			}
+		}
+		
+		if (!containsAvatarAttribute) {
+			throw new Exception("failed to locate user with proper attribute avatar");
+		}
+						
+		
+	}
+	
+//	@Test 
+//	public void test_Put_Update_User_Attribute_Role_Then_DataBase_Contains_User_With_The_Same_User_Attribute_Role() throws Exception{
+//	// GIVEN the server is up
+//		// do nothing
+//	// AND the database contains a single message with type: PLAYER	
+//	UserBoundary newUser = new UserBoundary(null,UserRole.PLAYER,"sapir",":-(");
+//	
+//	UserBoundary boundaryOnServer=
+//			this.restTemplate.postForObject
+//			(this.url + "/users", newUser,
+//					UserBoundary.class);
+//	
+//	String postedUserId = boundaryOnServer.getUserId().toString();
+//	String userDomain = postedUserId.substring(0, postedUserId.indexOf('#')); 
+//	String userEmail = postedUserId.substring(postedUserId.indexOf('#') + 1);
+//				
+//	// WHEN I PUT with update of role to be "MANAGER"
+//	UserBoundary update = new UserBoundary();
+//	update.setRole(UserRole.MANAGER);
+//	this.restTemplate
+//	.put(this.url + "/users/{userDomain}/{userEmail}", update, userDomain, userEmail);
+//	
+//	// THEN the database contains a user with same id and role: MANAGER
+//			assertThat(this.restTemplate
+//					.getForObject(this.url + "/users/login/{userDomain}/{userEmail}", UserBoundary.class , userDomain, userEmail))
+//				.extracting("userId","role")
+//				.containsExactly(boundaryOnServer, update.getRole());
+//	}
+//	
+	
+	@Test
+	public void test_Init_Server_With_3_Users_When_We_Get_All_Users_We_Receive_The_Same_Users_Initialized() throws Exception {
+		// GIVEN the server is up
+		// AND the server contains 3 users
+		List<UserBoundary> allUsersInDb = 
+		  IntStream.range(1, 4)
+		  .mapToObj(i -> ("user #" + i))
+			.map(user->new NewUserDetailsBoundary(user, UserRole.PLAYER , "sapir", ":-)"))
+			.map(boundary-> this.restTemplate
+						.postForObject(
+								this.url+ "/users", 
+								boundary, 
+								UserBoundary.class))
+			.collect(Collectors.toList()); 
+		
+		System.err.println(allUsersInDb.size());
+		for (UserBoundary m : allUsersInDb) {
+					System.err.println(m);
+				}
+		// WHEN I GET /admin/users/{adminDomain}/{adminEmail}
+		UserBoundary[] allUsers = 
+				this.restTemplate
+					.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}", UserBoundary[].class, "???", "??");
+		for (UserBoundary m : allUsers) {
+			System.err.println(m);
+		}
+		// THEN The server returns the same 3 users initialized
+		assertThat(allUsers)
+			.hasSize(allUsersInDb.size())
+			.usingRecursiveFieldByFieldElementComparator()
+			.containsExactlyInAnyOrderElementsOf(allUsersInDb);
 	}
 }
