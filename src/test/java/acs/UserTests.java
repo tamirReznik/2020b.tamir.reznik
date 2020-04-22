@@ -19,11 +19,6 @@ import org.springframework.web.client.RestTemplate;
 import acs.data.UserRole;
 import acs.rest.boundaries.user.NewUserDetailsBoundary;
 import acs.rest.boundaries.user.UserBoundary;
-import acs.rest.boundaries.user.UserIdBoundary;
-
-
-
-
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class UserTests {
@@ -188,34 +183,35 @@ public class UserTests {
 	}
 	
 
-//	@Test 
-//	public void test_Put_Update_User_Attribute_Role_To_MANAGER_Then_Role_Is_Updated_In_The_DataBase() throws Exception{
-//	// GIVEN the server is up
-//		// do nothing
-//		
-//	// AND the database contains a single user with role: PLAYER	
-//	UserBoundary boundaryOnServer=
-//			this.restTemplate.postForObject
-//			(this.url + "/users", new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER , "sapir", ":-))"),
-//			UserBoundary.class);
-//	
-//	String postedUserId = boundaryOnServer.getUserId().toString();
-//	String userDomain = postedUserId.substring(0, postedUserId.indexOf('#')); 
-//	String userEmail = postedUserId.substring(postedUserId.indexOf('#') + 1);
-//				
-//		
-//	// WHEN I PUT with update of role to be "MANAGER"
-//	UserBoundary update = new UserBoundary();
-//	update.setRole(UserRole.MANAGER);
-//	this.restTemplate
-//	.put(this.url + "/users/{userDomain}/{userEmail}", update, userDomain, userEmail);
-//	
-//	// THEN the database contains a user with same id and role: MANAGER
-//	assertThat(this.restTemplate
-//		.getForObject(this.url + "/users/login/{userDomain}/{userEmail}", UserBoundary.class , userDomain, userEmail))
-//		.extracting("userId","role") //??
-//		.containsExactly(postedUserId, update.getRole()); //??
-//	}
+	@Test 
+	public void test_Put_Update_User_Attribute_Role_To_MANAGER_Then_Role_Is_Updated_In_The_DataBase() throws Exception{
+	// GIVEN the server is up
+		// do nothing
+		
+	// AND the database contains a single user with role: PLAYER	
+	UserBoundary boundaryOnServer=
+			this.restTemplate.postForObject
+			(this.url + "/users", new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER , "sapir", ":-))"),
+			UserBoundary.class);
+	
+	String postedUserId = boundaryOnServer.getUserId().toString();
+	String userDomain = postedUserId.substring(0, postedUserId.indexOf('#')); 
+	String userEmail = postedUserId.substring(postedUserId.indexOf('#') + 1);
+				
+		
+	// WHEN I PUT with update of role to be "MANAGER"
+	UserBoundary update = new UserBoundary();
+	update.setRole(UserRole.MANAGER);
+	this.restTemplate
+	.put(this.url + "/users/{userDomain}/{userEmail}", update, userDomain, userEmail);
+	
+	// THEN the database contains a user with same id and role: MANAGER
+	assertThat(this.restTemplate
+		.getForObject(this.url + "/users/login/{userDomain}/{userEmail}", UserBoundary.class , userDomain, userEmail))
+		.extracting("userId","role")
+		.usingRecursiveFieldByFieldElementComparator()
+		.containsExactly(boundaryOnServer.getUserId(), update.getRole());
+	}
 	
 	
 	
