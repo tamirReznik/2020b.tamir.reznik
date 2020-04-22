@@ -219,6 +219,7 @@ public class UserTests {
 	public void test_Init_Server_With_3_Users_When_We_Get_All_Users_We_Receive_The_Same_Users_Initialized() throws Exception {
 		// GIVEN the server is up
 		// AND the server contains 3 users
+		
 		List<UserBoundary> allUsersInDb = 
 		  IntStream.range(1, 4)
 		  .mapToObj(i -> ("email" + i))
