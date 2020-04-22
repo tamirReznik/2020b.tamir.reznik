@@ -77,20 +77,20 @@ public class ElementBoundary {
 		this.active = active;
 	}
 
-	public Date getTimeStamp() {
+	public Date getCreatedTimestamp() {
 		return createdTimestamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
-		this.createdTimestamp = timeStamp;
+	public void setCreatedTimestamp(Date createdTimestamp) {
+		this.createdTimestamp = createdTimestamp;
 	}
 
-	public Map<String, Object> getElemntAttributes() {
+	public Map<String, Object> getElementAttributes() {
 		return elementAttributes;
 	}
 
-	public void setElemntAttributes(Map<String, Object> elemntAttributes) {
-		this.elementAttributes = elemntAttributes;
+	public void setElementAttributes(Map<String, Object> elementAttributes) {
+		this.elementAttributes = elementAttributes;
 	}
 
 	public ElementIdBoundary getElementId() {
@@ -113,13 +113,7 @@ public class ElementBoundary {
 		this.createBy = createBy;
 	}
 
-	public Map<String, Object> getElementAttributes() {
-		return elementAttributes;
-	}
 
-	public void setElementAttributes(Map<String, Object> elementAttributes) {
-		this.elementAttributes = elementAttributes;
-	}
 
 	public void setLocation(Map<String, Double> location) {
 		this.location = location;
