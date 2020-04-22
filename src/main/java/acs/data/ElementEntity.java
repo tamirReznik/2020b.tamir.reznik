@@ -12,7 +12,8 @@ public class ElementEntity {
 	private String name;
 	private Boolean active;
 	private Date timeStamp;
-	private Map<String, UserIdBoundary> createBy;
+//	private Map<String, UserIdBoundary> createBy;
+	private String createBy; 
 	private Map<String, Double> location;
 	private Map<String, Object> elemntAttributes;
 
@@ -21,7 +22,7 @@ public class ElementEntity {
 	}
 
 	public ElementEntity(String elementId, TypeEnum type, String name, Boolean active, Date timeStamp,
-			Map<String, Double> location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
+			Map<String, Double> location, Map<String, Object> elemntAttributes, String createBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -81,11 +82,11 @@ public class ElementEntity {
 		this.timeStamp = timeStamp;
 	}
 
-	public Map<String, UserIdBoundary> getCreateBy() {
+	public String getCreateBy() {
 		return createBy;
 	}
 
-	public void setCreateBy(Map<String, UserIdBoundary> createBy) {
+	public void setCreateBy(String createBy) {
 		this.createBy = createBy;
 	}
 

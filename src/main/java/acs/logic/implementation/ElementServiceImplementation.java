@@ -47,6 +47,7 @@ public class ElementServiceImplementation implements ElementService {
 		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
 		ElementEntity entity = this.converter.toEntity(elementDetails);
 		entity.setTimeStamp(new Date());
+//		entity.setCreateBy(createBy);
 		this.elementDatabase.put(entity.getElementId(), entity);
 		return this.converter.fromEntity(entity);
 
