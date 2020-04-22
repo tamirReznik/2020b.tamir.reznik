@@ -36,4 +36,9 @@ public class ElementIdBoundary {
 	public void setId(String id) {
 		this.id = id;
 	}
+
+	@Override
+	public String toString() {
+		return this.getDomain() + "#" + this.getId();
+	}
 }
