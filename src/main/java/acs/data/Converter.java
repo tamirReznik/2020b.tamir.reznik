@@ -19,13 +19,13 @@ public class Converter {
 		ElementIdBoundary elementIdBoundary=new ElementIdBoundary(entity.getElementId().split("#")[0], entity.getElementId().split("#")[1]);
 		ElementBoundary eb = new ElementBoundary(elementIdBoundary, entity.getType(), entity.getName(),
 				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
-				Collections.singletonMap("", entity.getCreateBy());
+				Collections.singletonMap("", entity.getCreateBy()));
 		return eb;
 	}
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
 
-		ElementEntity eE = new ElementEntity(boundary.getElementId().getDomain() + "#" +  boundary.getElementId().getId(), boundary.getType(), boundary.getName(),
+		ElementEntity eE = new ElementEntity(fromIdBoundary(boundary.getElementId()), boundary.getType(), boundary.getName(),
 				boundary.getActive(), boundary.getTimeStamp(), boundary.getLocation(), boundary.getElemntAttributes(),
 				"");
 		return eE;
@@ -89,7 +89,6 @@ public class Converter {
 		if (entity != null && !entity.trim().isEmpty())
 			return new ActionIdBoundary(entity.substring(0, entity.indexOf('#')),
 					entity.substring(entity.indexOf('#') + 1));
-
 		return null;
 	}
 
