@@ -1,9 +1,5 @@
 package acs.data;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
@@ -16,24 +12,25 @@ import acs.rest.boundaries.user.UserIdBoundary;
 public class Converter {
 
 	public ElementBoundary fromEntity(ElementEntity entity) {
-		ElementIdBoundary elementIdBoundary=new ElementIdBoundary(entity.getElementId().split("#")[0], entity.getElementId().split("#")[1]);
+		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().split("#")[0],
+				entity.getElementId().split("#")[1]);
 		ElementBoundary eb = new ElementBoundary(elementIdBoundary, entity.getType(), entity.getName(),
-				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),entity.getCreateBy()
-				);
+				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
+				entity.getCreateBy());
 		return eb;
 	}
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
 
-		ElementEntity eE = new ElementEntity(fromIdBoundary(boundary.getElementId()), boundary.getType(), boundary.getName(),
-				boundary.getActive(), boundary.getTimeStamp(), boundary.getLocation(), boundary.getElemntAttributes(),
-				boundary.getCreateBy());
+		ElementEntity eE = new ElementEntity(fromIdBoundary(boundary.getElementId()), boundary.getType(),
+				boundary.getName(), boundary.getActive(), boundary.getTimeStamp(), boundary.getLocation(),
+				boundary.getElemntAttributes(), boundary.getCreateBy());
 		return eE;
 	}
-	// domain :abc  id: 123 -- > abc#123
+	// domain :abc id: 123 -- > abc#123
 
 	public UserBoundary fromEntity(UserEntity entity) {
-		
+
 		UserIdBoundary userId = new UserIdBoundary(entity.getUserId().substring(0, entity.getUserId().indexOf('#')),
 				entity.getUserId().substring(entity.getUserId().indexOf('#') + 1));
 
