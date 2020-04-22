@@ -2,6 +2,7 @@ package acs.logic.implementation;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -48,8 +49,9 @@ public class ElementServiceImplementation implements ElementService {
 		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
 		ElementEntity entity = this.converter.toEntity(elementDetails);
 		entity.setTimeStamp(new Date());
-//		Map<String,UserIdBoundary> createBy =new Map("",new UserIdBoundary(managerDomain,managerEmail));
-//		entity.setCreateBy(createBy);
+		Map<String,UserIdBoundary> createBy =new HashMap<>();
+		createBy.put("Created by : ", new UserIdBoundary(managerDomain,managerEmail));
+		entity.setCreateBy(createBy);
 		this.elementDatabase.put(entity.getElementId(), entity);
 		return this.converter.fromEntity(entity);
 
