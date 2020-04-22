@@ -17,6 +17,7 @@ import acs.logic.ElementService;
 import acs.logic.ObjectNotFoundException;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
 public class ElementServiceImplementation implements ElementService {
@@ -47,6 +48,7 @@ public class ElementServiceImplementation implements ElementService {
 		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
 		ElementEntity entity = this.converter.toEntity(elementDetails);
 		entity.setTimeStamp(new Date());
+//		Map<String,UserIdBoundary> createBy =new Map("",new UserIdBoundary(managerDomain,managerEmail));
 //		entity.setCreateBy(createBy);
 		this.elementDatabase.put(entity.getElementId(), entity);
 		return this.converter.fromEntity(entity);

@@ -18,8 +18,8 @@ public class Converter {
 	public ElementBoundary fromEntity(ElementEntity entity) {
 		ElementIdBoundary elementIdBoundary=new ElementIdBoundary(entity.getElementId().split("#")[0], entity.getElementId().split("#")[1]);
 		ElementBoundary eb = new ElementBoundary(elementIdBoundary, entity.getType(), entity.getName(),
-				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
-				Collections.singletonMap("", entity.getCreateBy()));
+				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),entity.getCreateBy()
+				);
 		return eb;
 	}
 
