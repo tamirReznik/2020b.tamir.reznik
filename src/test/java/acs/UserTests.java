@@ -255,4 +255,35 @@ public class UserTests {
 		// THEN the returned value is an empty array
 		assertThat(actual).isEmpty();
 	}
+	
+	@Test
+	public void test_Init_Server_With_3_Users_When_We_Delete_all_Users_And_Than_Get_All_Users_We_Receive_empty_array() throws Exception {
+		// GIVEN the server is up
+		//AND the server contains 3 users
+		List<UserBoundary> allUsersInDb = 
+				  IntStream.range(1, 4)
+				  .mapToObj(i -> ("email" + i))
+					.map(email->new NewUserDetailsBoundary(email, UserRole.PLAYER , "anna", ":-)"))
+					.map(boundary-> this.restTemplate
+								.postForObject(
+										this.url+ "/users", 
+										boundary, 
+										UserBoundary.class))
+					.collect(Collectors.toList()); 
+		
+		//AND I delete all users
+		this.restTemplate
+		.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}","???","??");
+		
+		// WHEN I GET for all users
+		UserBoundary[] actual
+			= this.restTemplate
+				.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}", UserBoundary[].class ,"???", "??");
+		
+		// THEN the returned value is an empty array
+		assertThat(actual)
+			.isEmpty();
+	}
+	
+	
 }
