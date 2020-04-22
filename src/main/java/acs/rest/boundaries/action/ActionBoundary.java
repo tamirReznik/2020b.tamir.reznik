@@ -2,9 +2,7 @@ package acs.rest.boundaries.action;
 
 import java.util.Date;
 import java.util.Map;
-
 import acs.data.TypeEnum;
-import acs.rest.boundaries.element.ElementIdBoundary;
 
 /*
 {
@@ -12,10 +10,7 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 		"domain": "tamir",
 		"id": "54"	
 	}, 	
-	"elementId":{
-	"domain":"User",
-	"id": 456
-	}
+
 	"type":"actionType",
 	"element":{
 		"elementId": {
@@ -40,7 +35,6 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 
 public class ActionBoundary {
 	private ActionIdBoundary actionId;
-	private ElementIdBoundary elementId;
 	private TypeEnum type;
 	private Map<String, Object> element;
 	private Date createdTimestamp;
@@ -51,8 +45,8 @@ public class ActionBoundary {
 	}
 
 	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
-			Map<String, Object> invokedBy, Map<String, Object> actionAttributes, ElementIdBoundary elementId) {
-		this.elementId = elementId;
+			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
+
 		this.actionId = actionId;
 		this.type = type;
 		this.element = element;
@@ -93,14 +87,6 @@ public class ActionBoundary {
 		this.element = element;
 	}
 
-	public ElementIdBoundary getElementId() {
-		return elementId;
-	}
-
-	public void setElementId(ElementIdBoundary elementId) {
-		this.elementId = elementId;
-	}
-
 	public Map<String, Object> getInvokedBy() {
 		return invokedBy;
 	}
@@ -115,6 +101,18 @@ public class ActionBoundary {
 
 	public void setActionAttributes(Map<String, Object> actionAttributes) {
 		this.actionAttributes = actionAttributes;
+	}
+
+//	@Override
+//	public String toString() {
+//		return "ActionBoundary [actionId=" + actionId + ", type=" + type + ", element=" + element
+//				+ ", createdTimestamp=" + createdTimestamp + ", invokedBy=" + invokedBy + ", actionAttributes="
+//				+ actionAttributes + "]";
+//	}
+
+	@Override
+	public String toString() {
+		return "Action id: " + this.actionId.getDomain() + "#" + this.actionId.getId();
 	}
 
 }

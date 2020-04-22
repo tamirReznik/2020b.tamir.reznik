@@ -36,9 +36,12 @@ public class UserIdBoundary {
 		this.email = email;
 	}
 
+	
 	@Override
 	public String toString() {
-		return "UserIdBoundary [domain=" + domain + ", email=" + email + "]";
+		
+		return domain + "#" + email;
+		
 	}
 
 }

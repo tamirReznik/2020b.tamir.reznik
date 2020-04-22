@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import acs.data.Converter;
 import acs.data.UserEntity;
+import acs.data.UserRole;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.UserService;
 import acs.rest.boundaries.user.UserBoundary;
@@ -39,20 +40,18 @@ public class UserServiceImplementation implements UserService {
 		this.usersDatabase = Collections.synchronizedMap(new TreeMap<>());
 	}
 
-	// need to set domain to project name
 	public UserBoundary createUser(UserBoundary user) {
 
+		user.getUserId().setDomain(projectName);
+			
 		UserEntity entity = this.converter.toEntity(user);
-
-		this.usersDatabase.put(user.getUserId().getEmail(), entity); // ??
-
+		this.usersDatabase.put(entity.getUserId(), entity);
 		return this.converter.fromEntity(entity);
 	}
 
 	@Override
 	public UserBoundary login(String userDomain, String userEmail) {
-
-		UserEntity existing = this.usersDatabase.get(userEmail); // ???
+		UserEntity existing = this.usersDatabase.get(userDomain + "#" + userEmail);
 		if (existing != null) {
 			return this.converter.fromEntity(existing);
 		} else {
@@ -62,47 +61,69 @@ public class UserServiceImplementation implements UserService {
 
 	}
 
-	@Override // represent enum as string in entity + check for null in arguments(userDomain,
-				// userEmail)
+	@Override
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update) {
-		UserEntity existing = this.usersDatabase.get(userEmail); // ??
 
-		if (existing == null) {
-			throw new ObjectNotFoundException(
-					"could not find object by UserDomain: " + userDomain + "or userEmail: " + userEmail);
-		}
+		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
 
-		else {
-			if (update.getRole() != null) {
-				existing.setRole(update.getRole());
-				// this.usersDatabase.put(??, existing);
+			UserEntity existing = this.usersDatabase.get(userDomain + "#" + userEmail);
+
+			if (existing == null) {
+				throw new ObjectNotFoundException(
+						"could not find object by UserDomain: " + userDomain + "or userEmail: " + userEmail);
 			}
+			
+			boolean dirty = false;
+
+			if (update.getRole() != null) {
+				existing.setRole(this.converter.toEntity(update.getRole()));
+				dirty = true;
+			}
+
 			if (update.getUsername() != null) {
 				existing.setUsername(update.getUsername());
-				// this.usersDatabase.put(??, existing);
+				dirty = true;
 			}
+
 			if (update.getAvatar() != null) {
 				existing.setAvatar(update.getAvatar());
-				// this.usersDatabase.put(??, existing);
+				dirty = true;
+			}
+
+			if (dirty) {
+				this.usersDatabase.put(userDomain + "#" + userEmail, existing);
 			}
 
 			return this.converter.fromEntity(existing);
+		} else {
+			throw new RuntimeException("User Domain and User Email must not be empty or null");
+
 		}
-
 	}
 
-	@Override // check for null in arguments
+	@Override
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
-		return this.usersDatabase // Map<String, UserEntity>
-				.values() // Collection<UserEntity>
-				.stream() // Stream<UserEntity>
-				.map(e -> this.converter.fromEntity(e)) // Stream<UserBoundary>
-				.collect(Collectors.toList()); // List<UserBoundary>
+		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
+				&& !adminEmail.trim().isEmpty()) {
+			return this.usersDatabase // Map<String, UserEntity>
+					.values() // Collection<UserEntity>
+					.stream() // Stream<UserEntity>
+					.map(e -> this.converter.fromEntity(e)) // Stream<UserBoundary>
+					.collect(Collectors.toList()); // List<UserBoundary>
+		} else {
+			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
+
+		}
 	}
 
-	@Override // check for null in arguments
+	@Override
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
-		this.usersDatabase.clear();
+		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
+				&& !adminEmail.trim().isEmpty()) {
+			this.usersDatabase.clear();
+		} else {
+			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
+		}
 	}
 
 }

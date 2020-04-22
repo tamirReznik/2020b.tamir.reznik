@@ -11,6 +11,11 @@ package acs.rest.boundaries.action;
 
 public class ActionIdBoundary {
 
+	@Override
+	public String toString() {
+		return "ActionIdBoundary [domain=" + domain + ", id=" + id + "]";
+	}
+
 	private String domain;
 	private String id;
 
