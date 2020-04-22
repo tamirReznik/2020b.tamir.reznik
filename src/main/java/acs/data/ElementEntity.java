@@ -2,8 +2,6 @@ package acs.data;
 
 import java.util.Date;
 import java.util.Map;
-
-import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 public class ElementEntity {
@@ -13,7 +11,7 @@ public class ElementEntity {
 	private Boolean active;
 	private Date timeStamp;
 	private Map<String, UserIdBoundary> createBy;
-//	private String createBy; 
+
 	private Map<String, Double> location;
 	private Map<String, Object> elemntAttributes;
 

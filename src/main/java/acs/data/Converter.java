@@ -22,9 +22,9 @@ public class Converter {
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
 
-		ElementEntity eE = new ElementEntity(fromIdBoundary(boundary.getElementId()), boundary.getType(),
-				boundary.getName(), boundary.getActive(), boundary.getTimeStamp(), boundary.getLocation(),
-				boundary.getElemntAttributes(), boundary.getCreateBy());
+		ElementEntity eE = new ElementEntity(boundary.getElementId().toString(), boundary.getType(), boundary.getName(),
+				boundary.getActive(), boundary.getTimeStamp(), boundary.getLocation(), boundary.getElemntAttributes(),
+				boundary.getCreateBy());
 		return eE;
 	}
 	// domain :abc id: 123 -- > abc#123
@@ -60,6 +60,7 @@ public class Converter {
 		}
 	}
 
+	// keep the method for later use if toString change be needed!
 	public <T> String fromIdBoundary(T idBoundary) {
 
 		if (idBoundary.getClass().equals(ActionIdBoundary.class))
@@ -77,7 +78,7 @@ public class Converter {
 	public ActionEntity toEntity(ActionBoundary actionBoundary) {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType().name();
-		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, actionBoundary.getElement(),
+		return new ActionEntity(actionBoundary.getActionId().toString(), type, actionBoundary.getElement(),
 				actionBoundary.getTimestamp(), actionBoundary.getInvokedBy(), actionBoundary.getActionAttributes());
 
 	}
