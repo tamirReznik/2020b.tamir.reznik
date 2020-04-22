@@ -28,7 +28,6 @@ import acs.rest.boundaries.user.UserIdBoundary;
 public class ActionTests {
 
 	private RestTemplate restTemplate;
-
 	private String postUrl;
 	private int port;
 	private String delete_And_Get_Url;
