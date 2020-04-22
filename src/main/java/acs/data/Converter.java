@@ -14,7 +14,7 @@ public class Converter {
 	public ElementBoundary fromEntity(ElementEntity entity) {
 		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().split("#")[0],
 				entity.getElementId().split("#")[1]);
-		ElementBoundary eb = new ElementBoundary(elementIdBoundary, entity.getType(), entity.getName(),
+		ElementBoundary eb = new ElementBoundary(elementIdBoundary, TypeEnum.valueOf(entity.getType()) , entity.getName(),
 				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
 				entity.getCreateBy());
 		return eb;
@@ -22,7 +22,7 @@ public class Converter {
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
 
-		ElementEntity eE = new ElementEntity(fromIdBoundary(boundary.getElementId()), boundary.getType(),
+		ElementEntity eE = new ElementEntity(fromIdBoundary(boundary.getElementId()), toString(boundary.getType()),
 				boundary.getName(), boundary.getActive(), boundary.getTimeStamp(), boundary.getLocation(),
 				boundary.getElemntAttributes(), boundary.getCreateBy());
 		return eE;
@@ -53,6 +53,13 @@ public class Converter {
 	}
 
 	public String toEntity(UserRole type) {
+		if (type != null) {
+			return type.name();
+		} else {
+			return null;
+		}
+	}
+	public String toString(TypeEnum type) {
 		if (type != null) {
 			return type.name();
 		} else {
