@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import acs.data.UserRole;
 import acs.rest.boundaries.user.NewUserDetailsBoundary;
 import acs.rest.boundaries.user.UserBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 
 
@@ -202,8 +203,7 @@ public class UserTests {
 //	String userDomain = postedUserId.substring(0, postedUserId.indexOf('#')); 
 //	String userEmail = postedUserId.substring(postedUserId.indexOf('#') + 1);
 //				
-//	UserIdBoundary uib = new UserIdBoundary(userDomain,userEmail);
-//	
+//		
 //	// WHEN I PUT with update of role to be "MANAGER"
 //	UserBoundary update = new UserBoundary();
 //	update.setRole(UserRole.MANAGER);
