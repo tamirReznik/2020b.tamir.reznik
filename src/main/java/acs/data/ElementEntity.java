@@ -2,7 +2,6 @@ package acs.data;
 
 import java.util.Date;
 import java.util.Map;
-import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 public class ElementEntity {

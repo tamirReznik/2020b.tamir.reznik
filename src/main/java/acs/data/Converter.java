@@ -14,16 +14,16 @@ public class Converter {
 	public ElementBoundary fromEntity(ElementEntity entity) {
 		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().split("#")[0],
 				entity.getElementId().split("#")[1]);
-		ElementBoundary eb = new ElementBoundary(elementIdBoundary, TypeEnum.valueOf(entity.getType()) , entity.getName(),
-				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
-				entity.getCreateBy());
+		ElementBoundary eb = new ElementBoundary(elementIdBoundary, TypeEnum.valueOf(entity.getType()),
+				entity.getName(), entity.getActive(), entity.getTimeStamp(), entity.getLocation(),
+				entity.getElemntAttributes(), entity.getCreateBy());
 		return eb;
 	}
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
-		ElementEntity eE = new ElementEntity(boundary.getElementId().toString(), toString(boundary.getType()), boundary.getName(),
-				boundary.getActive(), boundary.getCreatedTimestamp(), boundary.getLocation(), boundary.getElementAttributes(),
-				boundary.getCreateBy());
+		ElementEntity eE = new ElementEntity(boundary.getElementId().toString(), typeEnumToString(boundary.getType()),
+				boundary.getName(), boundary.getActive(), boundary.getCreatedTimestamp(), boundary.getLocation(),
+				boundary.getElementAttributes(), boundary.getCreateBy());
 		return eE;
 	}
 	// domain :abc id: 123 -- > abc#123
@@ -58,7 +58,8 @@ public class Converter {
 			return null;
 		}
 	}
-	public String toString(TypeEnum type) {
+
+	public String typeEnumToString(TypeEnum type) {
 		if (type != null) {
 			return type.name();
 		} else {
@@ -66,6 +67,7 @@ public class Converter {
 		}
 	}
 
+	// keep this function for later use in case toString won't be enough
 	public <T> String fromIdBoundary(T idBoundary) {
 
 		if (idBoundary.getClass().equals(ActionIdBoundary.class))
