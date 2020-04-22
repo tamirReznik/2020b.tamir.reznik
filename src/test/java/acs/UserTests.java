@@ -223,7 +223,7 @@ public class UserTests {
 		List<UserBoundary> allUsersInDb = 
 		  IntStream.range(1, 4)
 		  .mapToObj(i -> ("email" + i))
-			.map(user->new NewUserDetailsBoundary(user, UserRole.PLAYER , "sapir", ":-)"))
+			.map(email->new NewUserDetailsBoundary(email, UserRole.PLAYER , "sapir", ":-)"))
 			.map(boundary-> this.restTemplate
 						.postForObject(
 								this.url+ "/users", 
@@ -231,17 +231,11 @@ public class UserTests {
 								UserBoundary.class))
 			.collect(Collectors.toList()); 
 		
-		System.err.println(allUsersInDb.size());
-		for (UserBoundary m : allUsersInDb) {
-					System.err.println(m);
-				}
 		// WHEN I GET /admin/users/{adminDomain}/{adminEmail}
 		UserBoundary[] allUsers = 
 				this.restTemplate
 					.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}", UserBoundary[].class, "???", "??");
-		for (UserBoundary m : allUsers) {
-			System.err.println(m);
-		}
+		
 		// THEN The server returns the same 3 users initialized
 		assertThat(allUsers)
 			.hasSize(allUsersInDb.size())

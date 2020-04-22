@@ -74,6 +74,7 @@ public class UserServiceImplementation implements UserService {
 			}
 			
 			boolean dirty = false;
+			
 
 			if (update.getRole() != null) {
 				existing.setRole(this.converter.toEntity(update.getRole()));

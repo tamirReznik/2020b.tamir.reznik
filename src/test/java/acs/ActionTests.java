@@ -84,12 +84,6 @@ public class ActionTests {
 		assertThat(results).hasSize(allActionsInDb.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allActionsInDb);
 
-		this.restTemplate.delete(this.delete_And_Get_Url);
-		results = this.restTemplate.getForObject(this.delete_And_Get_Url, ActionBoundary[].class, params);
-		assertThat(results).isEmpty();
-		assertThat(results).hasSize(allActionsInDb.size()).usingRecursiveFieldByFieldElementComparator()
-				.containsExactlyInAnyOrderElementsOf(allActionsInDb);
-
 	}
 
 	public ActionBoundary invoke_Random_ActionBoundary_For_Tests() throws JsonProcessingException {
