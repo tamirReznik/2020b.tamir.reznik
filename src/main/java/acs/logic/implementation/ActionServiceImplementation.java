@@ -48,7 +48,7 @@ public class ActionServiceImplementation implements ActionService {
 			action.getActionId().setDomain(projectName);
 			action.getActionId().setId(UUID.randomUUID().toString());
 			ActionEntity entity = converter.toEntity(action);
-			actionDatabase.put(converter.fromIdBoundary(action.getActionId()), entity);
+			actionDatabase.put(action.getActionId().toString(), entity);
 			return action;
 		}
 	}

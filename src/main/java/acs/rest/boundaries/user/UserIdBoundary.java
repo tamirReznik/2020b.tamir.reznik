@@ -38,8 +38,9 @@ public class UserIdBoundary {
 
 	@Override
 	public String toString() {
-		
-		return domain + "#" + email;
-		
+
+		return this.domain + "#" + this.email;
+
 	}
+
 }

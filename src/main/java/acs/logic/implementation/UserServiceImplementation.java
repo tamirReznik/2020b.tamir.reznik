@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import acs.data.Converter;
 import acs.data.UserEntity;
-import acs.data.UserRole;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.UserService;
 import acs.rest.boundaries.user.UserBoundary;
@@ -43,7 +42,7 @@ public class UserServiceImplementation implements UserService {
 	public UserBoundary createUser(UserBoundary user) {
 
 		user.getUserId().setDomain(projectName);
-			
+
 		UserEntity entity = this.converter.toEntity(user);
 		this.usersDatabase.put(entity.getUserId(), entity);
 		return this.converter.fromEntity(entity);
@@ -72,7 +71,7 @@ public class UserServiceImplementation implements UserService {
 				throw new ObjectNotFoundException(
 						"could not find object by UserDomain: " + userDomain + "or userEmail: " + userEmail);
 			}
-			
+
 			boolean dirty = false;
 
 			if (update.getRole() != null) {

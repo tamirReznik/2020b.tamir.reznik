@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -28,7 +29,6 @@ import acs.rest.boundaries.user.UserIdBoundary;
 public class ActionTests {
 
 	private RestTemplate restTemplate;
-
 	private String postUrl;
 	private int port;
 	private String delete_And_Get_Url;
@@ -43,6 +43,11 @@ public class ActionTests {
 		this.restTemplate = new RestTemplate();
 		this.postUrl = "http://localhost:" + this.port + "/acs/actions";
 		this.delete_And_Get_Url = "http://localhost:" + this.port + "/acs/admin/actions/{adminDomain}/{adminEmail}";
+	}
+
+	@BeforeEach
+	public void setup() {
+		this.restTemplate.delete(delete_And_Get_Url, "adminDomain", "adminEmail");
 	}
 
 	@AfterEach
@@ -84,11 +89,9 @@ public class ActionTests {
 		assertThat(results).hasSize(allActionsInDb.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allActionsInDb);
 
-		this.restTemplate.delete(this.delete_And_Get_Url);
+		this.restTemplate.delete(delete_And_Get_Url, "adminDomain", "adminEmail");
 		results = this.restTemplate.getForObject(this.delete_And_Get_Url, ActionBoundary[].class, params);
 		assertThat(results).isEmpty();
-		assertThat(results).hasSize(allActionsInDb.size()).usingRecursiveFieldByFieldElementComparator()
-				.containsExactlyInAnyOrderElementsOf(allActionsInDb);
 
 	}
 

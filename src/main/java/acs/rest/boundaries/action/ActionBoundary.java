@@ -103,16 +103,4 @@ public class ActionBoundary {
 		this.actionAttributes = actionAttributes;
 	}
 
-//	@Override
-//	public String toString() {
-//		return "ActionBoundary [actionId=" + actionId + ", type=" + type + ", element=" + element
-//				+ ", createdTimestamp=" + createdTimestamp + ", invokedBy=" + invokedBy + ", actionAttributes="
-//				+ actionAttributes + "]";
-//	}
-
-	@Override
-	public String toString() {
-		return "Action id: " + this.actionId.getDomain() + "#" + this.actionId.getId();
-	}
-
 }
