@@ -71,7 +71,7 @@ public class ElementServiceImplementation implements ElementService {
 			if (update.getLocation() != null)
 				existing.setLocation(update.getLocation());
 			if (update.getType() != null)
-				existing.setType(converter.toString(update.getType()));
+				existing.setType(converter.typeEnumToString(update.getType()));
 			return this.converter.fromEntity(existing);
 		}
 	}
