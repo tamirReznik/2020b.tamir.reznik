@@ -34,11 +34,11 @@ public class ElementBoundary {
 	private Boolean active;
 	private Date createdTimestamp;
 	private Map<String, UserIdBoundary> createBy;
-	private Map<String, Double> location;
+	private Location location;
 	private Map<String, Object> elementAttributes;
 
 	public ElementBoundary(ElementIdBoundary elementId, TypeEnum type, String name, Boolean active, Date timeStamp,
-			Map<String, Double> location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
+			Location location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -101,7 +101,7 @@ public class ElementBoundary {
 		this.elementId = elementId;
 	}
 
-	public Map<String, Double> getLocation() {
+	public Location getLocation() {
 		return location;
 	}
 
@@ -113,9 +113,7 @@ public class ElementBoundary {
 		this.createBy = createBy;
 	}
 
-
-
-	public void setLocation(Map<String, Double> location) {
+	public void setLocation(Location location) {
 		this.location = location;
 	}
 }

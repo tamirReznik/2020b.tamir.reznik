@@ -2,6 +2,8 @@ package acs.data;
 
 import java.util.Date;
 import java.util.Map;
+
+import acs.rest.boundaries.element.Location;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 public class ElementEntity {
@@ -11,7 +13,7 @@ public class ElementEntity {
 	private Boolean active;
 	private Date createdTimestamp;
 	private Map<String, UserIdBoundary> createdBy;
-	private Map<String, Double> location;
+	private Location location;
 	private Map<String, Object> elemntAttributes;
 
 	public ElementEntity() {
@@ -19,7 +21,7 @@ public class ElementEntity {
 	}
 
 	public ElementEntity(String elementId, String type, String name, Boolean active, Date timeStamp,
-			Map<String, Double> location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
+			Location location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -31,11 +33,11 @@ public class ElementEntity {
 		this.elemntAttributes = elemntAttributes;
 	}
 
-	public Map<String, Double> getLocation() {
+	public Location getLocation() {
 		return location;
 	}
 
-	public void setLocation(Map<String, Double> location) {
+	public void setLocation(Location location) {
 		this.location = location;
 	}
 

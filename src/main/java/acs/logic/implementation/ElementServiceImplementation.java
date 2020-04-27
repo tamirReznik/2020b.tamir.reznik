@@ -53,7 +53,6 @@ public class ElementServiceImplementation implements ElementService {
 		entity.setCreateBy(createdBy);
 		this.elementDatabase.put(entity.getElementId(), entity);
 		return this.converter.fromEntity(entity);
-
 	}
 
 	@Override
