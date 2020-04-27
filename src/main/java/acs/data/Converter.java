@@ -8,7 +8,6 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
-
 @Component
 public class Converter {
 
@@ -29,33 +28,29 @@ public class Converter {
 	}
 	// domain :abc id: 123 -- > abc#123
 
-	
 	public UserBoundary fromEntity(UserEntity entity) {
 
 		UserIdBoundary userId = fromEntity(entity.getUserId());
-				
+
 		UserBoundary ub = new UserBoundary(userId, null, entity.getUsername(), entity.getAvatar());
 
 		if (entity.getRole() != null)
 			ub.setRole(this.fromEntity(entity.getRole()));
-	
+
 		return ub;
 	}
 
-	
 	public UserEntity toEntity(UserBoundary boundary) {
 
-		
 		UserRoleEntityEnum role = boundary.getRole() == null ? null : toEntity(boundary.getRole());
-		
+
 		UserIdEntity userId = toEntity(boundary.getUserId());
-		
+
 		UserEntity ue = new UserEntity(userId, role, boundary.getUsername(), boundary.getAvatar());
 
 		return ue;
 	}
 
-	
 	public UserRoleEntityEnum toEntity(UserRole type) {
 		if (type != null) {
 			return UserRoleEntityEnum.valueOf(type.name().toLowerCase());
@@ -63,29 +58,29 @@ public class Converter {
 			return null;
 		}
 	}
-	
+
 	public UserRole fromEntity(UserRoleEntityEnum type) {
 		if (type != null) {
 			return UserRole.valueOf(type.name().toUpperCase());
-		}else {
+		} else {
 			return null;
 		}
 	}
 
-	public UserIdBoundary fromEntity (UserIdEntity userId) {
-		if(userId != null)
+	public UserIdBoundary fromEntity(UserIdEntity userId) {
+		if (userId != null)
 			return new UserIdBoundary(userId.getDomain(), userId.getEmail());
-		else 
-			return null; 
+		else
+			return null;
 	}
-	
+
 	public UserIdEntity toEntity(UserIdBoundary userId) {
-		if(userId != null)
+		if (userId != null)
 			return new UserIdEntity(userId.getDomain(), userId.getEmail());
 		else
-			return null; 
+			return null;
 	}
-	
+
 	public String typeEnumToString(TypeEnum type) {
 		if (type != null) {
 			return type.name();
@@ -113,7 +108,8 @@ public class Converter {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType().name();
 		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, actionBoundary.getElement(),
-				actionBoundary.getTimestamp(), actionBoundary.getInvokedBy(), actionBoundary.getActionAttributes());
+				actionBoundary.getCreatedTimestamp(), actionBoundary.getInvokedBy(),
+				actionBoundary.getActionAttributes());
 
 	}
 

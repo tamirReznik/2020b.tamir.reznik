@@ -16,7 +16,7 @@ import acs.data.Converter;
 import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 
-//@Service
+@Service
 public class ActionServiceImplementation implements ActionService {
 
 	private String projectName;
@@ -44,7 +44,7 @@ public class ActionServiceImplementation implements ActionService {
 		if (action == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 		} else {
-			action.setTimestamp(new Date());
+			action.setCreatedTimestamp(new Date());
 			action.getActionId().setDomain(projectName);
 			action.getActionId().setId(UUID.randomUUID().toString());
 			ActionEntity entity = converter.toEntity(action);

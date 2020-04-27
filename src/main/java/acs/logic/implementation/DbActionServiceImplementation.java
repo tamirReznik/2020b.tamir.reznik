@@ -41,11 +41,11 @@ public class DbActionServiceImplementation implements ActionService {
 		if (action == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 		} else {
-			action.setTimestamp(new Date());
+			action.setCreatedTimestamp(new Date());
 			action.getActionId().setDomain(projectName);
 			action.getActionId().setId(UUID.randomUUID().toString());
 			ActionEntity entity = converter.toEntity(action);
-			//actionDao.put(action.getActionId().toString(), entity);
+			// actionDao.put(action.getActionId().toString(), entity);
 			this.actionDao.save(entity);
 			return action;
 		}
@@ -55,7 +55,8 @@ public class DbActionServiceImplementation implements ActionService {
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
-			return this.actionDao.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
+//			return this.actionDao.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
+			return null;
 		} else {
 			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
 		}
@@ -66,7 +67,7 @@ public class DbActionServiceImplementation implements ActionService {
 	public void deleteAllActions(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
-			this.actionDao.clear();
+//			this.actionDao.clear();
 		} else {
 			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
 		}

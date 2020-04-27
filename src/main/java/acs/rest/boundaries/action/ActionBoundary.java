@@ -6,30 +6,30 @@ import acs.data.TypeEnum;
 
 /*
 {
- 	"actionId":{
-		"domain": "tamir",
-		"id": "54"	
-	}, 	
-
-	"type":"actionType",
-	"element":{
-		"elementId": {
+    "actionId": {
+        "domain": "2020b.tamir.reznik",
+        "id": "ce44996c-9a9d-475a-ae53-27575e6d24b5"
+    },
+    "type": "actionType",
+    "element": {
+        "elementId": {
             "domain": "2020b.demo",
             "id": 0
         }
-	},
- 	"invokedBy":{
- 		"userId": {
+    },
+    "createdTimestamp": "2020-04-27T16:13:57.475+0000",
+    "invokedBy": {
+        "userId": {
             "domain": "2020b.demo",
             "email": "anna@gmail.com"
         }
-	},
-	"actionAttributes":{
-		"streetName": "Sheshet Hayamim",
-		"cityName": "Binyamina",	
-		"isParkingEmpty": false,
-		"nameOfParking": "parking name"
-	} 	
+    },
+    "actionAttributes": {
+        "streetName": "Sheshet Hayamim",
+        "cityName": "Binyamina",
+        "isParkingEmpty": false,
+        "nameOfParking": "parking name"
+    }
 }
  */
 
@@ -44,23 +44,15 @@ public class ActionBoundary {
 	public ActionBoundary() {
 	}
 
-	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date timeStap,
+	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date createdTimestamp,
 			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
 
 		this.actionId = actionId;
 		this.type = type;
 		this.element = element;
-		this.createdTimestamp = timeStap;
+		this.setCreatedTimestamp(createdTimestamp);
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
-	}
-
-	public Date getTimestamp() {
-		return createdTimestamp;
-	}
-
-	public void setTimestamp(Date timestamp) {
-		this.createdTimestamp = timestamp;
 	}
 
 	public ActionIdBoundary getActionId() {
@@ -101,6 +93,14 @@ public class ActionBoundary {
 
 	public void setActionAttributes(Map<String, Object> actionAttributes) {
 		this.actionAttributes = actionAttributes;
+	}
+
+	public Date getCreatedTimestamp() {
+		return createdTimestamp;
+	}
+
+	public void setCreatedTimestamp(Date createdTimestamp) {
+		this.createdTimestamp = createdTimestamp;
 	}
 
 }
