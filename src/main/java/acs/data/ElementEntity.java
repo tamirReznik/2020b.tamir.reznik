@@ -9,8 +9,8 @@ public class ElementEntity {
 	private String type;
 	private String name;
 	private Boolean active;
-	private Date timeStamp;
-	private Map<String, UserIdBoundary> createBy;
+	private Date createdTimestamp;
+	private Map<String, UserIdBoundary> createdBy;
 	private Map<String, Double> location;
 	private Map<String, Object> elemntAttributes;
 
@@ -25,8 +25,8 @@ public class ElementEntity {
 		this.type = type;
 		this.name = name;
 		this.active = active;
-		this.timeStamp = timeStamp;
-		this.createBy = createBy;
+		this.createdTimestamp = timeStamp;
+		this.createdBy = createBy;
 		this.location = location;
 		this.elemntAttributes = elemntAttributes;
 	}
@@ -72,19 +72,19 @@ public class ElementEntity {
 	}
 
 	public Date getTimeStamp() {
-		return timeStamp;
+		return createdTimestamp;
 	}
 
 	public void setTimeStamp(Date timeStamp) {
-		this.timeStamp = timeStamp;
+		this.createdTimestamp = timeStamp;
 	}
 
 	public Map<String, UserIdBoundary> getCreateBy() {
-		return createBy;
+		return createdBy;
 	}
 
 	public void setCreateBy(Map<String, UserIdBoundary> createBy) {
-		this.createBy = createBy;
+		this.createdBy = createBy;
 	}
 
 	public Map<String, Object> getElemntAttributes() {

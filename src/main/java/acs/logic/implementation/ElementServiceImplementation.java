@@ -25,18 +25,17 @@ public class ElementServiceImplementation implements ElementService {
 	private Map<String, ElementEntity> elementDatabase;
 	private Converter converter;
 	private String projectName;
-	
-	
+
 	@Autowired
 	public ElementServiceImplementation(Converter converter) {
 		this.converter = converter;
 	}
-	
+
 	// injection of project name from the spring boot configuration
-		@Value("${spring.application.name: generic}")
-		public void setProjectName(String projectName) {
-			this.projectName = projectName;
-		}
+	@Value("${spring.application.name: generic}")
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -44,14 +43,14 @@ public class ElementServiceImplementation implements ElementService {
 		this.elementDatabase = Collections.synchronizedMap(new TreeMap<>());
 	}
 
-	@Override//need to update manager for the element
+	@Override
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
 		ElementEntity entity = this.converter.toEntity(elementDetails);
 		entity.setTimeStamp(new Date());
-		Map<String,UserIdBoundary> createBy =new HashMap<>();
-		createBy.put("User ID : ", new UserIdBoundary(managerDomain,managerEmail));
-		entity.setCreateBy(createBy);
+		Map<String, UserIdBoundary> createdBy = new HashMap<>();
+		createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
+		entity.setCreateBy(createdBy);
 		this.elementDatabase.put(entity.getElementId(), entity);
 		return this.converter.fromEntity(entity);
 
@@ -78,16 +77,14 @@ public class ElementServiceImplementation implements ElementService {
 
 	@Override
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
-		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null
-				&& !userEmail.trim().isEmpty()) {
+		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
 			return this.elementDatabase.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
-		}
-		else {
+		} else {
 			throw new RuntimeException("User Domain and User Email must not be empty or null");
 		}
 	}
 
-	@Override // check for null in arguments
+	@Override
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
 		ElementEntity existing = this.elementDatabase.get(elementId);
@@ -99,9 +96,9 @@ public class ElementServiceImplementation implements ElementService {
 
 	}
 
-	@Override // check for null in arguments
+	@Override
 	public void deleteAllElements(String adminDomain, String adminEmail) {
-		
+
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
 			this.elementDatabase.clear();

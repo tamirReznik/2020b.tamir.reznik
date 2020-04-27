@@ -8,7 +8,7 @@ public class ActionEntity {
 	private String actionId;
 	private String type;
 	private Map<String, Object> element;
-	private Date timestamp;
+	private Date createdTimestamp;
 	private Map<String, Object> invokedBy;
 	private Map<String, Object> actionAttributes;
 
@@ -21,7 +21,7 @@ public class ActionEntity {
 		this.actionId = actionId;
 		this.type = type;
 		this.element = element;
-		this.timestamp = timestamp;
+		this.createdTimestamp = timestamp;
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
 	}
@@ -51,11 +51,11 @@ public class ActionEntity {
 	}
 
 	public Date getTimestamp() {
-		return timestamp;
+		return createdTimestamp;
 	}
 
 	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
+		this.createdTimestamp = timestamp;
 	}
 
 	public Map<String, Object> getInvokedBy() {
