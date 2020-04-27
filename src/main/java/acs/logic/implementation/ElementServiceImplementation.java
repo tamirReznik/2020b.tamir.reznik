@@ -59,7 +59,7 @@ public class ElementServiceImplementation implements ElementService {
 	@Override
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
-		ElementEntity existing = this.elementDatabase.get(elementId);
+		ElementEntity existing = this.elementDatabase.get(elementDomain + "#" + elementId);
 		if (existing == null)
 			throw new ObjectNotFoundException("could not find object by id:" + elementId);
 		else {
@@ -87,7 +87,7 @@ public class ElementServiceImplementation implements ElementService {
 	@Override
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
-		ElementEntity existing = this.elementDatabase.get(elementId);
+		ElementEntity existing = this.elementDatabase.get(elementDomain + "#" + elementId);
 		if (existing != null) {
 			return this.converter.fromEntity(existing);
 		} else {
