@@ -1,13 +1,15 @@
 package acs.rest.boundaries.element;
 
+import javax.persistence.Embeddable;
 
+@Embeddable
 public class Location {
 	private Double lat;
 	private Double lng;
-	
+
 	public Location() {
 	}
-	
+
 	public Location(Double lat, Double lng) {
 		this.lat = lat;
 		this.lng = lng;
@@ -27,5 +29,5 @@ public class Location {
 
 	public void setLng(Double lng) {
 		this.lng = lng;
-	}	
+	}
 }
