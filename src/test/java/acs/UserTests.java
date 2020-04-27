@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import acs.data.UserRole;
 import acs.rest.boundaries.user.NewUserDetailsBoundary;
 import acs.rest.boundaries.user.UserBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class UserTests {
@@ -48,19 +49,24 @@ public class UserTests {
 		// do nothing
 
 		// WHEN I POST new user
-		String postedUserId = this.restTemplate.postForObject(this.url + "/users",
+		UserIdBoundary postedUserId = this.restTemplate.postForObject(this.url + "/users",
 				new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.PLAYER, "sapir", ":-)"), UserBoundary.class)
-				.getUserId().toString();
+				.getUserId();
 
 		// split the userId to Domain and Email
-		String userDomain = postedUserId.substring(0, postedUserId.indexOf('#'));
-		String userEmail = postedUserId.substring(postedUserId.indexOf('#') + 1);
+		String userDomain = postedUserId.getDomain();
+		String userEmail = postedUserId.getEmail();
 
 		// THEN the database contains a single user with same userId as posted
-		String actualUserId = this.restTemplate.getForObject(this.url + "/users/login/{userDomain}/{userEmail}",
-				UserBoundary.class, userDomain, userEmail).getUserId().toString();
+		UserIdBoundary actualUserId = this.restTemplate.getForObject(this.url + "/users/login/{userDomain}/{userEmail}",
+				UserBoundary.class, userDomain, userEmail).getUserId();
 
-		assertThat(actualUserId).isNotNull().isEqualTo(postedUserId);
+		assertThat(actualUserId).extracting("domain", "email")
+		.usingRecursiveFieldByFieldElementComparator()
+		.containsExactly(userDomain, userEmail);
+
+	//	assertThat(actualUserId).isNotNull().isEqualTo(postedUserId);
+
 	}
 
 	@Test
@@ -167,9 +173,9 @@ public class UserTests {
 		UserBoundary boundaryOnServer = this.restTemplate.postForObject(this.url + "/users",
 				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER, "sapir", ":-))"), UserBoundary.class);
 
-		String postedUserId = boundaryOnServer.getUserId().toString();
-		String userDomain = postedUserId.substring(0, postedUserId.indexOf('#'));
-		String userEmail = postedUserId.substring(postedUserId.indexOf('#') + 1);
+		UserIdBoundary postedUserId = boundaryOnServer.getUserId();
+		String userDomain = postedUserId.getDomain();
+		String userEmail = postedUserId.getEmail();
 
 		// WHEN I PUT with update of role to be "MANAGER"
 		UserBoundary update = new UserBoundary();
@@ -220,10 +226,10 @@ public class UserTests {
 			throws Exception {
 		// GIVEN the server is up
 		// AND the server contains 3 users
-		List<UserBoundary> allUsersInDb = IntStream.range(1, 4).mapToObj(i -> ("email" + i))
-				.map(email -> new NewUserDetailsBoundary(email, UserRole.PLAYER, "anna", ":-)"))
-				.map(boundary -> this.restTemplate.postForObject(this.url + "/users", boundary, UserBoundary.class))
-				.collect(Collectors.toList());
+//		List<UserBoundary> allUsersInDb = IntStream.range(1, 4).mapToObj(i -> ("email" + i))
+//				.map(email -> new NewUserDetailsBoundary(email, UserRole.PLAYER, "anna", ":-)"))
+//				.map(boundary -> this.restTemplate.postForObject(this.url + "/users", boundary, UserBoundary.class))
+//				.collect(Collectors.toList());
 
 		// AND I delete all users
 		this.restTemplate.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}", "???", "??");

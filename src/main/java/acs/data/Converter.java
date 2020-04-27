@@ -8,6 +8,7 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
+
 @Component
 public class Converter {
 
@@ -28,37 +29,63 @@ public class Converter {
 	}
 	// domain :abc id: 123 -- > abc#123
 
+	
 	public UserBoundary fromEntity(UserEntity entity) {
 
-		UserIdBoundary userId = new UserIdBoundary(entity.getUserId().substring(0, entity.getUserId().indexOf('#')),
-				entity.getUserId().substring(entity.getUserId().indexOf('#') + 1));
-
+		UserIdBoundary userId = fromEntity(entity.getUserId());
+				
 		UserBoundary ub = new UserBoundary(userId, null, entity.getUsername(), entity.getAvatar());
 
 		if (entity.getRole() != null)
-			ub.setRole(UserRole.valueOf(entity.getRole()));
-
+			ub.setRole(this.fromEntity(entity.getRole()));
+	
 		return ub;
 	}
 
+	
 	public UserEntity toEntity(UserBoundary boundary) {
 
-		String role = boundary.getRole() == null ? null : boundary.getRole().name();
-		String userId = boundary.getUserId().toString();
-
+		
+		UserRoleEntityEnum role = boundary.getRole() == null ? null : toEntity(boundary.getRole());
+		
+		UserIdEntity userId = toEntity(boundary.getUserId());
+		
 		UserEntity ue = new UserEntity(userId, role, boundary.getUsername(), boundary.getAvatar());
 
 		return ue;
 	}
 
-	public String toEntity(UserRole type) {
+	
+	public UserRoleEntityEnum toEntity(UserRole type) {
 		if (type != null) {
-			return type.name();
+			return UserRoleEntityEnum.valueOf(type.name().toLowerCase());
 		} else {
 			return null;
 		}
 	}
+	
+	public UserRole fromEntity(UserRoleEntityEnum type) {
+		if (type != null) {
+			return UserRole.valueOf(type.name().toUpperCase());
+		}else {
+			return null;
+		}
+	}
 
+	public UserIdBoundary fromEntity (UserIdEntity userId) {
+		if(userId != null)
+			return new UserIdBoundary(userId.getDomain(), userId.getEmail());
+		else 
+			return null; 
+	}
+	
+	public UserIdEntity toEntity(UserIdBoundary userId) {
+		if(userId != null)
+			return new UserIdEntity(userId.getDomain(), userId.getEmail());
+		else
+			return null; 
+	}
+	
 	public String typeEnumToString(TypeEnum type) {
 		if (type != null) {
 			return type.name();
