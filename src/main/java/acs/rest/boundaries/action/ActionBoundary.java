@@ -35,8 +35,9 @@ import acs.data.TypeEnum;
 
 public class ActionBoundary {
 	private ActionIdBoundary actionId;
-	private TypeEnum type;
-	private Map<String, Object> element;
+	private String type;
+
+	private ElementOfAction element;
 	private Date createdTimestamp;
 	private Map<String, Object> invokedBy;
 	private Map<String, Object> actionAttributes;
@@ -44,7 +45,7 @@ public class ActionBoundary {
 	public ActionBoundary() {
 	}
 
-	public ActionBoundary(ActionIdBoundary actionId, TypeEnum type, Map<String, Object> element, Date createdTimestamp,
+	public ActionBoundary(ActionIdBoundary actionId, String type, ElementOfAction element, Date createdTimestamp,
 			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
 
 		this.actionId = actionId;
@@ -63,19 +64,11 @@ public class ActionBoundary {
 		this.actionId = actionId;
 	}
 
-	public TypeEnum getType() {
-		return type;
-	}
-
-	public void setType(TypeEnum type) {
-		this.type = type;
-	}
-
-	public Map<String, Object> getElement() {
+	public ElementOfAction getElement() {
 		return element;
 	}
 
-	public void setElement(Map<String, Object> element) {
+	public void setElement(ElementOfAction element) {
 		this.element = element;
 	}
 
@@ -103,4 +96,11 @@ public class ActionBoundary {
 		this.createdTimestamp = createdTimestamp;
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 }

@@ -22,6 +22,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import acs.data.TypeEnum;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
+import acs.rest.boundaries.action.ElementOfAction;
+import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -60,7 +62,6 @@ public class ActionTests {
 
 		// GIVEN the server is up
 
-		// 5 actions on server
 		List<ActionBoundary> allActionsInDb = IntStream.range(1, 6).mapToObj(i -> {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
@@ -95,12 +96,12 @@ public class ActionTests {
 	}
 
 	public ActionBoundary invoke_Random_ActionBoundary_For_Tests() throws JsonProcessingException {
-		Map<String, Object> element = new HashMap<String, Object>();
+//		Map<String, Object> element = new HashMap<String, Object>();
 		Map<String, Object> invokedBy = new HashMap<String, Object>();
 		Map<String, Object> actionAttributes = new HashMap<String, Object>();
-
-		element.put("domain", "tamir");
-		element.put("id", "6464");
+		ElementOfAction element = new ElementOfAction(new ElementIdBoundary("tamir", null));
+//		element.put("domain", "tamir");
+//		element.put("id", "6464");
 
 		invokedBy.put("userId", new UserIdBoundary("2020b", "t@gmail.com"));
 
@@ -108,8 +109,8 @@ public class ActionTests {
 		actionAttributes.put("key2", "value2");
 		actionAttributes.put("key3", "value3");
 
-		return new ActionBoundary(new ActionIdBoundary("unvalid name", null), TypeEnum.actionType, element, new Date(),
-				invokedBy, actionAttributes);
+		return new ActionBoundary(new ActionIdBoundary("unvalid name", null), TypeEnum.actionType.name(), element,
+				new Date(), invokedBy, actionAttributes);
 	}
 
 }

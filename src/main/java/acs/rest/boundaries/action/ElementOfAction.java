@@ -1,19 +1,23 @@
 package acs.rest.boundaries.action;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+
 import acs.rest.boundaries.element.ElementIdBoundary;
 
+@Embeddable
 public class ElementOfAction {
+	ElementIdBoundary element;
+
 	public ElementOfAction(ElementIdBoundary element) {
 		super();
 		this.element = element;
 	}
 
-	ElementIdBoundary element;
-
 	public ElementOfAction() {
-		super();
-	}
 
+	}
+	@Embedded
 	public ElementIdBoundary getElement() {
 		return element;
 	}

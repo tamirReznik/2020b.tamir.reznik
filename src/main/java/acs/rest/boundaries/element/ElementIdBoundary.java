@@ -1,5 +1,7 @@
 package acs.rest.boundaries.element;
 
+import javax.persistence.Embeddable;
+
 /*
 {
 	"domain":"User",
@@ -7,6 +9,7 @@ package acs.rest.boundaries.element;
 }
 
 */
+@Embeddable
 public class ElementIdBoundary {
 	private String domain;
 	private String id;

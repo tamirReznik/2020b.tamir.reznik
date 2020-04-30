@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.persistence.Convert;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -11,12 +12,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import acs.rest.boundaries.action.ElementOfAction;
+
 @Entity
-@Table(name="ACTIONS")
+@Table(name = "ACTIONS")
 public class ActionEntity {
 	private String actionId;
 	private String type;
-	private Map<String, Object> element;
+	private ElementOfAction element;
 	private Date createdTimestamp;
 	private Map<String, Object> invokedBy;
 	private Map<String, Object> actionAttributes;
@@ -24,7 +27,7 @@ public class ActionEntity {
 	public ActionEntity() {
 	}
 
-	public ActionEntity(String actionId, String type, Map<String, Object> element, Date timestamp,
+	public ActionEntity(String actionId, String type, ElementOfAction element, Date timestamp,
 			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
@@ -52,19 +55,28 @@ public class ActionEntity {
 		this.type = type;
 	}
 
-	@Convert(converter = acs.dal.MapToJsonConverter.class)
-	@Lob
-	public Map<String, Object> getElement() {
-		return element;
-	}
-
-	public void setElement(Map<String, Object> element) {
-		this.element = element;
-	}
+//	@Convert(converter = acs.dal.MapToJsonConverter.class)
+//	@Lob
+//	public Map<String, Object> getElement() {
+//		return element;
+//	}
+//
+//	public void setElement(Map<String, Object> element) {
+//		this.element = element;
+//	}
 
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date getTimestamp() {
 		return createdTimestamp;
+	}
+
+	@Embedded
+	public ElementOfAction getElement() {
+		return element;
+	}
+
+	public void setElement(ElementOfAction element) {
+		this.element = element;
 	}
 
 	public void setTimestamp(Date timestamp) {
