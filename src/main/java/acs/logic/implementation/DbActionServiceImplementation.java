@@ -17,7 +17,7 @@ import acs.data.Converter;
 import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 
-@Service
+//@Service
 public class DbActionServiceImplementation implements ActionService {
 	private String projectName;
 	private ActionDao actionDao;
