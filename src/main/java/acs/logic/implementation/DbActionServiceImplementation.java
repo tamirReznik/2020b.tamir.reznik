@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ActionDao;
 import acs.data.ActionEntity;
@@ -16,8 +17,8 @@ import acs.data.Converter;
 import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 
+@Service
 public class DbActionServiceImplementation implements ActionService {
-
 	private String projectName;
 	private ActionDao actionDao;
 	private Converter converter;

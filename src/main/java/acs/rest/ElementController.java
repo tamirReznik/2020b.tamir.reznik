@@ -40,7 +40,6 @@ public class ElementController {
 	public ElementBoundary RetreiveElement(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
 			@PathVariable("elementId") String elementId) {
-
 		return this.elementService.getSpecificElement(userDomain, userEmail, elementDomain, String.valueOf(elementId));
 	}
 
