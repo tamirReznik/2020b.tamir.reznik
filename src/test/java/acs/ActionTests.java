@@ -109,8 +109,8 @@ public class ActionTests {
 		actionAttributes.put("key2", "value2");
 		actionAttributes.put("key3", "value3");
 
-		return new ActionBoundary(new ActionIdBoundary("tamir", UUID.randomUUID().toString()), TypeEnum.actionType,
-				element, new Date(), invokedBy, actionAttributes);
+		return new ActionBoundary(new ActionIdBoundary("unvalid name", null), TypeEnum.actionType, element, new Date(),
+				invokedBy, actionAttributes);
 	}
 
 }
