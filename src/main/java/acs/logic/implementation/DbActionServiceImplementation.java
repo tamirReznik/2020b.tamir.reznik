@@ -1,14 +1,12 @@
 package acs.logic.implementation;
 
 import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+
 import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +14,6 @@ import acs.dal.ActionDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
 import acs.logic.ActionService;
-import acs.rest.boundaries.action.ActionAttributes;
 import acs.rest.boundaries.action.ActionBoundary;
 
 public class DbActionServiceImplementation implements ActionService {
@@ -58,7 +55,7 @@ public class DbActionServiceImplementation implements ActionService {
 				&& !adminEmail.trim().isEmpty()) {
 			Iterable<ActionEntity> allActions = this.actionDao.findAll();
 			List<ActionBoundary> rv = new ArrayList<>();
-			for(ActionEntity ent:allActions)
+			for (ActionEntity ent : allActions)
 				rv.add(this.converter.fromEntity(ent));
 //			return this.actionDao.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
 			return rv;

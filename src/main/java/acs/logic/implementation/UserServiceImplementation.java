@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import acs.data.Converter;
 import acs.data.UserEntity;
 import acs.logic.ObjectNotFoundException;
@@ -44,7 +43,7 @@ public class UserServiceImplementation implements UserService {
 		user.getUserId().setDomain(projectName);
 
 		UserEntity entity = this.converter.toEntity(user);
-	//	this.usersDatabase.put(entity.getUserId(), entity);
+		// this.usersDatabase.put(entity.getUserId(), entity);
 		return this.converter.fromEntity(entity);
 	}
 
