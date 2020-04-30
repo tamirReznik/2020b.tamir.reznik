@@ -78,13 +78,13 @@ public class ElementTests {
 		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "david", true,
 				new Date(), new Location(), null, null);
 
-		this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb1, ElementBoundary.class);
+		ElementBoundary neweb1 = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb1, ElementBoundary.class);
 		this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb2, ElementBoundary.class);
+		
 		ElementBoundary ebCheck = this.restTemplate.getForObject(
-				this.url + "/elements/aaa/bbb/{elementDomain}/{elementId}", ElementBoundary.class,
-				eb1.getElementId().getDomain(), eb1.getElementId().getId());
-
-		if (!ebCheck.getElementId().getId().equals(eb1.getElementId().getId()))
+				this.url + "/elements/aaa/bbb/"+neweb1.getElementId().getDomain()+"/"+ neweb1.getElementId().getId(), ElementBoundary.class);
+		
+		if (!ebCheck.getElementId().getId().equals(neweb1.getElementId().getId()))
 			throw new Exception("error");
 	}
 
