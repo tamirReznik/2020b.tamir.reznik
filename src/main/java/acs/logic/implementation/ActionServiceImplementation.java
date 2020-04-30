@@ -16,9 +16,8 @@ import acs.data.Converter;
 import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 
-@Service
+//@Service
 public class ActionServiceImplementation implements ActionService {
-
 	private String projectName;
 	private Map<String, ActionEntity> actionDatabase;
 	private Converter converter;

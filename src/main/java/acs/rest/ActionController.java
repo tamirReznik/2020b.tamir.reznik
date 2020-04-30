@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
-import acs.rest.boundaries.action.ActionIdBoundary;
 
 @RestController
 public class ActionController {
@@ -18,7 +17,6 @@ public class ActionController {
 	public ActionController(ActionService actionService) {
 		super();
 		this.actionService = actionService;
-
 	}
 
 	@Autowired
