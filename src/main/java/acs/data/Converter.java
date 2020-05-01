@@ -3,6 +3,7 @@ package acs.data;
 import org.springframework.stereotype.Component;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
+import acs.rest.boundaries.action.ElementOfAction;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserBoundary;
@@ -107,7 +108,9 @@ public class Converter {
 	public ActionEntity toEntity(ActionBoundary actionBoundary) {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType();
-		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, actionBoundary.getElement(),
+		ElementIdEntity idEntity = new ElementIdEntity(actionBoundary.getElement().getElement().getDomain(),
+				actionBoundary.getElement().getElement().getId());
+		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, idEntity,
 				actionBoundary.getCreatedTimestamp(), actionBoundary.getInvokedBy(),
 				actionBoundary.getActionAttributes());
 
@@ -132,7 +135,10 @@ public class Converter {
 
 		ActionIdBoundary actionIdBoundary = toActionIdBoundary(entity.getActionId());
 
-		ActionBoundary boundary = new ActionBoundary(actionIdBoundary, null, entity.getElement(), entity.getTimestamp(),
+		ElementOfAction element = new ElementOfAction(
+				new ElementIdBoundary(entity.getElement().getDomain(), entity.getElement().getId()));
+
+		ActionBoundary boundary = new ActionBoundary(actionIdBoundary, null, element, entity.getTimestamp(),
 				entity.getInvokedBy(), entity.getActionAttributes());
 
 		if (entity.getType() != null)

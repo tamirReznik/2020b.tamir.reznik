@@ -1,11 +1,9 @@
 package acs.rest.boundaries.action;
 
-import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 
 import acs.rest.boundaries.element.ElementIdBoundary;
 
-@Embeddable
 public class ElementOfAction {
 	ElementIdBoundary element;
 
@@ -17,7 +15,7 @@ public class ElementOfAction {
 	public ElementOfAction() {
 
 	}
-	@Embedded
+
 	public ElementIdBoundary getElement() {
 		return element;
 	}

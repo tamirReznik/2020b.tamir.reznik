@@ -19,7 +19,7 @@ import acs.rest.boundaries.action.ElementOfAction;
 public class ActionEntity {
 	private String actionId;
 	private String type;
-	private ElementOfAction element;
+	private ElementIdEntity element;
 	private Date createdTimestamp;
 	private Map<String, Object> invokedBy;
 	private Map<String, Object> actionAttributes;
@@ -27,7 +27,7 @@ public class ActionEntity {
 	public ActionEntity() {
 	}
 
-	public ActionEntity(String actionId, String type, ElementOfAction element, Date timestamp,
+	public ActionEntity(String actionId, String type, ElementIdEntity element, Date timestamp,
 			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
@@ -71,11 +71,11 @@ public class ActionEntity {
 	}
 
 	@Embedded
-	public ElementOfAction getElement() {
+	public ElementIdEntity getElement() {
 		return element;
 	}
 
-	public void setElement(ElementOfAction element) {
+	public void setElement(ElementIdEntity element) {
 		this.element = element;
 	}
 
