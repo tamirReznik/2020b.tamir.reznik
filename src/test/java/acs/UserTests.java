@@ -92,7 +92,7 @@ public class UserTests {
 		// WHEN I POST new user with user role attribute: "PLAYER"
 
 		this.restTemplate.postForObject(this.url + "/users",
-				new NewUserDetailsBoundary("???", UserRole.PLAYER, "???", "???"), UserBoundary.class);
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER, "???", "???"), UserBoundary.class);
 
 		// THEN the database contains a user with user role attribute "PLAYER"
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
@@ -119,7 +119,7 @@ public class UserTests {
 		// WHEN I POST new user with userName attribute: "anna"
 
 		this.restTemplate.postForObject(this.url + "/users",
-				new NewUserDetailsBoundary("???", UserRole.PLAYER, "anna", "???"), UserBoundary.class);
+				new NewUserDetailsBoundary("anna@gmail.com", UserRole.PLAYER, "anna", "???"), UserBoundary.class);
 
 		// THEN the database contains a user with userName attribute "anna"
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
@@ -146,7 +146,7 @@ public class UserTests {
 		// WHEN I POST new user with avatar attribute: ":-))"
 
 		this.restTemplate.postForObject(this.url + "/users",
-				new NewUserDetailsBoundary("???", UserRole.PLAYER, "???", ":-))"), UserBoundary.class);
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER, "???", ":-))"), UserBoundary.class);
 
 		// THEN the database contains a user with user avatar attribute ":-))"
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
@@ -188,6 +188,32 @@ public class UserTests {
 						.usingRecursiveFieldByFieldElementComparator()
 						.containsExactly(boundaryOnServer.getUserId(), update.getRole());
 	}
+	
+	
+	@Test
+	public void test_Put_Update_User_Attribute_Avatar_Then_Avatar_Is_Updated_In_The_DataBase() throws Exception {
+		// GIVEN the server is up
+		// do nothing
+
+		// AND the database contains a single user with role: PLAYER
+		UserBoundary boundaryOnServer = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER, "sapir", ":-))"), UserBoundary.class);
+
+		UserIdBoundary postedUserId = boundaryOnServer.getUserId();
+		String userDomain = postedUserId.getDomain();
+		String userEmail = postedUserId.getEmail();
+
+		// WHEN I PUT with update of Avatar from ":-)" to be ";)"
+		UserBoundary update = new UserBoundary();
+		update.setAvatar(";)"); 
+		this.restTemplate.put(this.url + "/users/{userDomain}/{userEmail}", update, userDomain, userEmail);
+
+		// THEN the database contains a user with same id and Avatar: ";)"
+		assertThat(this.restTemplate.getForObject(this.url + "/users/login/{userDomain}/{userEmail}",
+				UserBoundary.class, userDomain, userEmail)).extracting("userId", "avatar")
+						.usingRecursiveFieldByFieldElementComparator()
+						.containsExactly(boundaryOnServer.getUserId(), update.getAvatar());
+	}
 
 	@Test
 	public void test_Init_Server_With_3_Users_When_We_Get_All_Users_We_Receive_The_Same_Users_Initialized()
@@ -195,7 +221,7 @@ public class UserTests {
 		// GIVEN the server is up
 		// AND the server contains 3 users
 
-		List<UserBoundary> allUsersInDb = IntStream.range(1, 4).mapToObj(i -> ("email" + i))
+		List<UserBoundary> allUsersInDb = IntStream.range(1, 4).mapToObj(i -> ("email" + i + "@gmail.com"))
 				.map(email -> new NewUserDetailsBoundary(email, UserRole.PLAYER, "sapir", ":-)"))
 				.map(boundary -> this.restTemplate.postForObject(this.url + "/users", boundary, UserBoundary.class))
 				.collect(Collectors.toList());

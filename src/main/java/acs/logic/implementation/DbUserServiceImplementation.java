@@ -12,10 +12,12 @@ import acs.dal.UserDao;
 import acs.data.Converter;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
+import acs.data.UserRole;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.UserService;
 import acs.rest.boundaries.user.UserBoundary;
-
+import java.util.regex.Matcher; 
+import java.util.regex.Pattern; 
 
 @Service
 public class DbUserServiceImplementation implements UserService {
@@ -40,6 +42,25 @@ public class DbUserServiceImplementation implements UserService {
 	@Transactional//(readOnly = false)
 	public UserBoundary createUser(UserBoundary user) {
 
+		//Email integrity check
+		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+ "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z" + "A-Z]{2,7}$"; 
+		Pattern pat = Pattern.compile(emailRegex); 
+        if(!(pat.matcher(user.getUserId().getEmail()).matches()))
+        	throw new ObjectNotFoundException("Invalid email address");
+
+        //User name integrity check
+        if(user.getUsername() == null)
+        	throw new ObjectNotFoundException("Username cannot be null");
+        
+        //Avatar integrity check
+        if(user.getAvatar() == null || user.getAvatar().trim().isEmpty())
+        	throw new ObjectNotFoundException("Avatar cannot be null or empty");
+        
+//        if(!(user.getRole().equals(UserRole.PLAYER)) 
+//        		|| user.getRole().equals(UserRole.ADMIN) 
+//        		|| user.getRole().equals(UserRole.MANAGER))
+//        	throw new ObjectNotFoundException("Invalid user role");
+        
 		user.getUserId().setDomain(projectName);
 
 		UserEntity entity = this.converter.toEntity(user);
@@ -84,7 +105,7 @@ public class DbUserServiceImplementation implements UserService {
 				existing.setUsername(update.getUsername());
 			}
 
-			if (update.getAvatar() != null) {
+			if (update.getAvatar() != null && !(update.getAvatar().trim().isEmpty())) {
 				existing.setAvatar(update.getAvatar());
 			}
 
