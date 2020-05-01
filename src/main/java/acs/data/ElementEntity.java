@@ -2,12 +2,16 @@ package acs.data;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -18,8 +22,9 @@ import acs.rest.boundaries.user.UserIdBoundary;
 
 @Entity
 @Table(name = "ELEMENTS")
-public class ElementEntity {
-	private String elementId;
+public class ElementEntity{
+
+	private ElementIdEntity elementId;
 	private String type;
 	private String name;
 	private Boolean active;
@@ -27,12 +32,15 @@ public class ElementEntity {
 	private Map<String, UserIdBoundary> createdBy;
 	private Location location;
 	private Map<String, Object> elemntAttributes;
+	//
+	private Set<ElementEntity> responses;
+	private ElementEntity origin;
 
 	public ElementEntity() {
 
 	}
 
-	public ElementEntity(String elementId, String type, String name, Boolean active, Date timeStamp, Location location,
+	public ElementEntity(ElementIdEntity elementId, String type, String name, Boolean active, Date timeStamp, Location location,
 			Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
@@ -53,13 +61,12 @@ public class ElementEntity {
 	public void setLocation(Location location) {
 		this.location = location;
 	}
-
-	@Id
-	public String getElementId() {
+	@EmbeddedId
+	public ElementIdEntity getElementId() {
 		return elementId;
 	}
 
-	public void setElementId(String elementId) {
+	public void setElementId(ElementIdEntity elementId) {
 		this.elementId = elementId;
 	}
 
@@ -114,6 +121,24 @@ public class ElementEntity {
 
 	public void setElemntAttributes(Map<String, Object> elemntAttributes) {
 		this.elemntAttributes = elemntAttributes;
+	}
+	
+	@OneToMany(mappedBy = "origin")
+	public Set<ElementEntity> getResponses() {
+		return responses;
+	}
+
+	public void setResponses(Set<ElementEntity> responses) {
+		this.responses = responses;
+	}
+	
+	@ManyToOne
+	public ElementEntity getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(ElementEntity origin) {
+		this.origin = origin;
 	}
 
 }

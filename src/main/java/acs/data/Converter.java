@@ -13,8 +13,7 @@ import acs.rest.boundaries.user.UserIdBoundary;
 public class Converter {
 
 	public ElementBoundary fromEntity(ElementEntity entity) {
-		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().split("#")[0],
-				entity.getElementId().split("#")[1]);
+		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().getDomain(),entity.getElementId().getId());
 		ElementBoundary eb = new ElementBoundary(elementIdBoundary, TypeEnum.valueOf(entity.getType()),
 				entity.getName(), entity.getActive(), entity.getTimeStamp(), entity.getLocation(),
 				entity.getElemntAttributes(), entity.getCreateBy());
@@ -22,7 +21,7 @@ public class Converter {
 	}
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
-		ElementEntity eE = new ElementEntity(boundary.getElementId().toString(), typeEnumToString(boundary.getType()),
+		ElementEntity eE = new ElementEntity(new ElementIdEntity(boundary.getElementId().getDomain(), boundary.getElementId().getId()), typeEnumToString(boundary.getType()),
 				boundary.getName(), boundary.getActive(), boundary.getCreatedTimestamp(), boundary.getLocation(),
 				boundary.getElementAttributes(), boundary.getCreateBy());
 		return eE;

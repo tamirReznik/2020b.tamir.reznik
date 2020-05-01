@@ -9,24 +9,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.ElementService;
+import acs.logic.EnhancedElementService;
 import acs.rest.boundaries.element.ElementBoundary;
 
 @RestController
 public class ElementController {
-	private ElementService elementService;
+	private EnhancedElementService elementService;
 
 	@Autowired
 	public ElementController() {
 
 	}
 
-	public ElementController(ElementService elementService) {
+	public ElementController(EnhancedElementService elementService) {
 		super();
 		this.elementService = elementService;
 	}
 
 	@Autowired
-	public void setElementService(ElementService elementService) {
+	public void setElementService(EnhancedElementService elementService) {
 		this.elementService = elementService;
 	}
 

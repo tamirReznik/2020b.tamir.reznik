@@ -20,7 +20,7 @@ import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
-@Service
+//@Service
 public class ElementServiceImplementation implements ElementService {
 	private Map<String, ElementEntity> elementDatabase;
 	private Converter converter;
@@ -51,7 +51,7 @@ public class ElementServiceImplementation implements ElementService {
 		Map<String, UserIdBoundary> createdBy = new HashMap<>();
 		createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
 		entity.setCreateBy(createdBy);
-		this.elementDatabase.put(entity.getElementId(), entity);
+		this.elementDatabase.put(entity.getElementId().toString(), entity);
 		return this.converter.fromEntity(entity);
 	}
 
