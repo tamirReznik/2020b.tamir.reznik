@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ActionDao;
 import acs.data.ActionEntity;
@@ -13,15 +14,16 @@ import acs.data.Converter;
 import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 
-//@Service
+@Service
 public class DbActionServiceImplementation implements ActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private Converter converter;
 
 	@Autowired
-	public DbActionServiceImplementation(Converter converter) {
+	public DbActionServiceImplementation(ActionDao actionDao,Converter converter) {
 		this.converter = converter;
+		this.actionDao = actionDao;
 	}
 
 	// injection of project name from the spring boot configuration
@@ -31,7 +33,7 @@ public class DbActionServiceImplementation implements ActionService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional //(readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
 		if (action == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
@@ -47,6 +49,7 @@ public class DbActionServiceImplementation implements ActionService {
 	}
 
 	@Override
+	@Transactional (readOnly = true)
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
@@ -62,6 +65,7 @@ public class DbActionServiceImplementation implements ActionService {
 	}
 
 	@Override
+	@Transactional //(readOnly = false)
 	public void deleteAllActions(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
