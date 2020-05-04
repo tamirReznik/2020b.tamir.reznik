@@ -1,6 +1,15 @@
 package acs;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
@@ -10,9 +19,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 import acs.data.TypeEnum;
+import acs.data.UserRole;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.element.Location;
+import acs.rest.boundaries.user.NewUserDetailsBoundary;
+import acs.rest.boundaries.user.UserBoundary;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ElementTests {
@@ -78,12 +90,13 @@ public class ElementTests {
 		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "david", true,
 				new Date(), new Location(), null, null);
 
-		ElementBoundary neweb1 = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb1, ElementBoundary.class);
+		ElementBoundary neweb1 = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb1,
+				ElementBoundary.class);
 		this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb2, ElementBoundary.class);
-		
-		ElementBoundary ebCheck = this.restTemplate.getForObject(
-				this.url + "/elements/aaa/bbb/"+neweb1.getElementId().getDomain()+"/"+ neweb1.getElementId().getId(), ElementBoundary.class);
-		
+
+		ElementBoundary ebCheck = this.restTemplate.getForObject(this.url + "/elements/aaa/bbb/"
+				+ neweb1.getElementId().getDomain() + "/" + neweb1.getElementId().getId(), ElementBoundary.class);
+
 		if (!ebCheck.getElementId().getId().equals(neweb1.getElementId().getId()))
 			throw new Exception("error");
 	}
@@ -121,5 +134,46 @@ public class ElementTests {
 				ElementBoundary[].class);
 		if (!allElements[0].getName().equals("new_name"))
 			throw new Exception("error");
+	}
+
+	@Test
+	public void test_Create_Three_Elements_Bind_Them_And_Validate_Relation() throws Exception {
+		ElementBoundary parent = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
+				new Date(), new Location(0.5, 0.5), null, null);
+
+		ElementBoundary child1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child1", true,
+				new Date(), new Location(0.5, 0.5), null, null);
+		ElementBoundary child2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child2", true,
+				new Date(), new Location(0.5, 0.5), null, null);
+
+		ElementBoundary postedChild1Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child1,
+				ElementBoundary.class);
+		ElementBoundary postedChild2Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child2,
+				ElementBoundary.class);
+		ElementBoundary postedParentElement = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", parent,
+				ElementBoundary.class);
+
+		List<ElementBoundary> allChildBeforeBind = new ArrayList<>();
+
+		allChildBeforeBind.add(postedChild1Element);
+		allChildBeforeBind.add(postedChild2Element);
+
+		this.restTemplate.put(
+				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
+				postedChild1Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
+				postedParentElement.getElementId().getId());
+		this.restTemplate.put(
+				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
+				postedChild2Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
+				postedParentElement.getElementId().getId());
+
+		ElementBoundary[] allChilds = this.restTemplate.getForObject(
+				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
+				ElementBoundary[].class, "???", "???", postedParentElement.getElementId().getDomain(),
+				postedParentElement.getElementId().getId());
+
+		assertThat(allChilds).hasSize(allChildBeforeBind.size()).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyInAnyOrderElementsOf(allChildBeforeBind);
+
 	}
 }

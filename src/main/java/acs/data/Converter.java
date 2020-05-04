@@ -146,5 +146,11 @@ public class Converter {
 		return boundary;
 
 	}
+	
+	public ElementIdEntity fromElementIdBoundary(ElementIdBoundary boundary) {
+		if(boundary.getDomain()!=null && boundary.getId()!=null)
+			return new ElementIdEntity(boundary.getDomain(), boundary.getId());
+		return null;
+	}
 
 }

@@ -61,11 +61,10 @@ public class UserTests {
 		UserIdBoundary actualUserId = this.restTemplate.getForObject(this.url + "/users/login/{userDomain}/{userEmail}",
 				UserBoundary.class, userDomain, userEmail).getUserId();
 
-		assertThat(actualUserId).extracting("domain", "email")
-		.usingRecursiveFieldByFieldElementComparator()
-		.containsExactly(userDomain, userEmail);
+		assertThat(actualUserId).extracting("domain", "email").usingRecursiveFieldByFieldElementComparator()
+				.containsExactly(userDomain, userEmail);
 
-	//	assertThat(actualUserId).isNotNull().isEqualTo(postedUserId);
+		// assertThat(actualUserId).isNotNull().isEqualTo(postedUserId);
 
 	}
 
@@ -188,8 +187,7 @@ public class UserTests {
 						.usingRecursiveFieldByFieldElementComparator()
 						.containsExactly(boundaryOnServer.getUserId(), update.getRole());
 	}
-	
-	
+
 	@Test
 	public void test_Put_Update_User_Attribute_Avatar_Then_Avatar_Is_Updated_In_The_DataBase() throws Exception {
 		// GIVEN the server is up
@@ -205,7 +203,7 @@ public class UserTests {
 
 		// WHEN I PUT with update of Avatar from ":-)" to be ";)"
 		UserBoundary update = new UserBoundary();
-		update.setAvatar(";)"); 
+		update.setAvatar(";)");
 		this.restTemplate.put(this.url + "/users/{userDomain}/{userEmail}", update, userDomain, userEmail);
 
 		// THEN the database contains a user with same id and Avatar: ";)"
@@ -225,11 +223,17 @@ public class UserTests {
 				.map(email -> new NewUserDetailsBoundary(email, UserRole.PLAYER, "sapir", ":-)"))
 				.map(boundary -> this.restTemplate.postForObject(this.url + "/users", boundary, UserBoundary.class))
 				.collect(Collectors.toList());
+		for (UserBoundary userBoundary : allUsersInDb) {
+			System.out.println("before" + userBoundary);
+		}
 
 		// WHEN I GET /admin/users/{adminDomain}/{adminEmail}
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
 				UserBoundary[].class, "???", "??");
 
+		for (UserBoundary userBoundary : allUsers) {
+			System.out.println("after" + userBoundary);
+		}
 		// THEN The server returns the same 3 users initialized
 		assertThat(allUsers).hasSize(allUsersInDb.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allUsersInDb);

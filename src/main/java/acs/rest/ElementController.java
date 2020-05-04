@@ -1,5 +1,7 @@
 package acs.rest;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.EnhancedElementService;
 import acs.rest.boundaries.element.ElementBoundary;
+import acs.rest.boundaries.element.ElementIdBoundary;
 
 @RestController
 public class ElementController {
@@ -50,7 +53,7 @@ public class ElementController {
 	}
 
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void updateUserDetails(@PathVariable("managerDomain") String managerDomain,
+	public void updateElementDetails(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @PathVariable("elementDomain") String elementDomain,
 			@PathVariable("elementId") String elementId, @RequestBody ElementBoundary update) {
 		elementService.update(managerDomain, managerEmail, elementDomain, elementId, update);
@@ -72,5 +75,13 @@ public class ElementController {
 		return this.elementService
 				.getAnArrayWithElementParent(userDomain, userEmail, elementDomain, String.valueOf(elementId))
 				.toArray(new ElementBoundary[0]);
+	}
+
+	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public void bindElements(@PathVariable("managerDomain") String managerDomain,
+			@PathVariable("managerEmail") String managerEmail, @PathVariable("elementDomain") String elementDomain,
+			@PathVariable("elementId") String elementId, @RequestBody ElementIdBoundary responseId) {
+		this.elementService.bindExistingElementToAnExsitingChildElement(new ElementIdBoundary(elementDomain, elementId),
+				responseId);
 	}
 }

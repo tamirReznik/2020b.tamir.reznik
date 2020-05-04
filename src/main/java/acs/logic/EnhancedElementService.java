@@ -9,12 +9,14 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 
 public interface EnhancedElementService extends ElementService {
 	//
-	public void bindExistingElementToAnExsitingChildElement(ElementIdBoundary idBoundary);
 
+	public void bindExistingElementToAnExsitingChildElement(ElementIdBoundary originId, ElementIdBoundary responseId);
+	
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
 			String elementDomain, String elementId);
 
 	public Collection<ElementBoundary> getAnArrayWithElementParent(String userDomain, String userEmail,
 			String elementDomain, String elementId);
+
 
 }

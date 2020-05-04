@@ -8,6 +8,7 @@ import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -22,7 +23,7 @@ import acs.rest.boundaries.user.UserIdBoundary;
 
 @Entity
 @Table(name = "ELEMENTS")
-public class ElementEntity{
+public class ElementEntity {
 
 	private ElementIdEntity elementId;
 	private String type;
@@ -40,8 +41,8 @@ public class ElementEntity{
 
 	}
 
-	public ElementEntity(ElementIdEntity elementId, String type, String name, Boolean active, Date timeStamp, Location location,
-			Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
+	public ElementEntity(ElementIdEntity elementId, String type, String name, Boolean active, Date timeStamp,
+			Location location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -61,6 +62,7 @@ public class ElementEntity{
 	public void setLocation(Location location) {
 		this.location = location;
 	}
+
 	@EmbeddedId
 	public ElementIdEntity getElementId() {
 		return elementId;
@@ -122,8 +124,8 @@ public class ElementEntity{
 	public void setElemntAttributes(Map<String, Object> elemntAttributes) {
 		this.elemntAttributes = elemntAttributes;
 	}
-	
-	@OneToMany(mappedBy = "origin")
+
+	@OneToMany(mappedBy = "origin", fetch = FetchType.LAZY)
 	public Set<ElementEntity> getResponses() {
 		return responses;
 	}
@@ -131,8 +133,8 @@ public class ElementEntity{
 	public void setResponses(Set<ElementEntity> responses) {
 		this.responses = responses;
 	}
-	
-	@ManyToOne
+
+	@ManyToOne()
 	public ElementEntity getOrigin() {
 		return origin;
 	}
@@ -141,4 +143,8 @@ public class ElementEntity{
 		this.origin = origin;
 	}
 
+	public void addResponse(ElementEntity response) {
+		this.responses.add(response);
+		response.setOrigin(this);
+	}
 }
