@@ -135,9 +135,17 @@ public class DbElementServiceImplementation implements EnhancedElementService  {
 
 	
 	@Override
-	public void bindExistingElementToAnExsitingChildElement(ElementIdBoundary idBoundary) {
-		// TODO Auto-generated method stub
+	@Transactional
+	public void bindExistingElementToAnExsitingChildElement(ElementIdBoundary originId, ElementIdBoundary responseId) {
 		
+		ElementEntity origin = this.elementDao.findById(converter.fromElementIdBoundary(originId)).orElseThrow(()->
+			new ObjectNotFoundException("could not find origin by id:" + originId));
+		
+		ElementEntity response = this.elementDao.findById(converter.fromElementIdBoundary(responseId)).orElseThrow(()->
+			new ObjectNotFoundException("could not find origin by id:" + originId));
+		
+		origin.addResponse(response);
+		this.elementDao.save(origin);
 	}
 
 	@Override
@@ -151,8 +159,7 @@ public class DbElementServiceImplementation implements EnhancedElementService  {
 					new ObjectNotFoundException("could not find origin by domain: " + elementDomain + "and id: " + elementId));
 		
 		return origin.getResponses().stream()
-				.map(this.converter::fromEntity).collect(Collectors.toSet());
-		
+				.map(this.converter::fromEntity).collect(Collectors.toSet());	
 	}
 	
 

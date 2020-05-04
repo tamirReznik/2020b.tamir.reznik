@@ -20,6 +20,7 @@ import acs.dal.MapToJsonConverter;
 import acs.rest.boundaries.element.Location;
 import acs.rest.boundaries.user.UserIdBoundary;
 
+
 @Entity
 @Table(name = "ELEMENTS")
 public class ElementEntity{
@@ -140,5 +141,9 @@ public class ElementEntity{
 	public void setOrigin(ElementEntity origin) {
 		this.origin = origin;
 	}
-
+	
+	public void addResponse (ElementEntity response) {
+		this.responses.add(response);
+		response.setOrigin(this);
+	}
 }
