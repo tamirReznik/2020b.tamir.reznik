@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import acs.logic.EnhancedElementService;
 import acs.rest.boundaries.element.ElementBoundary;
 
@@ -54,9 +55,14 @@ public class ElementController {
 			@PathVariable("elementId") String elementId, @RequestBody ElementBoundary update) {
 		elementService.update(managerDomain, managerEmail, elementDomain, elementId, update);
 	}
-
-//	@RequestMapping(path = "/dummy/{id}/origins", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//	public ElementBoundary[] getOrigin(@PathVariable("id") String responseId) {
-//		return this.elementService.getOrigin(responseId).toArray(new ElementBoundary[0]);
-//	}
+	
+	
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/children", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] getAllChildren(@PathVariable("userDomain") String userDomain,
+			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
+			@PathVariable("elementId") String elementId) {
+		return this.elementService.getAllChildrenOfAnExsitingElement
+				(userDomain, userEmail, elementDomain, String.valueOf(elementId))
+				.toArray(new ElementBoundary[0]);
+	}
 }
