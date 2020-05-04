@@ -55,14 +55,22 @@ public class ElementController {
 			@PathVariable("elementId") String elementId, @RequestBody ElementBoundary update) {
 		elementService.update(managerDomain, managerEmail, elementDomain, elementId, update);
 	}
-	
-	
+
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/children", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary[] getAllChildren(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
 			@PathVariable("elementId") String elementId) {
-		return this.elementService.getAllChildrenOfAnExsitingElement
-				(userDomain, userEmail, elementDomain, String.valueOf(elementId))
+		return this.elementService
+				.getAllChildrenOfAnExsitingElement(userDomain, userEmail, elementDomain, String.valueOf(elementId))
+				.toArray(new ElementBoundary[0]);
+	}
+
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] getAllParents(@PathVariable("userDomain") String userDomain,
+			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
+			@PathVariable("elementId") String elementId) {
+		return this.elementService
+				.getAnArrayWithElementParent(userDomain, userEmail, elementDomain, String.valueOf(elementId))
 				.toArray(new ElementBoundary[0]);
 	}
 }

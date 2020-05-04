@@ -1,8 +1,10 @@
 package acs.logic.implementation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +27,7 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
-public class DbElementServiceImplementation implements EnhancedElementService  {
+public class DbElementServiceImplementation implements EnhancedElementService {
 	private ElementDao elementDao;
 	private Converter converter;
 	private String projectName;
@@ -133,33 +135,42 @@ public class DbElementServiceImplementation implements EnhancedElementService  {
 		}
 	}
 
-	
 	@Override
 	public void bindExistingElementToAnExsitingChildElement(ElementIdBoundary idBoundary) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain,String userEmail, 
+	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
 			String elementDomain, String elementId) {
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
-		
-		ElementEntity origin = this.elementDao.findById(eid)
-				.orElseThrow(()->
-					new ObjectNotFoundException("could not find origin by domain: " + elementDomain + "and id: " + elementId));
-		
-		return origin.getResponses().stream()
-				.map(this.converter::fromEntity).collect(Collectors.toSet());
-		
+
+		ElementEntity origin = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
+				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
+
+		return origin.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());
+
 	}
-	
 
 	@Override
-	public ElementBoundary[] getAnArrayWithElementParent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	@Transactional(readOnly = true)
+	public Collection<ElementBoundary> getAnArrayWithElementParent(String userDomain, String userEmail,
+			String elementDomain, String elementId) {
 
+		ElementEntity element = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find children by domain: " + elementDomain + "and id: " + elementId));
+
+		ElementEntity parent = element.getOrigin();
+
+		Collection<ElementBoundary> rv = new HashSet<>();
+		if (parent != null) {
+			ElementBoundary rvBoundary = this.converter.fromEntity(parent);
+			rv.add(rvBoundary);
+		}
+
+		return rv;
+	}
 }
