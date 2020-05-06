@@ -74,7 +74,7 @@ public class ElementTests {
 			throw new Exception("error");
 	}
 
-	@Test // this test doesn't work yet!
+	@Test
 	public void test_Create_Two_Elements_Get_Specific_One_And_See_If_ID_Matches() throws Exception {
 		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "moshe", true,
 				new Date(), new Location(), null, null);
@@ -129,14 +129,15 @@ public class ElementTests {
 
 	@Test
 	public void test_Create_Three_Elements_Bind_Them_And_Validate_Relation() throws Exception {
+		// GIVEN the server is up
+		// WHEN we create 3 elemennts
 		ElementBoundary parent = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
 				new Date(), new Location(0.5, 0.5), null, null);
-
 		ElementBoundary child1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child1", true,
 				new Date(), new Location(0.5, 0.5), null, null);
 		ElementBoundary child2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child2", true,
 				new Date(), new Location(0.5, 0.5), null, null);
-
+		// AND post them
 		ElementBoundary postedChild1Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child1,
 				ElementBoundary.class);
 		ElementBoundary postedChild2Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child2,
@@ -145,7 +146,6 @@ public class ElementTests {
 				ElementBoundary.class);
 
 		List<ElementBoundary> allChildBeforeBind = new ArrayList<>();
-
 		allChildBeforeBind.add(postedChild1Element);
 		allChildBeforeBind.add(postedChild2Element);
 
@@ -161,7 +161,7 @@ public class ElementTests {
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				postedChild2Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
-
+		// AND get all children
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				ElementBoundary[].class, "???", "???", postedParentElement.getElementId().getDomain(),
@@ -177,6 +177,48 @@ public class ElementTests {
 
 		assertThat(allParents).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allParentsBeforeBind);
+
+	}
+
+	@Test
+	public void test_Create_One_Element_Check_For_Empty_Array_In_Childrens_Of_Element() throws Exception {
+		// GIVEN the server is up
+		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
+				new Date(), new Location(0.5, 0.5), null, null);
+
+		// WHEN we post the element
+		ElementBoundary postedElement = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", element,
+				ElementBoundary.class);
+
+		// get all children of the element
+		ElementBoundary[] allChilds = this.restTemplate.getForObject(
+				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
+				ElementBoundary[].class, "???", "???", postedElement.getElementId().getDomain(),
+				postedElement.getElementId().getId());
+
+		// THEN we get an empty array
+		assertThat(allChilds).isEmpty();
+
+	}
+
+	@Test
+	public void test_Create_One_Element_Check_For_Empty_Array_In_Parents_Of_Element() throws Exception {
+		// GIVEN the server is up
+		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
+				new Date(), new Location(0.5, 0.5), null, null);
+
+		// WHEN we post the element
+		ElementBoundary postedElement = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", element,
+				ElementBoundary.class);
+
+		// get all parents of the element
+		ElementBoundary[] allChilds = this.restTemplate.getForObject(
+				this.url + "/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents",
+				ElementBoundary[].class, "???", "???", postedElement.getElementId().getDomain(),
+				postedElement.getElementId().getId());
+
+		// THEN we get an empty array
+		assertThat(allChilds).isEmpty();
 
 	}
 }
