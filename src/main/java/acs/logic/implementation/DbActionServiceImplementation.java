@@ -35,7 +35,7 @@ public class DbActionServiceImplementation implements ActionService {
 	@Override
 	@Transactional //(readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
-		if (action == null) {
+		if (action == null || action.getType() == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 		} else {
 			action.setCreatedTimestamp(new Date());

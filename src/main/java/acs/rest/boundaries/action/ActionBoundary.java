@@ -35,7 +35,6 @@ import java.util.Map;
 public class ActionBoundary {
 	private ActionIdBoundary actionId;
 	private String type;
-
 	private ElementOfAction element;
 	private Date createdTimestamp;
 	private Map<String, Object> invokedBy;
