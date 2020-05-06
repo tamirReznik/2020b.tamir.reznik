@@ -130,14 +130,15 @@ public class ElementTests {
 	@Test
 	public void test_Create_Three_Elements_Bind_Them_And_Validate_Relation() throws Exception {
 		// GIVEN the server is up
-		// WHEN we create 3 elemennts
+		// WHEN we create 3 elements
 		ElementBoundary parent = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
 				new Date(), new Location(0.5, 0.5), null, null);
 		ElementBoundary child1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child1", true,
 				new Date(), new Location(0.5, 0.5), null, null);
 		ElementBoundary child2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child2", true,
 				new Date(), new Location(0.5, 0.5), null, null);
-		// AND post them
+		
+		//post them
 		ElementBoundary postedChild1Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child1,
 				ElementBoundary.class);
 		ElementBoundary postedChild2Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child2,
@@ -150,9 +151,9 @@ public class ElementTests {
 		allChildBeforeBind.add(postedChild2Element);
 
 		List<ElementBoundary> allParentsBeforeBind = new ArrayList<>();
-
 		allParentsBeforeBind.add(postedParentElement);
-
+		
+		//bind children to the parent
 		this.restTemplate.put(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				postedChild1Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
@@ -161,20 +162,24 @@ public class ElementTests {
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				postedChild2Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
+		
 		// AND get all children
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				ElementBoundary[].class, "???", "???", postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
-
+		
+		//AND get all parents
 		ElementBoundary[] allParents = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/parents",
 				ElementBoundary[].class, "???", "???", postedChild1Element.getElementId().getDomain(),
 				postedChild1Element.getElementId().getId());
-
+		
+		//THEN we get the same array with the childrens
 		assertThat(allChilds).hasSize(allChildBeforeBind.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allChildBeforeBind);
-
+		
+		//THEN we get the same array with the Parents
 		assertThat(allParents).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allParentsBeforeBind);
 
