@@ -4,13 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import javax.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
@@ -19,12 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 import acs.data.TypeEnum;
-import acs.data.UserRole;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.element.Location;
-import acs.rest.boundaries.user.NewUserDetailsBoundary;
-import acs.rest.boundaries.user.UserBoundary;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ElementTests {
@@ -158,6 +149,10 @@ public class ElementTests {
 		allChildBeforeBind.add(postedChild1Element);
 		allChildBeforeBind.add(postedChild2Element);
 
+		List<ElementBoundary> allParentsBeforeBind = new ArrayList<>();
+
+		allParentsBeforeBind.add(postedParentElement);
+
 		this.restTemplate.put(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				postedChild1Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
@@ -172,8 +167,16 @@ public class ElementTests {
 				ElementBoundary[].class, "???", "???", postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
 
+		ElementBoundary[] allParents = this.restTemplate.getForObject(
+				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/parents",
+				ElementBoundary[].class, "???", "???", postedChild1Element.getElementId().getDomain(),
+				postedChild1Element.getElementId().getId());
+
 		assertThat(allChilds).hasSize(allChildBeforeBind.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allChildBeforeBind);
+
+		assertThat(allParents).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyInAnyOrderElementsOf(allParentsBeforeBind);
 
 	}
 }
