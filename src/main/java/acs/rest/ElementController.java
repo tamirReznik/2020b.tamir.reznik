@@ -1,6 +1,7 @@
 package acs.rest;
 
-import java.util.Map;
+
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -8,16 +9,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import acs.logic.EnhancedElementService;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
+
 
 @RestController
 public class ElementController {
 	private EnhancedElementService elementService;
 
+	
+	
 	@Autowired
 	public ElementController() {
 
@@ -36,7 +40,8 @@ public class ElementController {
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary CreateNewElement(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @RequestBody ElementBoundary elementDetails) {
-		return this.elementService.create(managerDomain, managerEmail, elementDetails);
+			return this.elementService.create(managerDomain, managerEmail, elementDetails);
+	
 	}
 
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,8 +53,11 @@ public class ElementController {
 
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary[] RetreiveElementArr(@PathVariable("userDomain") String userDomain,
-			@PathVariable("userEmail") String userEmail) {
-		return this.elementService.getAll(userDomain, userEmail).toArray(new ElementBoundary[0]);
+			@PathVariable("userEmail") String userEmail, 
+			@RequestParam (name = "size", required = false, defaultValue = "10") int size,
+			@RequestParam (name = "page", required = false, defaultValue = "0") int page) {
+		return this.elementService.
+				getAll(userDomain, userEmail, size, page).toArray(new ElementBoundary[0]);
 	}
 
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -18,5 +18,6 @@ public interface EnhancedElementService extends ElementService {
 	public Collection<ElementBoundary> getAnArrayWithElementParent(String userDomain, String userEmail,
 			String elementDomain, String elementId);
 
+	public List<ElementBoundary> getAll(String userDomain, String userEmail,int size, int page);
 
 }

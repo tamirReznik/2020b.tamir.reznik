@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import acs.dal.ElementDao;
 import acs.data.Converter;
@@ -21,10 +24,12 @@ import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
 import acs.logic.EnhancedElementService;
 import acs.logic.ObjectNotFoundException;
-
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
+
 import acs.rest.boundaries.user.UserIdBoundary;
+
+
 
 @Service
 public class DbElementServiceImplementation implements EnhancedElementService {
@@ -47,6 +52,8 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Override
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
+		
+
 		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
 		ElementEntity entity = this.converter.toEntity(elementDetails);
 		entity.setTimeStamp(new Date());
@@ -84,19 +91,45 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		}
 	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
-
 		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
-
+			
 			Iterable<ElementEntity> allElements = this.elementDao.findAll();
 			List<ElementBoundary> returnElements = new ArrayList<>();
+			
 			for (ElementEntity entity : allElements) {
 				returnElements.add(this.converter.fromEntity(entity)); // map entities to boundaries
 			}
 			return returnElements;
+
+		} else {
+			throw new RuntimeException("User Domain and User Email must not be empty or null");
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> getAll(String userDomain, String userEmail, int size, int page) {
+
+		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
+			
+			if (size < 1) {
+				throw new RuntimeException("size must be not less than 1"); 
+			}
+			
+			if (page < 0) {
+				throw new RuntimeException("page must not be negative");
+			}
+			
+			return this.elementDao.findAll(
+				PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+				.getContent() // List<ElementEntity>
+				.stream() // Stream<ElementEntity>
+				.map(this.converter::fromEntity) // Stream<ElementBoundary>
+				.collect(Collectors.toList()); // List<ElementBoundary>
 
 		} else {
 			throw new RuntimeException("User Domain and User Email must not be empty or null");
@@ -182,4 +215,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		return rv;
 	}
+
+	
+
 }
