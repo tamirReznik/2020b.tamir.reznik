@@ -34,8 +34,8 @@ public class ElementEntity {
 	private Location location;
 	private Map<String, Object> elemntAttributes;
 	//
-	private Set<ElementEntity> responses;
-	private ElementEntity origin;
+	private Set<ElementEntity> childrens;
+	private ElementEntity parent;
 
 	public ElementEntity() {
 
@@ -127,24 +127,24 @@ public class ElementEntity {
 
 	@OneToMany(mappedBy = "origin", fetch = FetchType.LAZY)
 	public Set<ElementEntity> getResponses() {
-		return responses;
+		return childrens;
 	}
 
 	public void setResponses(Set<ElementEntity> responses) {
-		this.responses = responses;
+		this.childrens = responses;
 	}
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	public ElementEntity getOrigin() {
-		return origin;
+		return parent;
 	}
 
 	public void setOrigin(ElementEntity origin) {
-		this.origin = origin;
+		this.parent = origin;
 	}
 
 	public void addResponse(ElementEntity response) {
-		this.responses.add(response);
+		this.childrens.add(response);
 		response.setOrigin(this);
 	}
 }

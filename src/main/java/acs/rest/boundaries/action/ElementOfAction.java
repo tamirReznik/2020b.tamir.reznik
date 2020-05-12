@@ -1,15 +1,13 @@
 package acs.rest.boundaries.action;
 
-import javax.persistence.Embedded;
-
 import acs.rest.boundaries.element.ElementIdBoundary;
 
 public class ElementOfAction {
-	ElementIdBoundary element;
+	ElementIdBoundary elementId;
 
 	public ElementOfAction(ElementIdBoundary element) {
 		super();
-		this.element = element;
+		this.elementId = element;
 	}
 
 	public ElementOfAction() {
@@ -17,10 +15,10 @@ public class ElementOfAction {
 	}
 
 	public ElementIdBoundary getElement() {
-		return element;
+		return elementId;
 	}
 
 	public void setElement(ElementIdBoundary element) {
-		this.element = element;
+		this.elementId = element;
 	}
 }

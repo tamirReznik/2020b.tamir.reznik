@@ -13,6 +13,7 @@ import acs.data.ActionEntity;
 import acs.data.Converter;
 import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
+import acs.rest.boundaries.action.ActionIdBoundary;
 
 @Service
 public class DbActionServiceImplementation implements ActionService {
@@ -38,9 +39,9 @@ public class DbActionServiceImplementation implements ActionService {
 		if (action == null || action.getType() == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 		} else {
+			ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
 			action.setCreatedTimestamp(new Date());
-			action.getActionId().setDomain(projectName);
-			action.getActionId().setId(UUID.randomUUID().toString());
+			action.setActionId(aib);
 			ActionEntity entity = converter.toEntity(action);
 			// actionDao.put(action.getActionId().toString(), entity);
 			this.actionDao.save(entity);

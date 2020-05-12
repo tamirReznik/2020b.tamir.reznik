@@ -77,7 +77,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				existing.setLocation(update.getLocation());
 			if (update.getType() != null)
 				existing.setType(converter.typeEnumToString(update.getType()));
-
+//			TODO update elementAttribute
 			return this.converter.fromEntity(this.elementDao.save(existing));
 		} else {
 			throw new RuntimeException("User Domain and User Email must not be empty or null");
@@ -104,6 +104,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
 		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()
@@ -126,6 +127,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteAllElements(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
