@@ -13,17 +13,19 @@ import acs.rest.boundaries.user.UserIdBoundary;
 public class Converter {
 
 	public ElementBoundary fromEntity(ElementEntity entity) {
-		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().getDomain(),entity.getElementId().getId());
-		ElementBoundary eb = new ElementBoundary(elementIdBoundary, TypeEnum.valueOf(entity.getType()),
-				entity.getName(), entity.getActive(), entity.getTimeStamp(), entity.getLocation(),
-				entity.getElemntAttributes(), entity.getCreateBy());
+		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().getDomain(),
+				entity.getElementId().getId());
+		ElementBoundary eb = new ElementBoundary(elementIdBoundary, entity.getType(), entity.getName(),
+				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
+				entity.getCreateBy());
 		return eb;
 	}
 
 	public ElementEntity toEntity(ElementBoundary boundary) {
-		ElementEntity eE = new ElementEntity(new ElementIdEntity(boundary.getElementId().getDomain(), boundary.getElementId().getId()), typeEnumToString(boundary.getType()),
-				boundary.getName(), boundary.getActive(), boundary.getCreatedTimestamp(), boundary.getLocation(),
-				boundary.getElementAttributes(), boundary.getCreateBy());
+		ElementEntity eE = new ElementEntity(
+				new ElementIdEntity(boundary.getElementId().getDomain(), boundary.getElementId().getId()),
+				boundary.getType(), boundary.getName(), boundary.getActive(), boundary.getCreatedTimestamp(),
+				boundary.getLocation(), boundary.getElementAttributes(), boundary.getCreateBy());
 		return eE;
 	}
 	// domain :abc id: 123 -- > abc#123
@@ -146,9 +148,9 @@ public class Converter {
 		return boundary;
 
 	}
-	
+
 	public ElementIdEntity fromElementIdBoundary(ElementIdBoundary boundary) {
-		if(boundary.getDomain()!=null && boundary.getId()!=null)
+		if (boundary.getDomain() != null && boundary.getId() != null)
 			return new ElementIdEntity(boundary.getDomain(), boundary.getId());
 		return null;
 	}

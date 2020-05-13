@@ -29,7 +29,7 @@ import acs.rest.boundaries.user.UserIdBoundary;
  */
 public class ElementBoundary {
 	private ElementIdBoundary elementId;
-	private TypeEnum type;
+	private String type;
 	private String name;
 	private Boolean active;
 	private Date createdTimestamp;
@@ -37,7 +37,7 @@ public class ElementBoundary {
 	private Location location;
 	private Map<String, Object> elementAttributes;
 
-	public ElementBoundary(ElementIdBoundary elementId, TypeEnum type, String name, Boolean active, Date timeStamp,
+	public ElementBoundary(ElementIdBoundary elementId, String type, String name, Boolean active, Date timeStamp,
 			Location location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
@@ -53,11 +53,11 @@ public class ElementBoundary {
 	public ElementBoundary() {
 	}
 
-	public TypeEnum getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(TypeEnum type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

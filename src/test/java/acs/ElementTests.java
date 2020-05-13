@@ -46,7 +46,7 @@ public class ElementTests {
 
 	@Test
 	public void test_Create_New_Element_And_Check_If_DB_Contatins_Same_ElementID() throws Exception {
-		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "moshe", true,
+		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
 		ElementIdBoundary postedElementId = this.restTemplate
 				.postForObject(this.url + "/elements/aaa/bbb", eb, ElementBoundary.class).getElementId();
@@ -64,7 +64,7 @@ public class ElementTests {
 
 	@Test
 	public void test_Create_New_Element_And_Check_If_DB_Contatins_Exactly_One_Element() throws Exception {
-		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "moshe", true,
+		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
 		this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb, ElementBoundary.class).getElementId();
 
@@ -76,9 +76,9 @@ public class ElementTests {
 
 	@Test
 	public void test_Create_Two_Elements_Get_Specific_One_And_See_If_ID_Matches() throws Exception {
-		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "moshe", true,
+		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
-		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "david", true,
+		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "david", true,
 				new Date(), new Location(), null, null);
 
 		ElementBoundary neweb1 = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb1,
@@ -94,9 +94,9 @@ public class ElementTests {
 
 	@Test
 	public void test_Create_Two_Elements_Delete_All_Elements_And_Check_If_Delete_Succeeded() throws Exception {
-		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "moshe", true,
+		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
-		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "david", true,
+		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "david", true,
 				new Date(), new Location(), null, null);
 
 		this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", eb1, ElementBoundary.class);
@@ -112,7 +112,7 @@ public class ElementTests {
 
 	@Test
 	public void test_Update_Element_And_Check_If_Update_Succeeded() throws Exception {
-		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "moshe", true,
+		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
 		ElementIdBoundary postedElementId = this.restTemplate
 				.postForObject(this.url + "/elements/aaa/bbb", eb, ElementBoundary.class).getElementId();
@@ -131,14 +131,14 @@ public class ElementTests {
 	public void test_Create_Three_Elements_Bind_Them_And_Validate_Relation() throws Exception {
 		// GIVEN the server is up
 		// WHEN we create 3 elements
-		ElementBoundary parent = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
-				new Date(), new Location(0.5, 0.5), null, null);
-		ElementBoundary child1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child1", true,
-				new Date(), new Location(0.5, 0.5), null, null);
-		ElementBoundary child2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "child2", true,
-				new Date(), new Location(0.5, 0.5), null, null);
-		
-		//post them
+		ElementBoundary parent = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "Parent",
+				true, new Date(), new Location(0.5, 0.5), null, null);
+		ElementBoundary child1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "child1",
+				true, new Date(), new Location(0.5, 0.5), null, null);
+		ElementBoundary child2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "child2",
+				true, new Date(), new Location(0.5, 0.5), null, null);
+
+		// post them
 		ElementBoundary postedChild1Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child1,
 				ElementBoundary.class);
 		ElementBoundary postedChild2Element = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", child2,
@@ -152,8 +152,8 @@ public class ElementTests {
 
 		List<ElementBoundary> allParentsBeforeBind = new ArrayList<>();
 		allParentsBeforeBind.add(postedParentElement);
-		
-		//bind children to the parent
+
+		// bind children to the parent
 		this.restTemplate.put(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				postedChild1Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
@@ -162,24 +162,24 @@ public class ElementTests {
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				postedChild2Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
-		
+
 		// AND get all children
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 				ElementBoundary[].class, "???", "???", postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
-		
-		//AND get all parents
+
+		// AND get all parents
 		ElementBoundary[] allParents = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/parents",
 				ElementBoundary[].class, "???", "???", postedChild1Element.getElementId().getDomain(),
 				postedChild1Element.getElementId().getId());
-		
-		//THEN we get the same array with the childrens
+
+		// THEN we get the same array with the childrens
 		assertThat(allChilds).hasSize(allChildBeforeBind.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allChildBeforeBind);
-		
-		//THEN we get the same array with the Parents
+
+		// THEN we get the same array with the Parents
 		assertThat(allParents).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allParentsBeforeBind);
 
@@ -188,8 +188,8 @@ public class ElementTests {
 	@Test
 	public void test_Create_One_Element_Check_For_Empty_Array_In_Childrens_Of_Element() throws Exception {
 		// GIVEN the server is up
-		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
-				new Date(), new Location(0.5, 0.5), null, null);
+		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "Parent",
+				true, new Date(), new Location(0.5, 0.5), null, null);
 
 		// WHEN we post the element
 		ElementBoundary postedElement = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", element,
@@ -209,8 +209,8 @@ public class ElementTests {
 	@Test
 	public void test_Create_One_Element_Check_For_Empty_Array_In_Parents_Of_Element() throws Exception {
 		// GIVEN the server is up
-		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType, "Parent", true,
-				new Date(), new Location(0.5, 0.5), null, null);
+		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "Parent",
+				true, new Date(), new Location(0.5, 0.5), null, null);
 
 		// WHEN we post the element
 		ElementBoundary postedElement = this.restTemplate.postForObject(this.url + "/elements/aaa/bbb", element,
