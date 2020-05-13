@@ -128,18 +128,20 @@ public class ElementTests {
 
 	@Test
 	public void test_Update_Element_And_Check_If_Update_Succeeded() throws Exception {
+		
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
 		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
+		
 		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
 		ElementIdBoundary postedElementId = this.restTemplate
 				.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb, ElementBoundary.class).getElementId();
 		eb.setName("new_name");
 
-		this.restTemplate.put(this.url + "/elements/aaa/bbb/{elementDomain}/{elementId}", eb,
-				postedElementId.getDomain(), postedElementId.getId());
+		this.restTemplate.put(this.url + "/elements/2020b.tamir.reznik/demo@us.er/{elementDomain}/{elementId}",
+				 eb,postedElementId.getDomain(), postedElementId.getId());
 
-		ElementBoundary[] allElements = this.restTemplate.getForObject(this.url + "/elements/aaa/bbb",
+		ElementBoundary[] allElements = this.restTemplate.getForObject(this.url + "/elements/2020b.tamir.reznik/demo@us.er",
 				ElementBoundary[].class);
 		if (!allElements[0].getName().equals("new_name"))
 			throw new Exception("error");

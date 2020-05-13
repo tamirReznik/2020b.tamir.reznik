@@ -54,24 +54,29 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 
-		UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
-		UserEntity existing = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
-				"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
+		if (managerDomain != null && !managerDomain.trim().isEmpty() && managerEmail != null && !managerEmail.trim().isEmpty()) {
 
-		if (existing.getRole().equals(UserRoleEntityEnum.manager)) {
+			UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
+			UserEntity existing = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
+					"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
 
-			elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
-			ElementEntity entity = this.converter.toEntity(elementDetails);
-			entity.setTimeStamp(new Date());
-			Map<String, UserIdBoundary> createdBy = new HashMap<>();
-			createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
-			entity.setCreateBy(createdBy);
-			return this.converter.fromEntity(this.elementDao.save(entity));
+			if (existing.getRole().equals(UserRoleEntityEnum.manager)) {
+
+				elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
+				ElementEntity entity = this.converter.toEntity(elementDetails);
+				entity.setTimeStamp(new Date());
+				Map<String, UserIdBoundary> createdBy = new HashMap<>();
+				createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
+				entity.setCreateBy(createdBy);
+				return this.converter.fromEntity(this.elementDao.save(entity));
+			}
+
+			else
+				throw new ObjectNotFoundException("You are not manager! Can't create an element");
+		
+		} else {
+			throw new ObjectNotFoundException("User Domain and User Email must not be empty or null");
 		}
-
-		else
-			throw new ObjectNotFoundException("you are not manager!");
-
 	}
 
 	@Override
@@ -82,24 +87,34 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		if (elementDomain != null && !elementDomain.trim().isEmpty() && elementId != null && !elementId.trim().isEmpty()
 				&& managerDomain != null && !managerDomain.trim().isEmpty() && managerEmail != null
 				&& !managerEmail.trim().isEmpty()) {
-			ElementIdEntity elementIdEntity = new ElementIdEntity(elementDomain, elementId);
-			ElementEntity existing = this.elementDao.findById(elementIdEntity)
-					.orElseThrow(() -> new ObjectNotFoundException(
-							"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
 
-			if (update.getActive() != null)
-				existing.setActive(update.getActive());
-			if (update.getName() != null)
-				existing.setName(update.getName());
-			if (update.getLocation() != null)
-				existing.setLocation(update.getLocation());
-			if (update.getType() != null)
-				existing.setType(update.getType());
-//			TODO update elementAttribute
-			return this.converter.fromEntity(this.elementDao.save(existing));
+			UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
+			UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
+					"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
+
+			if (existingUser.getRole().equals(UserRoleEntityEnum.manager)) {
+
+				ElementIdEntity elementIdEntity = new ElementIdEntity(elementDomain, elementId);
+				ElementEntity existing = this.elementDao.findById(elementIdEntity)
+						.orElseThrow(() -> new ObjectNotFoundException(
+								"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
+
+				if (update.getActive() != null)
+					existing.setActive(update.getActive());
+				if (update.getName() != null)
+					existing.setName(update.getName());
+				if (update.getLocation() != null)
+					existing.setLocation(update.getLocation());
+				if (update.getType() != null)
+					existing.setType(update.getType());
+				//			TODO update elementAttribute
+				return this.converter.fromEntity(this.elementDao.save(existing));
+
+			} else
+				throw new ObjectNotFoundException("You are not manager! Can't update an element");
+
 		} else {
 			throw new RuntimeException("User Domain and User Email must not be empty or null");
-
 		}
 	}
 
