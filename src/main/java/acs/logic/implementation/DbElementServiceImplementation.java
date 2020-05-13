@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,14 +17,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import acs.dal.ElementDao;
+import acs.dal.UserDao;
 import acs.data.Converter;
 import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
+import acs.data.UserEntity;
+import acs.data.UserIdEntity;
+import acs.data.UserRoleEntityEnum;
 import acs.logic.EnhancedElementService;
 import acs.logic.ObjectNotFoundException;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
-
+import acs.rest.boundaries.user.UserBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 
@@ -36,11 +38,13 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	private ElementDao elementDao;
 	private Converter converter;
 	private String projectName;
+	private UserDao userDao;
 
 	@Autowired
-	public DbElementServiceImplementation(ElementDao elementDao, Converter converter) {
+	public DbElementServiceImplementation(ElementDao elementDao, Converter converter, UserDao userDao) {
 		this.elementDao = elementDao;
 		this.converter = converter;
+		this.userDao = userDao;
 	}
 
 	// injection of project name from the spring boot configuration
@@ -52,15 +56,27 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Override
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
+		UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
+		UserEntity existing = this.userDao.findById(uib)
+				.orElseThrow(()->new ObjectNotFoundException("could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
 		
+			if (existing.getRole().equals(UserRoleEntityEnum.manager)) {
+			
+			elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
+			ElementEntity entity = this.converter.toEntity(elementDetails);
+			entity.setTimeStamp(new Date());
+			Map<String, UserIdBoundary> createdBy = new HashMap<>();
+			createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
+			entity.setCreateBy(createdBy);
+			return this.converter.fromEntity(this.elementDao.save(entity));
+			}
+		
+			else 
+				throw new ObjectNotFoundException("you are not manager!");
+		
+	
 
-		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
-		ElementEntity entity = this.converter.toEntity(elementDetails);
-		entity.setTimeStamp(new Date());
-		Map<String, UserIdBoundary> createdBy = new HashMap<>();
-		createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
-		entity.setCreateBy(createdBy);
-		return this.converter.fromEntity(this.elementDao.save(entity));
+		
 	}
 
 	@Override
