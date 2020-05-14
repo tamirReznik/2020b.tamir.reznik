@@ -5,10 +5,12 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.ActionService;
 import acs.logic.ElementService;
+import acs.logic.EnhancedActionService;
 import acs.logic.UserService;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.user.UserBoundary;
@@ -17,14 +19,14 @@ import acs.rest.boundaries.user.UserBoundary;
 public class AdminController {
 
 	private UserService userService;
-	private ActionService actionService;
+	private EnhancedActionService actionService;
 	private ElementService elementService;
 
 	@Autowired
 	public AdminController() {
 	}
 
-	public AdminController(UserService userService, ActionService actionService, ElementService elementService) {
+	public AdminController(UserService userService, EnhancedActionService actionService, ElementService elementService) {
 		super();
 		this.userService = userService;
 		this.actionService = actionService;
@@ -42,7 +44,7 @@ public class AdminController {
 	}
 
 	@Autowired
-	public void setActionService(ActionService actionService) {
+	public void setActionService(EnhancedActionService actionService) {
 		this.actionService = actionService;
 	}
 
@@ -55,8 +57,10 @@ public class AdminController {
 
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ActionBoundary[] exportAllActions(@PathVariable("adminDomain") String adminDomain,
-			@PathVariable("adminEmail") String adminEmail) {
-		return actionService.getAllActions(adminDomain, adminEmail).toArray(new ActionBoundary[0]);
+			@PathVariable("adminEmail") String adminEmail,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size, 
+			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
+		return actionService.getAllActions(adminDomain, adminEmail,size,page).toArray(new ActionBoundary[0]);
 	}
 
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
