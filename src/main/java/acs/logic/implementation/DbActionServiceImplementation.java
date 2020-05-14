@@ -3,20 +3,25 @@ package acs.logic.implementation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.UUID;import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ActionDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
 import acs.logic.ActionService;
+import acs.logic.EnhancedActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 
 @Service
-public class DbActionServiceImplementation implements ActionService {
+public class DbActionServiceImplementation implements EnhancedActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private Converter converter;
@@ -75,5 +80,28 @@ public class DbActionServiceImplementation implements ActionService {
 			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
 		}
 
+	}
+
+	@Override
+	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail, int size, int page) {
+		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
+				&& !adminEmail.trim().isEmpty()) {
+			
+			if (size < 1) {
+				throw new RuntimeException("size must be not less than 1"); 
+			}
+			
+			if (page < 0) {
+				throw new RuntimeException("page must positive");
+			}
+			
+			return this.actionDao.findAll(PageRequest.of(page, size,Direction.DESC,"actionId"))// Page<ActionEntity>
+					.getContent()// List<ActionEntity>
+					.stream()// Stream<ActionEntity>
+					.map(this.converter::fromEntity)// Stream<ActionEntity>
+					.collect(Collectors.toList()); // List<ActionEntity>
+		} else {
+			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
+		}
 	}
 }

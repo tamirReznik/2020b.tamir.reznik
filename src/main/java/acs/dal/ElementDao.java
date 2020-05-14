@@ -10,6 +10,7 @@ import acs.data.ElementIdEntity;
 
 //Create Read Update Delete - CRUD
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity> {
+
 	public List<ElementEntity> findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(
 			@Param("minLat") Double minLat, @Param("maxLat") Double maxLat, @Param("minLng") Double minLng,
 			@Param("maxLng") Double maxLng, @Param("active") Boolean active, Pageable pageable);
@@ -17,5 +18,10 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 	public List<ElementEntity> findAllByLocation_LatBetweenAndLocation_LngBetween(@Param("minLat") double minLat,
 			@Param("maxLat") double maxLat, @Param("minLng") double minLng, @Param("maxLng") double maxLng,
 			Pageable pageable);
+
+	// CrudRepository<ElementEntity, ElementIdEntity>
+
+	// SELECT ... FROM ELEMENTS WHERE ACTIVE=?
+	public List<ElementEntity> findAllByActive(@Param("active") boolean active, Pageable pageable);
 
 }
