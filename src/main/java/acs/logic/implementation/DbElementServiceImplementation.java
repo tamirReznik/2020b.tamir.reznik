@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +57,8 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 
-		if (managerDomain != null && !managerDomain.trim().isEmpty() && managerEmail != null && !managerEmail.trim().isEmpty()) {
+		if (managerDomain != null && !managerDomain.trim().isEmpty() && managerEmail != null
+				&& !managerEmail.trim().isEmpty()) {
 
 			UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
 			UserEntity existing = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
@@ -73,7 +77,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 			else
 				throw new ObjectNotFoundException("You are not manager! Can't create an element");
-		
+
 		} else {
 			throw new ObjectNotFoundException("User Domain and User Email must not be empty or null");
 		}
@@ -96,24 +100,24 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 				ElementIdEntity elementIdEntity = new ElementIdEntity(elementDomain, elementId);
 				ElementEntity existing = this.elementDao.findById(elementIdEntity)
-						.orElseThrow(() -> new ObjectNotFoundException(
-								"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
+						.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
+								+ elementDomain + "or elementId: " + elementId));
 
 				if (update.getActive() != null)
 					existing.setActive(update.getActive());
-				
+
 				if (update.getName() != null)
 					existing.setName(update.getName());
-				
+
 				if (update.getLocation() != null)
 					existing.setLocation(update.getLocation());
-				
+
 				if (update.getType() != null)
 					existing.setType(update.getType());
-				
-				if(update.getElementAttributes() != null)
+
+				if (update.getElementAttributes() != null)
 					existing.setElemntAttributes(update.getElementAttributes());
-			
+
 				return this.converter.fromEntity(this.elementDao.save(existing));
 
 			} else
@@ -155,23 +159,23 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 			if (page < 0) {
 				throw new RuntimeException("page must not be negative");
 			}
-			
+
 			UserIdEntity uib = new UserIdEntity(userDomain, userEmail);
 			UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
 					"could not find object by UserDomain:" + userDomain + "or userEmail:" + userEmail));
-			
-			//if user is MANAGER : findAll 
+
+			// if user is MANAGER : findAll
 			if (existingUser.getRole().equals(UserRoleEntityEnum.manager)) {
 				return this.elementDao.findAll(PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
-					.getContent() // List<ElementEntity>
-					.stream() // Stream<ElementEntity>
-					.map(this.converter::fromEntity) // Stream<ElementBoundary>
-					.collect(Collectors.toList()); // List<ElementBoundary>
+						.getContent() // List<ElementEntity>
+						.stream() // Stream<ElementEntity>
+						.map(this.converter::fromEntity) // Stream<ElementBoundary>
+						.collect(Collectors.toList()); // List<ElementBoundary>
 			}
-			
-			//if user = PLAYER : findAllByActive
+
+			// if user = PLAYER : findAllByActive
 			else if (existingUser.getRole().equals(UserRoleEntityEnum.player)) {
-				return this.elementDao.findAllByActive(Boolean.TRUE,PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+				return this.elementDao.findAllByActive(Boolean.TRUE, PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
 						.stream() // Stream<ElementEntity>
 						.map(this.converter::fromEntity) // Stream<ElementBoundary>
 						.collect(Collectors.toList()); // List<ElementBoundary>
@@ -180,7 +184,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		} else {
 			throw new RuntimeException("User Domain and User Email must not be empty or null");
 		}
-		
+
 		return null;
 	}
 
