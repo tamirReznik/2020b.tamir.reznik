@@ -7,16 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import acs.dal.UserDao;
 import acs.data.Converter;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
-import acs.data.UserRole;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.UserService;
 import acs.rest.boundaries.user.UserBoundary;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service

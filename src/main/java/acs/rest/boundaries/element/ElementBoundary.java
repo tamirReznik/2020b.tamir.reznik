@@ -2,21 +2,24 @@ package acs.rest.boundaries.element;
 
 import java.util.Date;
 import java.util.Map;
-
-import acs.data.TypeEnum;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 /*
 {
     "elementId": {
-        "domain": "{managerDomain}",
+        "domain": "2020b.tamir.reznik",
         "id": "5303776d-87d8-4d84-b8c3-b1240787e2a8"
     },
     "type": "demoElement",
     "name": "Parking Lot",
     "active": true,
     "timeStamp": "1970-01-01",
-    "createBy": null,
+    "createdBy":
+    	{"userId":{
+			"domain":"2020b.tamir.reznik",
+			"email":"aNNA@us.er"
+			}
+	}	,
     "location": {
         "lat": 35.3256,
         "lng": 46.0234

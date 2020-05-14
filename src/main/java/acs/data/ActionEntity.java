@@ -55,16 +55,6 @@ public class ActionEntity {
 		this.type = type;
 	}
 
-//	@Convert(converter = acs.dal.MapToJsonConverter.class)
-//	@Lob
-//	public Map<String, Object> getElement() {
-//		return element;
-//	}
-//
-//	public void setElement(Map<String, Object> element) {
-//		this.element = element;
-//	}
-
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date getTimestamp() {
 		return createdTimestamp;

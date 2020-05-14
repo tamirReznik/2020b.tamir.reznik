@@ -52,11 +52,12 @@ public class ActionsCreator implements CommandLineRunner {
 
 		ActionBoundary actionBoundary = new ActionBoundary(new ActionIdBoundary("tamir", null),
 				TypeEnum.actionType.name(), element, new Date(), invokedBy, actionAttributes);
-
+		
 		IntStream.range(1, 6).mapToObj(i -> {
 			actionBoundary.setActionId(new ActionIdBoundary("tamir", Integer.toString(i)));
 			return actionBoundary;
 		}).forEach(System.err::println);
+
 		this.actionService.invokeAction(actionBoundary);
 
 	}

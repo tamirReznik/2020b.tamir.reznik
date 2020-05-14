@@ -226,4 +226,32 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		return rv;
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public Collection<ElementBoundary> searchByLocation(UserIdBoundary userIdBoundary, double lat, double lng,
+			double distance, int size, int page) {
+
+//			TODO - check how to search for distance
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userIdBoundary.getDomain(), userIdBoundary.getEmail()))
+				.orElseThrow(() -> new ObjectNotFoundException("could not find user by userDomain: "
+						+ userIdBoundary.getDomain() + "and userEmail: " + userIdBoundary.getEmail()));
+
+		if (uE.getRole() == UserRoleEntityEnum.manager)
+			return this.elementDao
+					.findAllByLocation_LatBetweenAndLocation_LngBetween(lat - distance, lat + distance, lng - distance,
+							lng + distance, PageRequest.of(page, size, Direction.ASC, "name"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
+
+		if (uE.getRole() == UserRoleEntityEnum.player)
+			return this.elementDao
+					.findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(lat - distance, lat + distance,
+							lng - distance, lng + distance, true, PageRequest.of(page, size, Direction.ASC, "name"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
+//
+		if (uE.getRole() == UserRoleEntityEnum.admin) {
+//			TODO THROW the match 4** error
+
+		}
+		return new ArrayList<>();
+	}
 }

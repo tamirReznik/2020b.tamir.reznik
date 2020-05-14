@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import acs.logic.EnhancedElementService;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 @RestController
 public class ElementController {
@@ -50,6 +51,7 @@ public class ElementController {
 			@PathVariable("userEmail") String userEmail,
 			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
+		System.err.println("checkthisout\n\n\n\n");
 		return this.elementService.getAll(userDomain, userEmail, size, page).toArray(new ElementBoundary[0]);
 	}
 
@@ -85,4 +87,17 @@ public class ElementController {
 		this.elementService.bindExistingElementToAnExsitingChildElement(new ElementIdBoundary(elementDomain, elementId),
 				responseId);
 	}
+
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/search/near/{lat}/{lng}/{distance}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] searchByLocation(@PathVariable("userDomain") String userDomain,
+			@PathVariable("userEmail") String userEmail, @PathVariable("lat") double lat,
+			@PathVariable("lng") double lng, @PathVariable("distance") double distance,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
+			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
+
+		return this.elementService
+				.searchByLocation(new UserIdBoundary(userDomain, userEmail), lat, lng, distance, size, page)
+				.toArray(new ElementBoundary[0]);
+	}
+
 }

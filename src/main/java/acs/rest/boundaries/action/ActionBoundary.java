@@ -7,27 +7,26 @@ import java.util.Map;
 {
     "actionId": {
         "domain": "2020b.tamir.reznik",
-        "id": "ce44996c-9a9d-475a-ae53-27575e6d24b5"
+        "id": "d4a60562-76ef-4dfe-b6cf-0b2effc35500"
     },
     "type": "actionType",
     "element": {
-        "elementId": {
-            "domain": "2020b.demo",
-            "id": 0
+        "element": {
+            "domain": "tamir",
+            "id": null
         }
     },
-    "createdTimestamp": "2020-04-27T16:13:57.475+0000",
+    "createdTimestamp": "2020-05-13T13:05:49.130+0000",
     "invokedBy": {
         "userId": {
-            "domain": "2020b.demo",
-            "email": "anna@gmail.com"
+            "domain": "2020b",
+            "email": "t@gmail.com"
         }
     },
     "actionAttributes": {
-        "streetName": "Sheshet Hayamim",
-        "cityName": "Binyamina",
-        "isParkingEmpty": false,
-        "nameOfParking": "parking name"
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
     }
 }
  */
