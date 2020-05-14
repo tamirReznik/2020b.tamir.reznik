@@ -101,13 +101,19 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 				if (update.getActive() != null)
 					existing.setActive(update.getActive());
+				
 				if (update.getName() != null)
 					existing.setName(update.getName());
+				
 				if (update.getLocation() != null)
 					existing.setLocation(update.getLocation());
+				
 				if (update.getType() != null)
 					existing.setType(update.getType());
-				//			TODO update elementAttribute
+				
+				if(update.getElementAttributes() != null)
+					existing.setElemntAttributes(update.getElementAttributes());
+			
 				return this.converter.fromEntity(this.elementDao.save(existing));
 
 			} else
@@ -149,16 +155,33 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 			if (page < 0) {
 				throw new RuntimeException("page must not be negative");
 			}
-
-			return this.elementDao.findAll(PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+			
+			UserIdEntity uib = new UserIdEntity(userDomain, userEmail);
+			UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
+					"could not find object by UserDomain:" + userDomain + "or userEmail:" + userEmail));
+			
+			//if user is MANAGER : findAll 
+			if (existingUser.getRole().equals(UserRoleEntityEnum.manager)) {
+				return this.elementDao.findAll(PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
 					.getContent() // List<ElementEntity>
 					.stream() // Stream<ElementEntity>
 					.map(this.converter::fromEntity) // Stream<ElementBoundary>
 					.collect(Collectors.toList()); // List<ElementBoundary>
+			}
+			
+			//if user = PLAYER : findAllByActive
+			else if (existingUser.getRole().equals(UserRoleEntityEnum.player)) {
+				return this.elementDao.findAllByActive(Boolean.TRUE,PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+						.stream() // Stream<ElementEntity>
+						.map(this.converter::fromEntity) // Stream<ElementBoundary>
+						.collect(Collectors.toList()); // List<ElementBoundary>
+			}
 
 		} else {
 			throw new RuntimeException("User Domain and User Email must not be empty or null");
 		}
+		
+		return null;
 	}
 
 	@Override
