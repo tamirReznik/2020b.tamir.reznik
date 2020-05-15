@@ -18,4 +18,5 @@ public class ObjectNotFoundException extends RuntimeException {
 	public ObjectNotFoundException(Throwable cause) {
 		super(cause);
 	}
+	
 }
