@@ -400,4 +400,78 @@ public class ElementTests {
 		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElements);
 	}
 
+	@Test
+	public void testGetSpecificInactiveElementViaPlayerUserAndGetNotFoundException() throws Exception {
+
+// 		GIVEN the database contains 2 users - player and manger
+//		manager create element
+		NewUserDetailsBoundary User = new NewUserDetailsBoundary("managerTamir@afeka.ac.il", UserRole.MANAGER,
+				"managerTamir", ":>");
+
+		UserBoundary managerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		User = new NewUserDetailsBoundary("playerTamir@afeka.ac.il", UserRole.PLAYER, "playerTamir", ":<");
+
+		UserBoundary playerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "Parent",
+				false, new Date(), new Location(0.5, 0.5), null, null);
+
+//		WHEN Manager post the element
+		ElementBoundary postElement = this.restTemplate.postForObject(this.url + "/elements/"
+				+ managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail(), element,
+				ElementBoundary.class);
+
+//		Player Cannot get specific inActive element
+		assertThrows(HttpClientErrorException.NotFound.class, () -> this.restTemplate.getForObject(
+				this.url + "/elements/" + playerUser.getUserId().getDomain() + "/" + playerUser.getUserId().getEmail()
+						+ "/" + postElement.getElementId().getDomain() + "/" + postElement.getElementId().getId(),
+				ElementBoundary.class));
+
+		ElementBoundary[] getElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/"
+						+ managerUser.getUserId().getEmail(),
+				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
+
+//		Manager Can get specific element
+		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElement);
+	}
+
+	@Test
+	public void testGetSpecificActiveElementViaAdminUserAndGetUnauthorizedException() throws Exception {
+
+// 		GIVEN the database contains 2 users - player and manger
+//		manager create element
+		NewUserDetailsBoundary User = new NewUserDetailsBoundary("managerTamir@afeka.ac.il", UserRole.MANAGER,
+				"managerTamir", ":>");
+
+		UserBoundary managerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		User = new NewUserDetailsBoundary("adminTamir@afeka.ac.il", UserRole.ADMIN, "adminTamir", ":<");
+
+		UserBoundary adminUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "Parent",
+				true, new Date(), new Location(0.5, 0.5), null, null);
+
+//		WHEN Manager post the element
+		ElementBoundary postElement = this.restTemplate.postForObject(this.url + "/elements/"
+				+ managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail(), element,
+				ElementBoundary.class);
+
+//		Admin Cannot get specific element
+		assertThrows(HttpClientErrorException.Unauthorized.class, () -> this.restTemplate.getForObject(
+				this.url + "/elements/" + adminUser.getUserId().getDomain() + "/" + adminUser.getUserId().getEmail()
+						+ "/" + postElement.getElementId().getDomain() + "/" + postElement.getElementId().getId(),
+				ElementBoundary.class));
+
+		ElementBoundary[] getElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/"
+						+ managerUser.getUserId().getEmail(),
+				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
+
+//		Manager Can get specific element
+		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElement);
+	}
+//TODO - tamir - create test of search by player user and get only active elements
 }

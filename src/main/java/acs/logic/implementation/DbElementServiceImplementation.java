@@ -171,13 +171,15 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
+		if (uE.getRole() == UserRoleEntityEnum.admin)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Get Specific Element");
 
 		ElementEntity existing = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
 
 		if (uE.getRole() == UserRoleEntityEnum.player && !existing.getActive())
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin User Can't Search Elements By Location");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player User Can't Get Specific Inactive Element");
 
 		return this.converter.fromEntity(existing);
 
