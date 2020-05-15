@@ -10,14 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import acs.dal.ElementDao;
 import acs.dal.UserDao;
@@ -57,30 +56,23 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 
-		if (managerDomain != null && !managerDomain.trim().isEmpty() && managerEmail != null
-				&& !managerEmail.trim().isEmpty()) {
+		stringValidation(managerDomain, managerEmail);
 
-			UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
-			UserEntity existing = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
-					"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
+		UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
+		UserEntity existing = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
+				"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
 
-			if (existing.getRole().equals(UserRoleEntityEnum.manager)) {
+		if (!existing.getRole().equals(UserRoleEntityEnum.manager))
+			throw new ObjectNotFoundException("You are not manager! Can't create an element");
 
-				elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
-				ElementEntity entity = this.converter.toEntity(elementDetails);
-				entity.setTimeStamp(new Date());
-				Map<String, UserIdBoundary> createdBy = new HashMap<>();
-				createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
-				entity.setCreateBy(createdBy);
-				return this.converter.fromEntity(this.elementDao.save(entity));
-			}
+		elementDetails.setElementId(new ElementIdBoundary(projectName, UUID.randomUUID().toString()));
+		ElementEntity entity = this.converter.toEntity(elementDetails);
+		entity.setTimeStamp(new Date());
+		Map<String, UserIdBoundary> createdBy = new HashMap<>();
+		createdBy.put("userId", new UserIdBoundary(managerDomain, managerEmail));
+		entity.setCreateBy(createdBy);
+		return this.converter.fromEntity(this.elementDao.save(entity));
 
-			else
-				throw new ObjectNotFoundException("You are not manager! Can't create an element");
-
-		} else {
-			throw new ObjectNotFoundException("User Domain and User Email must not be empty or null");
-		}
 	}
 
 	@Override
@@ -88,138 +80,114 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 
-		if (elementDomain != null && !elementDomain.trim().isEmpty() && elementId != null && !elementId.trim().isEmpty()
-				&& managerDomain != null && !managerDomain.trim().isEmpty() && managerEmail != null
-				&& !managerEmail.trim().isEmpty()) {
+		stringValidation(managerDomain, managerEmail, elementDomain, elementId);
 
-			UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
-			UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
-					"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
+		UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
+		UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
+				"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
 
-			if (existingUser.getRole().equals(UserRoleEntityEnum.manager)) {
+		if (!existingUser.getRole().equals(UserRoleEntityEnum.manager))
+			throw new ObjectNotFoundException("You are not manager! Can't update an element");
 
-				ElementIdEntity elementIdEntity = new ElementIdEntity(elementDomain, elementId);
-				ElementEntity existing = this.elementDao.findById(elementIdEntity)
-						.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
-								+ elementDomain + "or elementId: " + elementId));
+		ElementIdEntity elementIdEntity = new ElementIdEntity(elementDomain, elementId);
+		ElementEntity existing = this.elementDao.findById(elementIdEntity)
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
 
-				if (update.getActive() != null)
-					existing.setActive(update.getActive());
+		if (update.getActive() != null)
+			existing.setActive(update.getActive());
 
-				if (update.getName() != null)
-					existing.setName(update.getName());
+		if (update.getName() != null)
+			existing.setName(update.getName());
 
-				if (update.getLocation() != null)
-					existing.setLocation(update.getLocation());
+		if (update.getLocation() != null)
+			existing.setLocation(update.getLocation());
 
-				if (update.getType() != null)
-					existing.setType(update.getType());
+		if (update.getType() != null)
+			existing.setType(update.getType());
 
-				if (update.getElementAttributes() != null)
-					existing.setElemntAttributes(update.getElementAttributes());
+		if (update.getElementAttributes() != null)
+			existing.setElemntAttributes(update.getElementAttributes());
 
-				return this.converter.fromEntity(this.elementDao.save(existing));
+		return this.converter.fromEntity(this.elementDao.save(existing));
 
-			} else
-				throw new ObjectNotFoundException("You are not manager! Can't update an element");
-
-		} else {
-			throw new RuntimeException("User Domain and User Email must not be empty or null");
-		}
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
-		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
+		stringValidation(userDomain, userEmail);
 
-			Iterable<ElementEntity> allElements = this.elementDao.findAll();
-			List<ElementBoundary> returnElements = new ArrayList<>();
+		Iterable<ElementEntity> allElements = this.elementDao.findAll();
+		List<ElementBoundary> returnElements = new ArrayList<>();
 
-			for (ElementEntity entity : allElements) {
-				returnElements.add(this.converter.fromEntity(entity)); // map entities to boundaries
-			}
-			return returnElements;
-
-		} else {
-			throw new RuntimeException("User Domain and User Email must not be empty or null");
+		for (ElementEntity entity : allElements) {
+			returnElements.add(this.converter.fromEntity(entity)); // map entities to boundaries
 		}
+
+		return returnElements;
+
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail, int size, int page) {
 
-		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()) {
+		stringValidation(userDomain, userEmail);
 
-			if (size < 1) {
-				throw new RuntimeException("size must be not less than 1");
-			}
+		validatePaging(size, page);
 
-			if (page < 0) {
-				throw new RuntimeException("page must not be negative");
-			}
+		UserIdEntity uib = new UserIdEntity(userDomain, userEmail);
+		UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
+				"could not find object by UserDomain:" + userDomain + "or userEmail:" + userEmail));
 
-			UserIdEntity uib = new UserIdEntity(userDomain, userEmail);
-			UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
-					"could not find object by UserDomain:" + userDomain + "or userEmail:" + userEmail));
-
-			// if user is MANAGER : findAll
-			if (existingUser.getRole().equals(UserRoleEntityEnum.manager)) {
-				return this.elementDao.findAll(PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
-						.getContent() // List<ElementEntity>
-						.stream() // Stream<ElementEntity>
-						.map(this.converter::fromEntity) // Stream<ElementBoundary>
-						.collect(Collectors.toList()); // List<ElementBoundary>
-			}
-
-			// if user = PLAYER : findAllByActive
-			else if (existingUser.getRole().equals(UserRoleEntityEnum.player)) {
-				return this.elementDao.findAllByActive(Boolean.TRUE, PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
-						.stream() // Stream<ElementEntity>
-						.map(this.converter::fromEntity) // Stream<ElementBoundary>
-						.collect(Collectors.toList()); // List<ElementBoundary>
-			}
-
-		} else {
-			throw new RuntimeException("User Domain and User Email must not be empty or null");
+		// if user is MANAGER : findAll
+		if (existingUser.getRole().equals(UserRoleEntityEnum.manager)) {
+			return this.elementDao.findAll(PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+					.getContent() // List<ElementEntity>
+					.stream() // Stream<ElementEntity>
+					.map(this.converter::fromEntity) // Stream<ElementBoundary>
+					.collect(Collectors.toList()); // List<ElementBoundary>
 		}
 
-		return null;
+		// if user = PLAYER : findAllByActive
+		else if (existingUser.getRole().equals(UserRoleEntityEnum.player)) {
+			return this.elementDao.findAllByActive(Boolean.TRUE, PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+					.stream() // Stream<ElementEntity>
+					.map(this.converter::fromEntity) // Stream<ElementBoundary>
+					.collect(Collectors.toList()); // List<ElementBoundary>
+		}
+
+		return new ArrayList<>();
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
-		if (userDomain != null && !userDomain.trim().isEmpty() && userEmail != null && !userEmail.trim().isEmpty()
-				&& elementDomain != null && !elementDomain.trim().isEmpty() && elementId != null
-				&& !elementId.trim().isEmpty()) {
 
-			ElementIdEntity elementIdEntity = new ElementIdEntity(elementDomain, elementId);
-			ElementEntity existing = this.elementDao.findById(elementIdEntity)
-					.orElseThrow(() -> new ObjectNotFoundException(
-							"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
-			if (existing != null) {
-				return this.converter.fromEntity(existing);
-			} else {
-				throw new ObjectNotFoundException("could not find object by id: " + elementId);
-			}
-		} else {
-			throw new RuntimeException("User Domain and User Email must not be empty or null");
-		}
+		stringValidation(userDomain, userEmail, elementDomain, elementId);
+
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
+
+		ElementEntity existing = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
+
+		if (uE.getRole() == UserRoleEntityEnum.player && !existing.getActive())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin User Can't Search Elements By Location");
+
+		return this.converter.fromEntity(existing);
 
 	}
 
 	@Override
 	@Transactional
 	public void deleteAllElements(String adminDomain, String adminEmail) {
-		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
-				&& !adminEmail.trim().isEmpty()) {
-			this.elementDao.deleteAll();
-		} else {
-			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
-		}
+		stringValidation(adminDomain, adminEmail);
+		this.elementDao.deleteAll();
 	}
 
 	@Override
@@ -235,21 +203,17 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		origin.addResponse(response);
 		this.elementDao.save(origin);
 	}
-	//---------------------------------------------------------------------------TO DO ------------------------------------------
+	// TODO
 
 	@Override
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
-			String elementDomain, String elementId,int size, int page) {
-		
-		
-		if (size < 1) {
-			throw new RuntimeException("size must be not less than 1");
-		}
+			String elementDomain, String elementId, int size, int page) {
 
-		if (page < 0) {
-			throw new RuntimeException("page must not be negative");
-		}
+		validatePaging(size, page);
+
+		stringValidation(elementDomain, elementId, userDomain, userEmail);
+
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
 
 		ElementEntity origin = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
@@ -286,13 +250,16 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<ElementBoundary> searchByLocation(UserIdBoundary userIdBoundary, double lat, double lng,
+	public Collection<ElementBoundary> searchByLocation(String userDomain, String userEmail, double lat, double lng,
 			double distance, int size, int page) {
 
-//			TODO - check how to search for distance
-		UserEntity uE = this.userDao.findById(new UserIdEntity(userIdBoundary.getDomain(), userIdBoundary.getEmail()))
-				.orElseThrow(() -> new ObjectNotFoundException("could not find user by userDomain: "
-						+ userIdBoundary.getDomain() + "and userEmail: " + userIdBoundary.getEmail()));
+		validatePaging(size, page);
+
+		stringValidation(userDomain, userEmail);
+
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
 
 		if (uE.getRole() == UserRoleEntityEnum.manager)
 			return this.elementDao
@@ -305,11 +272,26 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 					.findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(lat - distance, lat + distance,
 							lng - distance, lng + distance, true, PageRequest.of(page, size, Direction.ASC, "name"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
-//
-		if (uE.getRole() == UserRoleEntityEnum.admin) {
-//			TODO THROW the match 4** error
 
-		}
+		if (uE.getRole() == UserRoleEntityEnum.admin)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
+
 		return new ArrayList<>();
+	}
+
+	public void stringValidation(String... strings) {
+		for (String string : strings)
+			if (string == null || string.trim().isEmpty())
+				throw new RuntimeException("Any Url String Variable Must Not Be Empty Or null");
+
+	}
+
+	public void validatePaging(int size, int page) {
+		if (size < 1)
+			throw new RuntimeException("size must be not less than 1");
+
+		if (page < 0)
+			throw new RuntimeException("page must not be negative");
+
 	}
 }

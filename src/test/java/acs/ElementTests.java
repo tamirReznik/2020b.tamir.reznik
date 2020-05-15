@@ -14,6 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import acs.data.TypeEnum;
 import acs.data.UserRole;
@@ -23,7 +24,6 @@ import acs.rest.boundaries.element.Location;
 import acs.rest.boundaries.user.NewUserDetailsBoundary;
 import acs.rest.boundaries.user.UserBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
-
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ElementTests {
@@ -57,12 +57,14 @@ public class ElementTests {
 		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-		
-		ElementIdBoundary postedElementId = this.restTemplate
-				.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb, ElementBoundary.class).getElementId();
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
 
-		ElementBoundary[] allElements = this.restTemplate.getForObject(this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
+		ElementIdBoundary postedElementId = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb,
+				ElementBoundary.class).getElementId();
+
+		ElementBoundary[] allElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
 				ElementBoundary[].class);
 		boolean exist = false;
 		for (ElementBoundary element : allElements)
@@ -78,37 +80,40 @@ public class ElementTests {
 		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-		
-		this.restTemplate.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb, ElementBoundary.class).getElementId();
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
 
-		ElementBoundary[] allElements = this.restTemplate.getForObject(this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
+		this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb,
+				ElementBoundary.class).getElementId();
+
+		ElementBoundary[] allElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
 				ElementBoundary[].class);
 		if (allElements.length != 1)
 			throw new Exception("error");
 	}
-	
+
 	@Test
 	public void test_Create_New_Element_And_User_Is_Not_Manager() throws Exception {
 		// GIVEN the server is up
-			// do nothing
+		// do nothing
 
 		// WHEN I POST new element and new user
 		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
-		
-		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.PLAYER, "demo1", ":("); //create PLAYER user 
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-		
-		//THEN the server responds with status <> 2xx
-		//exception because the user is PLAYER (and not MANAGER)
-		assertThrows(Exception.class, ()-> 
-		this.restTemplate.postForObject(this.url 
-				+ "/elements/"+postedUB.getUserId().getDomain()+"/"
-				+postedUB.getUserId().getEmail(), eb, ElementBoundary.class));
+
+		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.PLAYER, "demo1", ":("); // create
+																												// PLAYER
+																												// user
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
+
+		// THEN the server responds with status <> 2xx
+		// exception because the user is PLAYER (and not MANAGER)
+		assertThrows(Exception.class, () -> this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb,
+				ElementBoundary.class));
 	}
 
-	
 	@Test
 	public void test_Create_Two_Elements_Get_Specific_One_And_See_If_ID_Matches() throws Exception {
 		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
@@ -117,16 +122,19 @@ public class ElementTests {
 				new Date(), new Location(), null, null);
 
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-		
-		ElementBoundary neweb1 = this.restTemplate
-				.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb1,
-				ElementBoundary.class);
-		this.restTemplate
-		.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb2, ElementBoundary.class);
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
 
-		ElementBoundary ebCheck = this.restTemplate.getForObject(this.url + "/elements/aaa/bbb/"
-				+ neweb1.getElementId().getDomain() + "/" + neweb1.getElementId().getId(), ElementBoundary.class);
+		ElementBoundary neweb1 = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb1,
+				ElementBoundary.class);
+		this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb2,
+				ElementBoundary.class);
+
+		ElementBoundary ebCheck = this.restTemplate.getForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail() + "/"
+						+ neweb1.getElementId().getDomain() + "/" + neweb1.getElementId().getId(),
+				ElementBoundary.class);
 
 		if (!ebCheck.getElementId().getId().equals(neweb1.getElementId().getId()))
 			throw new Exception("error");
@@ -139,13 +147,19 @@ public class ElementTests {
 		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "david", true,
 				new Date(), new Location(), null, null);
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-		this.restTemplate.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb1, ElementBoundary.class);
-		this.restTemplate.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb2, ElementBoundary.class);
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
+		this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb1,
+				ElementBoundary.class);
+		this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb2,
+				ElementBoundary.class);
 
-		this.restTemplate.delete(this.url + "/admin/elements/{adminDomain}/{adminEmail}", postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail());
+		this.restTemplate.delete(this.url + "/admin/elements/{adminDomain}/{adminEmail}",
+				postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail());
 
-		ElementBoundary[] allElements = this.restTemplate.getForObject(this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
+		ElementBoundary[] allElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
 				ElementBoundary[].class);
 		if (allElements.length != 0)
 			throw new Exception("error, delete failed");
@@ -153,21 +167,22 @@ public class ElementTests {
 
 	@Test
 	public void test_Update_Element_And_Check_If_Update_Succeeded() throws Exception {
-		
+
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-		
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
+
 		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
-		ElementIdBoundary postedElementId = this.restTemplate
-				.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb, ElementBoundary.class).getElementId();
+		ElementIdBoundary postedElementId = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(), eb,
+				ElementBoundary.class).getElementId();
 		eb.setName("new_name");
 
-		this.restTemplate.put(this.url + "/elements/2020b.tamir.reznik/demo@us.er/{elementDomain}/{elementId}",
-				 eb,postedElementId.getDomain(), postedElementId.getId());
+		this.restTemplate.put(this.url + "/elements/2020b.tamir.reznik/demo@us.er/{elementDomain}/{elementId}", eb,
+				postedElementId.getDomain(), postedElementId.getId());
 
-		ElementBoundary[] allElements = this.restTemplate.getForObject(this.url + "/elements/2020b.tamir.reznik/demo@us.er",
-				ElementBoundary[].class);
+		ElementBoundary[] allElements = this.restTemplate
+				.getForObject(this.url + "/elements/2020b.tamir.reznik/demo@us.er", ElementBoundary[].class);
 		if (!allElements[0].getName().equals("new_name"))
 			throw new Exception("error");
 	}
@@ -202,8 +217,7 @@ public class ElementTests {
 //					+postedUB.getUserId().getEmail() + "/{elementDomain}/{elementId}",
 //				 eb,domain, id));
 //	}
-	
-	
+
 	@Test
 	public void test_Create_Three_Elements_Bind_Them_And_Validate_Relation() throws Exception {
 		// GIVEN the server is up
@@ -216,17 +230,17 @@ public class ElementTests {
 				true, new Date(), new Location(0.5, 0.5), null, null);
 
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
 		// post them
-		ElementBoundary postedChild1Element = this.restTemplate
-				.postForObject(this.url +"/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(),
-						child1,ElementBoundary.class);
-		ElementBoundary postedChild2Element = this.restTemplate
-				.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(),
-						child2,ElementBoundary.class);
-		ElementBoundary postedParentElement = this.restTemplate
-				.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(),
-						parent, ElementBoundary.class);
+		ElementBoundary postedChild1Element = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
+				child1, ElementBoundary.class);
+		ElementBoundary postedChild2Element = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
+				child2, ElementBoundary.class);
+		ElementBoundary postedParentElement = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
+				parent, ElementBoundary.class);
 
 		List<ElementBoundary> allChildBeforeBind = new ArrayList<>();
 		allChildBeforeBind.add(postedChild1Element);
@@ -274,12 +288,12 @@ public class ElementTests {
 				true, new Date(), new Location(0.5, 0.5), null, null);
 
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
 
 		// WHEN we post the element
-		ElementBoundary postedElement = this.restTemplate
-				.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), element,
-				ElementBoundary.class);
+		ElementBoundary postedElement = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
+				element, ElementBoundary.class);
 
 		// get all children of the element
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
@@ -298,10 +312,11 @@ public class ElementTests {
 		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "Parent",
 				true, new Date(), new Location(0.5, 0.5), null, null);
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-		
+		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
+
 		// WHEN we post the element
-		ElementBoundary postedElement = this.restTemplate.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(),
+		ElementBoundary postedElement = this.restTemplate.postForObject(
+				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
 				element, ElementBoundary.class);
 
 		// get all parents of the element
@@ -314,33 +329,75 @@ public class ElementTests {
 		assertThat(allChilds).isEmpty();
 
 	}
-	
+
 	@Test
-	public void testGetAllElementsWithBadSize() throws Exception{
-		
-		// GIVEN the database contains 3 Element 
+	public void testGetAllElementsWithBadSize() throws Exception {
+
+		// GIVEN the database contains 3 Element
 		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "element1", true,
 				new Date(), new Location(), null, null);
 		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "element2", true,
 				new Date(), new Location(), null, null);
 		ElementBoundary eb3 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "element3", true,
 				new Date(), new Location(), null, null);
-	
-		//create MANAGER user
-		UserIdBoundary manager = this.restTemplate.postForObject(this.url + "/users",
-			new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.MANAGER, "sapir", ":-)"),UserBoundary.class).getUserId();	
-		this.restTemplate.postForObject(this.url + "/elements/"+manager.getDomain()+"/"+manager.getEmail(), eb1, ElementBoundary.class);
-		this.restTemplate.postForObject(this.url + "/elements/"+manager.getDomain()+"/"+manager.getEmail(), eb2, ElementBoundary.class);
-		this.restTemplate.postForObject(this.url + "/elements/"+manager.getDomain()+"/"+manager.getEmail(), eb3, ElementBoundary.class);
 
-		
+		// create MANAGER user
+		UserIdBoundary manager = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.MANAGER, "sapir", ":-)"), UserBoundary.class)
+				.getUserId();
+		this.restTemplate.postForObject(this.url + "/elements/" + manager.getDomain() + "/" + manager.getEmail(), eb1,
+				ElementBoundary.class);
+		this.restTemplate.postForObject(this.url + "/elements/" + manager.getDomain() + "/" + manager.getEmail(), eb2,
+				ElementBoundary.class);
+		this.restTemplate.postForObject(this.url + "/elements/" + manager.getDomain() + "/" + manager.getEmail(), eb3,
+				ElementBoundary.class);
+
 		// WHEN I invoke GET /acs/elements/{userDomain}/{userEmail}?page=5&size=-1
-		// THEN the server responds with status <> 2xx	
-		assertThrows(Exception.class, ()->
-			this.restTemplate.getForObject(this.url + "/elements/{userDomain}/{userEmail}?page={page}&size={size}",
-				ElementBoundary[].class, manager.getDomain(), manager.getEmail(),
-				5, //page
-				-1 //size 
-			));
+		// THEN the server responds with status <> 2xx
+		assertThrows(Exception.class,
+				() -> this.restTemplate.getForObject(
+						this.url + "/elements/{userDomain}/{userEmail}?page={page}&size={size}",
+						ElementBoundary[].class, manager.getDomain(), manager.getEmail(), 5, // page
+						-1 // size
+				));
 	}
+
+	@Test
+	public void testSearchByLoactionViaAdminUserAndGetUnauthorizedException() throws Exception {
+
+// 		GIVEN the database contains 2 users - admin and manger
+//		manager create element
+		NewUserDetailsBoundary User = new NewUserDetailsBoundary("managerTamir@afeka.ac.il", UserRole.MANAGER,
+				"managerTamir", ":>");
+
+		UserBoundary managerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		User = new NewUserDetailsBoundary("adminTamir@afeka.ac.il", UserRole.ADMIN, "adminTamir", ":<");
+
+		UserBoundary adminUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		ElementBoundary element = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "Parent",
+				true, new Date(), new Location(0.5, 0.5), null, null);
+
+//		WHEN Manager post the element
+		ElementBoundary postElements = this.restTemplate.postForObject(this.url + "/elements/"
+				+ managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail(), element,
+				ElementBoundary.class);
+
+//		Admin Cannot search elements by location...
+		assertThrows(HttpClientErrorException.Unauthorized.class,
+				() -> this.restTemplate.getForObject(
+						this.url + "/elements/" + adminUser.getUserId().getDomain() + "/"
+								+ adminUser.getUserId().getEmail() + "/search/near/1/1/10",
+						ElementBoundary[].class, adminUser.getUserId().getDomain(), adminUser.getUserId().getEmail()));
+
+		ElementBoundary[] getElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail()
+						+ "/search/near/1/1/10",
+				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
+
+//		Manager Can search elements by location...
+		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElements);
+	}
+
 }

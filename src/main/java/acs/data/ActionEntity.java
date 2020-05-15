@@ -12,8 +12,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import acs.rest.boundaries.action.ElementOfAction;
-
 @Entity
 @Table(name = "ACTIONS")
 public class ActionEntity {

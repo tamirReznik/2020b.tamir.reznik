@@ -3,9 +3,8 @@ package acs.logic.implementation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;import java.util.stream.Collector;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ActionDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
-import acs.logic.ActionService;
 import acs.logic.EnhancedActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
@@ -27,7 +25,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private Converter converter;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao,Converter converter) {
+	public DbActionServiceImplementation(ActionDao actionDao, Converter converter) {
 		this.converter = converter;
 		this.actionDao = actionDao;
 	}
@@ -39,7 +37,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	}
 
 	@Override
-	@Transactional //(readOnly = false)
+	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
 		if (action == null || action.getType() == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
@@ -55,7 +53,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	}
 
 	@Override
-	@Transactional (readOnly = true)
+	@Transactional(readOnly = true)
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
@@ -71,7 +69,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	}
 
 	@Override
-	@Transactional //(readOnly = false)
+	@Transactional // (readOnly = false)
 	public void deleteAllActions(String adminDomain, String adminEmail) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
@@ -86,16 +84,16 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail, int size, int page) {
 		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
 				&& !adminEmail.trim().isEmpty()) {
-			
+
 			if (size < 1) {
-				throw new RuntimeException("size must be not less than 1"); 
+				throw new RuntimeException("size must be not less than 1");
 			}
-			
+
 			if (page < 0) {
 				throw new RuntimeException("page must positive");
 			}
-			
-			return this.actionDao.findAll(PageRequest.of(page, size,Direction.DESC,"actionId"))// Page<ActionEntity>
+
+			return this.actionDao.findAll(PageRequest.of(page, size, Direction.DESC, "actionId"))// Page<ActionEntity>
 					.getContent()// List<ActionEntity>
 					.stream()// Stream<ActionEntity>
 					.map(this.converter::fromEntity)// Stream<ActionEntity>

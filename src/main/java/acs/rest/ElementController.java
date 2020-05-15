@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import acs.logic.EnhancedElementService;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
-import acs.rest.boundaries.user.UserIdBoundary;
 
 @RestController
 public class ElementController {
@@ -96,8 +95,7 @@ public class ElementController {
 			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
 
-		return this.elementService
-				.searchByLocation(new UserIdBoundary(userDomain, userEmail), lat, lng, distance, size, page)
+		return this.elementService.searchByLocation(userDomain, userEmail, lat, lng, distance, size, page)
 				.toArray(new ElementBoundary[0]);
 	}
 
