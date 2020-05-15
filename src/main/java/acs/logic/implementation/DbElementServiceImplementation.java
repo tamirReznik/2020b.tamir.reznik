@@ -208,17 +208,33 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		origin.addResponse(response);
 		this.elementDao.save(origin);
 	}
+	//---------------------------------------------------------------------------TO DO ------------------------------------------
 
 	@Override
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
-			String elementDomain, String elementId) {
+			String elementDomain, String elementId,int size, int page) {
+		
+		
+		if (size < 1) {
+			throw new RuntimeException("size must be not less than 1");
+		}
+
+		if (page < 0) {
+			throw new RuntimeException("page must not be negative");
+		}
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
 
 		ElementEntity origin = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
 				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
 
 		return origin.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());
+//		return
+//				this.elementDao
+//					.findAllByParent_id(eid, PageRequest.of(page, size, Direction.DESC, "timestamp", "id"))
+//					.stream()
+//					.map(this.converter::fromEntity)
+//					.collect(Collectors.toSet());
 	}
 
 	@Override

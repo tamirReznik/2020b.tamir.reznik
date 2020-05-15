@@ -63,10 +63,11 @@ public class ElementController {
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/children", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary[] getAllChildren(@PathVariable("userDomain") String userDomain,
 			@PathVariable("userEmail") String userEmail, @PathVariable("elementDomain") String elementDomain,
-			@PathVariable("elementId") String elementId) {
-		return this.elementService
-				.getAllChildrenOfAnExsitingElement(userDomain, userEmail, elementDomain, String.valueOf(elementId))
-				.toArray(new ElementBoundary[0]);
+			@PathVariable("elementId") String elementId,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
+			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
+		return this.elementService.getAllChildrenOfAnExsitingElement(userDomain, userEmail, elementDomain,
+				String.valueOf(elementId), size, page).toArray(new ElementBoundary[0]);
 	}
 
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
