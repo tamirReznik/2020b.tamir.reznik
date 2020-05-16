@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
@@ -515,12 +514,18 @@ public class ElementTests {
 						+ "?page=0&size=16",
 				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
 
+//		player get back only Active_Elements array
 		assertThat(playerGetElements).hasSize(total_Active_Elements);
+//		manager get back all active and inactive elements array
+		assertThat(managerGetElements).hasSize(postedElements.size());
 
+//		each element that player got from db is active
 		for (ElementBoundary elementBoundary : playerGetElements)
 			assertThat(elementBoundary.getActive()).isTrue();
 
-//		assertThat(managerGetElements).usingRecursiveFieldByFieldElementComparator()
-//				.containsExactlyInAnyOrderElementsOf(postedElements);
+//		TODO - tamir - check why assert below return different elements
+//		assertThat(managerGetElements).hasSize(postedElements.size()).usingRecursiveFieldByFieldElementComparator()
+//		.containsExactlyInAnyOrderElementsOf(postedElements);
+
 	}
 }
