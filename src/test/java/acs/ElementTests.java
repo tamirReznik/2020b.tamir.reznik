@@ -6,11 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -43,6 +45,7 @@ public class ElementTests {
 	}
 
 	@AfterEach
+	@BeforeEach
 	public void teardown() {
 		this.restTemplate.delete(this.url + "/admin/elements/{adminDomain}/{adminEmail}", "???", "??");
 	}
@@ -474,6 +477,7 @@ public class ElementTests {
 		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElement);
 	}
 
+	@Test
 	public void testGetElementArrayViaPlayerUserAndGetOnlyActiveElements() {
 
 //	note - total_Elements_To_Post need to be even
@@ -493,7 +497,7 @@ public class ElementTests {
 		// WHEN post 8 active elements and 8 inactive elements and save them in a list
 		List<ElementBoundary> postedElements = IntStream
 				.range(0, total_Elements_To_Post).mapToObj(i -> new ElementBoundary(new ElementIdBoundary(),
-						Integer.toString(i), "Parent", true, new Date(), new Location(0.5, 0.5), null, null))
+						"parking lot", Integer.toString(i), true, new Date(), new Location(0.5, 0.5), null, null))
 				.filter(Boundary -> {
 					if (Integer.valueOf(Boundary.getName()) % 2 == 0)
 						Boundary.setActive(false);
@@ -501,13 +505,22 @@ public class ElementTests {
 							+ "/" + managerUser.getUserId().getEmail(), Boundary, ElementBoundary.class) != null;
 				}).collect(Collectors.toList());
 //		Player get all elements and receive only active elements from db 
-		ElementBoundary[] getElements = this.restTemplate.getForObject(
+		ElementBoundary[] playerGetElements = this.restTemplate.getForObject(
 				this.url + "/elements/" + playerUser.getUserId().getDomain() + "/" + playerUser.getUserId().getEmail()
 						+ "?page=0&size=16",
 				ElementBoundary[].class, playerUser.getUserId().getDomain(), playerUser.getUserId().getEmail());
 
-		assertThat(getElements).hasSize(total_Active_Elements);
-		assertThat(postedElements).containsAnyOf(getElements);
+		ElementBoundary[] managerGetElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail()
+						+ "?page=0&size=16",
+				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
 
+		assertThat(playerGetElements).hasSize(total_Active_Elements);
+
+		for (ElementBoundary elementBoundary : playerGetElements)
+			assertThat(elementBoundary.getActive()).isTrue();
+
+//		assertThat(managerGetElements).usingRecursiveFieldByFieldElementComparator()
+//				.containsExactlyInAnyOrderElementsOf(postedElements);
 	}
 }
