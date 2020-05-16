@@ -12,8 +12,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import acs.rest.boundaries.action.ElementOfAction;
-
 @Entity
 @Table(name = "ACTIONS")
 public class ActionEntity {
@@ -54,16 +52,6 @@ public class ActionEntity {
 	public void setType(String type) {
 		this.type = type;
 	}
-
-//	@Convert(converter = acs.dal.MapToJsonConverter.class)
-//	@Lob
-//	public Map<String, Object> getElement() {
-//		return element;
-//	}
-//
-//	public void setElement(Map<String, Object> element) {
-//		this.element = element;
-//	}
 
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date getTimestamp() {

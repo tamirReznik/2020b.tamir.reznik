@@ -8,14 +8,15 @@ import org.springframework.data.repository.query.Param;
 import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
 
-
-
 //Create Read Update Delete - CRUD
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity> {
+
 
  		//CrudRepository<ElementEntity, ElementIdEntity> 
 	
 	 
+
+	// CrudRepository<ElementEntity, ElementIdEntity>
 	// SELECT ... FROM ELEMENT WHERE ORIGIN_ID=?
 	//public List<ElementEntity> findAllByParent_id(@Param("elementId") ElementIdEntity elementId, Pageable pageable);
 ////
@@ -34,7 +35,9 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 
 	// CrudRepository<ElementEntity, ElementIdEntity>
 
+
 	public List<ElementEntity> findAllByName(@Param("name") String name,Pageable pageable);	
+
 	// SELECT ... FROM ELEMENTS WHERE ACTIVE=?
 	public List<ElementEntity> findAllByActive(@Param("active") boolean active, Pageable pageable);
 

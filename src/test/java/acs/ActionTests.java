@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import acs.data.TypeEnum;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
@@ -33,6 +34,7 @@ public class ActionTests {
 	private String postUrl;
 	private int port;
 	private String delete_And_Get_Url;
+	private ObjectMapper mapper;
 
 	@LocalServerPort
 	public void setPort(int port) {
@@ -41,16 +43,13 @@ public class ActionTests {
 
 	@PostConstruct
 	public void init() {
+		mapper = new ObjectMapper();
 		this.restTemplate = new RestTemplate();
 		this.postUrl = "http://localhost:" + this.port + "/acs/actions";
 		this.delete_And_Get_Url = "http://localhost:" + this.port + "/acs/admin/actions/{adminDomain}/{adminEmail}";
 	}
 
 	@BeforeEach
-	public void setup() {
-		this.restTemplate.delete(delete_And_Get_Url, "adminDomain", "adminEmail");
-	}
-
 	@AfterEach
 	public void tear_down() {
 		this.restTemplate.delete(delete_And_Get_Url, "adminDomain", "adminEmail");
@@ -109,6 +108,9 @@ public class ActionTests {
 		actionAttributes.put("key1", "value1");
 		actionAttributes.put("key2", "value2");
 		actionAttributes.put("key3", "value3");
+		System.out.println("tamirmeshu\n\n"
+				+ this.mapper.writeValueAsString(new ActionBoundary(new ActionIdBoundary("unvalid name", null),
+						TypeEnum.actionType.name(), element, new Date(), invokedBy, actionAttributes)));
 
 		return new ActionBoundary(new ActionIdBoundary("unvalid name", null), TypeEnum.actionType.name(), element,
 				new Date(), invokedBy, actionAttributes);

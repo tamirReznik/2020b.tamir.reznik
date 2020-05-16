@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import acs.logic.ActionService;
 import acs.logic.ElementService;
 import acs.logic.EnhancedActionService;
 import acs.logic.UserService;
@@ -26,7 +24,8 @@ public class AdminController {
 	public AdminController() {
 	}
 
-	public AdminController(UserService userService, EnhancedActionService actionService, ElementService elementService) {
+	public AdminController(UserService userService, EnhancedActionService actionService,
+			ElementService elementService) {
 		super();
 		this.userService = userService;
 		this.actionService = actionService;
@@ -58,9 +57,9 @@ public class AdminController {
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ActionBoundary[] exportAllActions(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail,
-			@RequestParam(name = "size", required = false, defaultValue = "10") int size, 
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-		return actionService.getAllActions(adminDomain, adminEmail,size,page).toArray(new ActionBoundary[0]);
+		return actionService.getAllActions(adminDomain, adminEmail, size, page).toArray(new ActionBoundary[0]);
 	}
 
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)

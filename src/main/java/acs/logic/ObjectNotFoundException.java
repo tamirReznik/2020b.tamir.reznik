@@ -1,6 +1,6 @@
 package acs.logic;
 
-public class ObjectNotFoundException extends RuntimeException  {
+public class ObjectNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = -3183057250236533850L;
 
 	public ObjectNotFoundException() {
@@ -18,4 +18,5 @@ public class ObjectNotFoundException extends RuntimeException  {
 	public ObjectNotFoundException(Throwable cause) {
 		super(cause);
 	}
+	
 }
