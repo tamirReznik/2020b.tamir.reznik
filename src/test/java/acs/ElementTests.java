@@ -248,13 +248,13 @@ public class ElementTests {
 				element, ElementBoundary.class);
 
 		// get all parents of the element
-		ElementBoundary[] allChilds = this.restTemplate.getForObject(
+		ElementBoundary[] allParents = this.restTemplate.getForObject(
 				this.url + "/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents",
 				ElementBoundary[].class, "???", "???", postedElement.getElementId().getDomain(),
 				postedElement.getElementId().getId());
-
+		
 		// THEN we get an empty array
-		assertThat(allChilds).isEmpty();
+		assertThat(allParents).isEmpty();
 
 	}
 }

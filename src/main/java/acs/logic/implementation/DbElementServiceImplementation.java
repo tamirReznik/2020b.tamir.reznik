@@ -213,9 +213,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Override
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
-			String elementDomain, String elementId,int size, int page) {
-		
-		
+			String elementDomain, String elementId,int size, int page) {		
 		if (size < 1) {
 			throw new RuntimeException("size must be not less than 1");
 		}
@@ -229,32 +227,57 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
 
 		return origin.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());
-//		return
-//				this.elementDao
-//					.findAllByParent_id(eid, PageRequest.of(page, size, Direction.DESC, "timestamp", "id"))
-//					.stream()
-//					.map(this.converter::fromEntity)
-//					.collect(Collectors.toSet());
+		/*return
+				this.elementDao
+				.findAllByParent_id(eid, PageRequest.of(page, size, Direction.DESC, "elementId"))
+					.stream()
+					.map(this.converter::fromEntity)
+					.collect(Collectors.toSet());*/
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<ElementBoundary> getAnArrayWithElementParent(String userDomain, String userEmail,
-			String elementDomain, String elementId) {
-
-		ElementEntity element = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
-				.orElseThrow(() -> new ObjectNotFoundException(
-						"could not find children by domain: " + elementDomain + "and id: " + elementId));
-
-		ElementEntity parent = element.getOrigin();
-
+			String elementDomain, String elementId, int size, int page) {
+		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain,elementId))
+				.orElseThrow(()->
+				new ObjectNotFoundException("could not find response by id:" + elementId));
+		
+		if (size < 1) {
+			throw new RuntimeException("size must be not less than 1"); 
+		}
+		
+		if (page < 0) {
+			throw new RuntimeException("page must not be negative");
+		}
+		
+		ElementEntity origin = child.getOrigin();
 		Collection<ElementBoundary> rv = new HashSet<>();
-		if (parent != null) {
-			ElementBoundary rvBoundary = this.converter.fromEntity(parent);
+		
+		if (origin != null && page == 0) {
+			ElementBoundary rvBoundary = this.converter.fromEntity(origin);
 			rv.add(rvBoundary);
 		}
-
 		return rv;
+		
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> getElementsByName(String userDomain, String userEmail, String name, int size,
+			int page) {
+		
+		if (size < 1) {
+			throw new RuntimeException("size must be not less than 1"); 
+		}
+		
+		if (page < 0) {
+			throw new RuntimeException("page must not be negative");
+		}
+		return this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.DESC, "name"))
+				.stream()
+				.map(this.converter::fromEntity)
+				.collect(Collectors.toList());
 	}
 
 }

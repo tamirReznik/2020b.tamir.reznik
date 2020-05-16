@@ -13,23 +13,31 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ActionDao;
+import acs.dal.ElementDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
+import acs.data.ElementEntity;
+import acs.data.ElementIdEntity;
+import acs.data.UserRole;
 import acs.logic.ActionService;
 import acs.logic.EnhancedActionService;
+import acs.logic.ObjectNotFoundException;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
+import acs.rest.boundaries.user.UserBoundary;
 
 @Service
 public class DbActionServiceImplementation implements EnhancedActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private Converter converter;
+	
 
 	@Autowired
 	public DbActionServiceImplementation(ActionDao actionDao,Converter converter) {
 		this.converter = converter;
 		this.actionDao = actionDao;
+		
 	}
 
 	// injection of project name from the spring boot configuration
@@ -43,7 +51,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public Object invokeAction(ActionBoundary action) {
 		if (action == null || action.getType() == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
-		} else {
+		} else {	
 			ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
 			action.setCreatedTimestamp(new Date());
 			action.setActionId(aib);

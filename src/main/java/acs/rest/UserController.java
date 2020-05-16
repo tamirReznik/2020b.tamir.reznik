@@ -43,7 +43,6 @@ public class UserController {
 	public UserBoundary CreateNewUser(@RequestBody NewUserDetailsBoundary userDetails) {
 		return this.userService.createUser(new UserBoundary(new UserIdBoundary("", userDetails.getEmail()),
 				userDetails.getRole(), userDetails.getUsername(), userDetails.getAvatar()));
-
 	}
 
 	@RequestMapping(path = "/acs/users/{userDomain}/{userEmail}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
