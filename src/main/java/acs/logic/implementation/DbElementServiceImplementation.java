@@ -28,6 +28,7 @@ import acs.data.UserIdEntity;
 import acs.data.UserRoleEntityEnum;
 import acs.logic.EnhancedElementService;
 import acs.logic.ObjectNotFoundException;
+import acs.logic.ServiceTools;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
@@ -56,7 +57,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 
-		stringValidation(managerDomain, managerEmail);
+		ServiceTools.stringValidation(managerDomain, managerEmail);
 
 		UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
 		UserEntity existing = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
@@ -80,9 +81,10 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 
-		stringValidation(managerDomain, managerEmail, elementDomain, elementId);
+		ServiceTools.stringValidation(managerDomain, managerEmail, elementDomain, elementId);
 
 		UserIdEntity uib = new UserIdEntity(managerDomain, managerEmail);
+
 		UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
 				"could not find object by UserDomain:" + managerDomain + "or userEmail:" + managerEmail));
 
@@ -93,7 +95,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ElementEntity existing = this.elementDao.findById(elementIdEntity)
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
-
+//TODO IF we want to update to null ?
 		if (update.getActive() != null)
 			existing.setActive(update.getActive());
 
@@ -116,7 +118,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
-		stringValidation(userDomain, userEmail);
+		ServiceTools.stringValidation(userDomain, userEmail);
 
 		Iterable<ElementEntity> allElements = this.elementDao.findAll();
 		List<ElementBoundary> returnElements = new ArrayList<>();
@@ -133,9 +135,9 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail, int size, int page) {
 
-		stringValidation(userDomain, userEmail);
+		ServiceTools.stringValidation(userDomain, userEmail);
 
-		validatePaging(size, page);
+		ServiceTools.validatePaging(size, page);
 
 		UserIdEntity uib = new UserIdEntity(userDomain, userEmail);
 		UserEntity existingUser = this.userDao.findById(uib).orElseThrow(() -> new ObjectNotFoundException(
@@ -166,7 +168,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
 
-		stringValidation(userDomain, userEmail, elementDomain, elementId);
+		ServiceTools.stringValidation(userDomain, userEmail, elementDomain, elementId);
 
 		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
 				.orElseThrow(() -> new ObjectNotFoundException(
@@ -188,7 +190,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Override
 	@Transactional
 	public void deleteAllElements(String adminDomain, String adminEmail) {
-		stringValidation(adminDomain, adminEmail);
+		ServiceTools.stringValidation(adminDomain, adminEmail);
 		this.elementDao.deleteAll();
 	}
 
@@ -212,9 +214,9 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
 			String elementDomain, String elementId, int size, int page) {
 
-		validatePaging(size, page);
+		ServiceTools.validatePaging(size, page);
 
-		stringValidation(elementDomain, elementId, userDomain, userEmail);
+		ServiceTools.stringValidation(elementDomain, elementId, userDomain, userEmail);
 
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
 
@@ -255,9 +257,9 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	public Collection<ElementBoundary> searchByLocation(String userDomain, String userEmail, double lat, double lng,
 			double distance, int size, int page) {
 
-		validatePaging(size, page);
+		ServiceTools.validatePaging(size, page);
 
-		stringValidation(userDomain, userEmail);
+		ServiceTools.stringValidation(userDomain, userEmail);
 
 		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
 				.orElseThrow(() -> new ObjectNotFoundException(
@@ -281,19 +283,4 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		return new ArrayList<>();
 	}
 
-	public void stringValidation(String... strings) {
-		for (String string : strings)
-			if (string == null || string.trim().isEmpty())
-				throw new RuntimeException("Any Url String Variable Must Not Be Empty Or null");
-
-	}
-
-	public void validatePaging(int size, int page) {
-		if (size < 1)
-			throw new RuntimeException("size must be not less than 1");
-
-		if (page < 0)
-			throw new RuntimeException("page must not be negative");
-
-	}
 }

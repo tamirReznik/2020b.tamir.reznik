@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Date;
-
 import java.util.List;
-
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
@@ -473,5 +473,41 @@ public class ElementTests {
 //		Manager Can get specific element
 		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElement);
 	}
-//TODO - tamir - create test of search by player user and get only active elements
+
+	public void testGetElementArrayViaPlayerUserAndGetOnlyActiveElements() {
+
+//	note - total_Elements_To_Post need to be even
+		int total_Elements_To_Post = 16;
+		int total_Active_Elements = total_Elements_To_Post / 2;
+
+// 		GIVEN the database contains 2 users - player and manger
+		NewUserDetailsBoundary User = new NewUserDetailsBoundary("managerTamir@afeka.ac.il", UserRole.MANAGER,
+				"managerTamir", ":>");
+
+		UserBoundary managerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		User = new NewUserDetailsBoundary("playerTamir@afeka.ac.il", UserRole.PLAYER, "playerTamir", ":<");
+
+		UserBoundary playerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		// WHEN post 8 active elements and 8 inactive elements and save them in a list
+		List<ElementBoundary> postedElements = IntStream
+				.range(0, total_Elements_To_Post).mapToObj(i -> new ElementBoundary(new ElementIdBoundary(),
+						Integer.toString(i), "Parent", true, new Date(), new Location(0.5, 0.5), null, null))
+				.filter(Boundary -> {
+					if (Integer.valueOf(Boundary.getName()) % 2 == 0)
+						Boundary.setActive(false);
+					return this.restTemplate.postForObject(this.url + "/elements/" + managerUser.getUserId().getDomain()
+							+ "/" + managerUser.getUserId().getEmail(), Boundary, ElementBoundary.class) != null;
+				}).collect(Collectors.toList());
+//		Player get all elements and receive only active elements from db 
+		ElementBoundary[] getElements = this.restTemplate.getForObject(
+				this.url + "/elements/" + playerUser.getUserId().getDomain() + "/" + playerUser.getUserId().getEmail()
+						+ "?page=0&size=16",
+				ElementBoundary[].class, playerUser.getUserId().getDomain(), playerUser.getUserId().getEmail());
+
+		assertThat(getElements).hasSize(total_Active_Elements);
+		assertThat(postedElements).containsAnyOf(getElements);
+
+	}
 }
