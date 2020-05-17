@@ -234,14 +234,12 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find response by id:" + elementId));
 
-		/*if (size < 1) {
-			throw new RuntimeException("size must be not less than 1");
-		}
+		/*
+		 * if (size < 1) { throw new RuntimeException("size must be not less than 1"); }
+		 * 
+		 * if (page < 0) { throw new RuntimeException("page must not be negative"); }
+		 */
 
-		if (page < 0) {
-			throw new RuntimeException("page must not be negative");
-		}*/
-		
 		ServiceTools.validatePaging(size, page);
 
 		ElementEntity origin = child.getOrigin();
