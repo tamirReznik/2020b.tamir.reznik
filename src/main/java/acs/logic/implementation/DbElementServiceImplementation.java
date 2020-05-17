@@ -306,6 +306,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		return new ArrayList<>();
 	}
+	
 	@Override
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getElementsByType(String userDomain , String userEmail, String type, int size, int page) {

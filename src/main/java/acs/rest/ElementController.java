@@ -120,6 +120,7 @@ public class ElementController {
 		return this.elementService.searchByLocation(userDomain, userEmail, lat, lng, distance, size, page)
 				.toArray(new ElementBoundary[0]);
 	}
+	
 	@RequestMapping(
 			path="/acs/elements/{userDomain}/{userEmail}/search/byType/{type}", 
 			method = RequestMethod.GET,

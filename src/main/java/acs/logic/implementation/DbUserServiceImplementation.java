@@ -130,6 +130,7 @@ public class DbUserServiceImplementation implements EnhancedUserService {
 			if (uE.getRole() != UserRoleEntityEnum.admin) {
 				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only Admin can get all users!");
 			}
+			
 			return this.userDao.findAll(PageRequest.of(page, size, Direction.DESC, "userId"))// Page<UserEntity>
 					.getContent()// List<UserEntity>
 					.stream()// Stream<UserEntity>
@@ -152,6 +153,7 @@ public class DbUserServiceImplementation implements EnhancedUserService {
 
 			return returnUsers;
 	}
+	
 	@Override
 	@Transactional // (readOnly = false)
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
