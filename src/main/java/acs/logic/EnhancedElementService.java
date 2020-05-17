@@ -27,4 +27,6 @@ public interface EnhancedElementService extends ElementService {
 	public Collection<ElementBoundary> searchByLocation(String userDomain, String userEmail, double lat, double lng,
 			double distance, int size, int page);
 
+	List<ElementBoundary> getElementsByType(String userDomain, String userEmail, String type, int size, int page);
+
 }

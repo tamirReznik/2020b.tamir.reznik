@@ -5,19 +5,28 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import acs.dal.UserDao;
 import acs.data.Converter;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
+import acs.data.UserRoleEntityEnum;
+import acs.logic.EnhancedUserService;
 import acs.logic.ObjectNotFoundException;
+import acs.logic.ServiceTools;
 import acs.logic.UserService;
 import acs.rest.boundaries.user.UserBoundary;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
-public class DbUserServiceImplementation implements UserService {
+public class DbUserServiceImplementation implements EnhancedUserService {
 	private String projectName;
 	private UserDao userDao;
 	private Converter converter;
@@ -110,9 +119,29 @@ public class DbUserServiceImplementation implements UserService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail, int size, int page) {
+			ServiceTools.stringValidation(adminDomain, adminEmail);
+	
+			ServiceTools.validatePaging(size, page);
+			UserEntity uE = this.userDao.findById(new UserIdEntity(adminDomain, adminEmail))
+					.orElseThrow(() -> new ObjectNotFoundException("could not find user by userDomain: "
+							+ adminDomain + " and userEmail: " + adminEmail));
+
+			if (uE.getRole() != UserRoleEntityEnum.admin) {
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only Admin can get all users!");
+			}
+			return this.userDao.findAll(PageRequest.of(page, size, Direction.DESC, "userId"))// Page<UserEntity>
+					.getContent()// List<UserEntity>
+					.stream()// Stream<UserEntity>
+					.map(this.converter::fromEntity)// Stream<UserEntity>
+					.collect(Collectors.toList()); // List<UserEntity>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
-		if (adminDomain != null && !adminDomain.trim().isEmpty() && adminEmail != null
-				&& !adminEmail.trim().isEmpty()) {
+		
+			ServiceTools.stringValidation(adminDomain, adminEmail);
 
 			Iterable<UserEntity> allUsers = this.userDao.findAll();
 
@@ -122,13 +151,7 @@ public class DbUserServiceImplementation implements UserService {
 			}
 
 			return returnUsers;
-
-		} else {
-			throw new RuntimeException("Admin Domain and Admin Email must not be empty or null");
-
-		}
 	}
-
 	@Override
 	@Transactional // (readOnly = false)
 	public void deleteAllUsers(String adminDomain, String adminEmail) {

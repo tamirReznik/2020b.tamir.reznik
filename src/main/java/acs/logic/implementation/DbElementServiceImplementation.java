@@ -306,5 +306,34 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		return new ArrayList<>();
 	}
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> getElementsByType(String userDomain , String userEmail, String type, int size, int page) {
+		
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ObjectNotFoundException("could not find user by userDomain: "
+						+ userDomain + " and userEmail: " + userEmail));
+
+		if (uE.getRole() == UserRoleEntityEnum.manager) {
+			return this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "name"))
+				.stream()
+				.map(this.converter::fromEntity)
+				.collect(Collectors.toList());
+		}
+		if (uE.getRole() == UserRoleEntityEnum.player)
+			return this.elementDao.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "name"))
+					.stream()
+					.map(this.converter::fromEntity)
+					.collect(Collectors.toList());
+
+		if (uE.getRole() == UserRoleEntityEnum.admin) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Type");
+
+	}
+		return new ArrayList<>();
+	}
+
+
+
 
 }

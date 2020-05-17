@@ -22,10 +22,6 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 	// SELECT ... FROM ELEMENT WHERE ORIGIN_ID=?
 	//public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_Domain(@Param("id") String id,@Param("domain") String domain, Pageable pageable);
 ////
-//	// SELECT ... FROM DUMMIES WHERE TYPE=?
-//	public List<DummyEntity> findAllByType(
-//			@Param("type") TypeEntityEnum type, 
-//			Pageable pageable);	
 
 	public List<ElementEntity> findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(
 			@Param("minLat") Double minLat, @Param("maxLat") Double maxLat, @Param("minLng") Double minLng,
@@ -42,5 +38,9 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 
 	// SELECT ... FROM ELEMENTS WHERE ACTIVE=?
 	public List<ElementEntity> findAllByActive(@Param("active") boolean active, Pageable pageable);
+	
+	public List<ElementEntity> findAllByType(@Param("type") String type, Pageable pageable);
+	public List<ElementEntity> findAllByTypeAndActive(@Param("type") String type, @Param("active") boolean active, Pageable pageable);
+
 
 }
