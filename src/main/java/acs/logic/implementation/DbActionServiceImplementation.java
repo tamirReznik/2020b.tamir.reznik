@@ -9,8 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
+
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
 import acs.data.ActionEntity;
@@ -29,19 +34,21 @@ import acs.logic.ServiceTools;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.user.UserBoundary;
+import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
 public class DbActionServiceImplementation implements EnhancedActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private Converter converter;
-	
+	private ElementDao elementDao;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao, Converter converter) {
+	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, Converter converter) {
 		this.converter = converter;
 		this.actionDao = actionDao;
-		
+		this.elementDao = elementDao;
+
 	}
 
 	// injection of project name from the spring boot configuration
@@ -56,24 +63,38 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (action == null || action.getType() == null) {
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 
-		} else {	
-			ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
-			action.setCreatedTimestamp(new Date());
-			action.setActionId(aib);
-			ActionEntity entity = converter.toEntity(action);
-			// actionDao.put(action.getActionId().toString(), entity);
-			this.actionDao.save(entity);
-			return action;
+		} else {
+
+			/*for (Object user : action.getInvokedBy().values()) {
+				UserBoundary userB = (UserBoundary) user;
+				if (!userB.getRole().equals(UserRole.PLAYER))
+					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+							"Admin User Can't Search Elements By Location");
+			}*/
+		//	UserIdBoundary ub = (UserIdBoundary)action.getInvokedBy().values().toArray()[0];
+			ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
+			ElementEntity element = this.elementDao.findById(elementIdOfAction)
+					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
+							+ elementIdOfAction.getDomain() + " or ElementId:" + elementIdOfAction.getId()));
+
+			if (element.getActive()) {
+				ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
+				action.setCreatedTimestamp(new Date());
+				action.setActionId(aib);
+				ActionEntity entity = converter.toEntity(action);
+				// actionDao.put(action.getActionId().toString(), entity);
+				this.actionDao.save(entity);
+				return action;
+			}
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
 		}
-	
-/*
-		ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
-		action.setCreatedTimestamp(new Date());
-		action.setActionId(aib);
-		ActionEntity entity = converter.toEntity(action);
-		// actionDao.put(action.getActionId().toString(), entity);
-		this.actionDao.save(entity);
-		return action;*/
+		/*
+		 * ActionIdBoundary aib = new ActionIdBoundary(projectName,
+		 * UUID.randomUUID().toString()); action.setCreatedTimestamp(new Date());
+		 * action.setActionId(aib); ActionEntity entity = converter.toEntity(action); //
+		 * actionDao.put(action.getActionId().toString(), entity);
+		 * this.actionDao.save(entity); return action;
+		 */
 	}
 
 	@Override

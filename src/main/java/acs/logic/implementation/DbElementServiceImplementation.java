@@ -31,6 +31,7 @@ import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
+import acs.rest.boundaries.user.UserBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
@@ -213,9 +214,6 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
 			String elementDomain, String elementId, int size, int page) {
-		if (size < 1) {
-			throw new RuntimeException("size must be not less than 1");
-		}
 
 		ServiceTools.validatePaging(size, page);
 
@@ -223,15 +221,10 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
 
-		ElementEntity origin = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
+		ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
 				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
 
-		return origin.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());
-		/*
-		 * return this.elementDao .findAllByParent_id(eid, PageRequest.of(page, size,
-		 * Direction.DESC, "elementId")) .stream() .map(this.converter::fromEntity)
-		 * .collect(Collectors.toSet());
-		 */
+		return element.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -241,13 +234,15 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find response by id:" + elementId));
 
-		if (size < 1) {
+		/*if (size < 1) {
 			throw new RuntimeException("size must be not less than 1");
 		}
 
 		if (page < 0) {
 			throw new RuntimeException("page must not be negative");
-		}
+		}*/
+		
+		ServiceTools.validatePaging(size, page);
 
 		ElementEntity origin = child.getOrigin();
 		Collection<ElementBoundary> rv = new HashSet<>();
@@ -264,16 +259,21 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getElementsByName(String userDomain, String userEmail, String name, int size,
 			int page) {
-
-		if (size < 1) {
-			throw new RuntimeException("size must be not less than 1");
-		}
-
-		if (page < 0) {
-			throw new RuntimeException("page must not be negative");
-		}
-		return this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.DESC, "name")).stream()
-				.map(this.converter::fromEntity).collect(Collectors.toList());
+		ServiceTools.stringValidation(userDomain, userEmail, name);
+		ServiceTools.validatePaging(size, page);
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
+		if (uE.getRole() == UserRoleEntityEnum.admin)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
+		if (uE.getRole() == UserRoleEntityEnum.player)
+			return this.elementDao
+					.findAllByNameAndActive(name, true, PageRequest.of(page, size, Direction.DESC, "name")).stream()
+					.map(this.converter::fromEntity).collect(Collectors.toList());
+		if (uE.getRole() == UserRoleEntityEnum.manager)
+			return this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.DESC, "name")).stream()
+					.map(this.converter::fromEntity).collect(Collectors.toList());
+		return new ArrayList<>();
 	}
 
 	@Override

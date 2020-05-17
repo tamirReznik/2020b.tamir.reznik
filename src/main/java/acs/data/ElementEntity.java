@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Convert;
+import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -21,6 +22,7 @@ import acs.dal.MapToJsonConverter;
 import acs.rest.boundaries.element.Location;
 import acs.rest.boundaries.user.UserIdBoundary;
 
+@Embeddable
 @Entity
 @Table(name = "ELEMENTS")
 public class ElementEntity {
@@ -134,6 +136,7 @@ public class ElementEntity {
 		this.childrens = responses;
 	}
 
+	@Embedded
 	@ManyToOne(fetch = FetchType.LAZY)
 	public ElementEntity getOrigin() {
 		return parent;
