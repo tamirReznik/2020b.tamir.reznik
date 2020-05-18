@@ -221,10 +221,13 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
 
-		ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
+		/*ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
 				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
 
-		return element.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());
+		return element.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());*/
+		return this.elementDao.findAllByParent_ElementId_IdAndParent_ElementId_Domain(elementId, elementDomain, 
+				PageRequest.of(page, size, Direction.DESC, "name")).stream()
+				.map(this.converter::fromEntity).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -234,19 +237,12 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find response by id:" + elementId));
 
-		/*if (size < 1) {
-			throw new RuntimeException("size must be not less than 1");
-		}
-
-		if (page < 0) {
-			throw new RuntimeException("page must not be negative");
-		}*/
-		
 		ServiceTools.validatePaging(size, page);
-
-		ElementEntity origin = child.getOrigin();
+		
+		ElementEntity origin = child.getParent();
 		Collection<ElementBoundary> rv = new HashSet<>();
-
+		if(page>1)
+			return rv;
 		if (origin != null && page == 0) {
 			ElementBoundary rvBoundary = this.converter.fromEntity(origin);
 			rv.add(rvBoundary);

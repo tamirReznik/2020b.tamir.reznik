@@ -20,7 +20,8 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 
 	// CrudRepository<ElementEntity, ElementIdEntity>
 	// SELECT ... FROM ELEMENT WHERE ORIGIN_ID=?
-	//public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_Domain(@Param("id") String id,@Param("domain") String domain, Pageable pageable);
+	public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_Domain(
+	@Param("id") String id,@Param("domain") String domain, Pageable pageable);
 ////
 
 	public List<ElementEntity> findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(

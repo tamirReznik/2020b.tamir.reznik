@@ -3,6 +3,7 @@ package acs.logic.implementation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 							"Admin User Can't Search Elements By Location");
 			}*/
-		//	UserIdBoundary ub = (UserIdBoundary)action.getInvokedBy().values().toArray()[0];
+			
 			ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
 			ElementEntity element = this.elementDao.findById(elementIdOfAction)
 					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
