@@ -49,34 +49,32 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	@Override
 	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
-		if (action == null || action.getType() == null) {
+		if (action == null || action.getType() == null)
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 
-		} else {
+		/*
+		 * for (Object user : action.getInvokedBy().values()) { UserBoundary userB =
+		 * (UserBoundary) user; if (!userB.getRole().equals(UserRole.PLAYER)) throw new
+		 * ResponseStatusException(HttpStatus.UNAUTHORIZED,
+		 * "Admin User Can't Search Elements By Location"); }
+		 */
 
-			/*
-			 * for (Object user : action.getInvokedBy().values()) { UserBoundary userB =
-			 * (UserBoundary) user; if (!userB.getRole().equals(UserRole.PLAYER)) throw new
-			 * ResponseStatusException(HttpStatus.UNAUTHORIZED,
-			 * "Admin User Can't Search Elements By Location"); }
-			 */
+		ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
+		ElementEntity element = this.elementDao.findById(elementIdOfAction)
+				.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
+						+ elementIdOfAction.getDomain() + " or ElementId:" + elementIdOfAction.getId()));
 
-			ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
-			ElementEntity element = this.elementDao.findById(elementIdOfAction)
-					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
-							+ elementIdOfAction.getDomain() + " or ElementId:" + elementIdOfAction.getId()));
-
-			if (element.getActive()) {
-				ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
-				action.setCreatedTimestamp(new Date());
-				action.setActionId(aib);
-				ActionEntity entity = converter.toEntity(action);
-				// actionDao.put(action.getActionId().toString(), entity);
-				this.actionDao.save(entity);
-				return action;
-			}
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
+		if (element.getActive()) {
+			ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
+			action.setCreatedTimestamp(new Date());
+			action.setActionId(aib);
+			ActionEntity entity = converter.toEntity(action);
+			// actionDao.put(action.getActionId().toString(), entity);
+			this.actionDao.save(entity);
+			return action;
 		}
+		throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "invoke action only on active element!");
+
 		/*
 		 * ActionIdBoundary aib = new ActionIdBoundary(projectName,
 		 * UUID.randomUUID().toString()); action.setCreatedTimestamp(new Date());

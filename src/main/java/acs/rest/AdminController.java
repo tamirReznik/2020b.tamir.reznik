@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import acs.logic.ElementService;
 import acs.logic.EnhancedActionService;
+import acs.logic.EnhancedElementService;
 import acs.logic.EnhancedUserService;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.user.UserBoundary;
@@ -18,22 +18,14 @@ public class AdminController {
 
 	private EnhancedUserService userService;
 	private EnhancedActionService actionService;
-	private ElementService elementService;
+	private EnhancedElementService elementService;
 
 	@Autowired
 	public AdminController() {
 	}
 
-	public AdminController(EnhancedUserService userService, EnhancedActionService actionService,
-			ElementService elementService) {
-		super();
-		this.userService = userService;
-		this.actionService = actionService;
-		this.elementService = elementService;
-	}
-
 	@Autowired
-	public void setElementService(ElementService elementService) {
+	public void setElementService(EnhancedElementService elementService) {
 		this.elementService = elementService;
 	}
 
