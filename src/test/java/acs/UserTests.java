@@ -35,7 +35,10 @@ public class UserTests {
 
 	@AfterEach
 	public void teardown() {
-		this.restTemplate.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}", "???", "??");
+		UserBoundary userAdmin = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "sapir", "???"), UserBoundary.class); 
+		
+		this.restTemplate.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}", userAdmin.getUserId().getDomain(), userAdmin.getUserId().getEmail());
 	}
 
 	@Test
@@ -253,21 +256,10 @@ public class UserTests {
 				.containsExactlyInAnyOrderElementsOf(allUsersInDb);
 	}
 
+	//Maybe this test is not Relevant need to check -  anna
+	//it was before to check if the db is empty after deleting, but now we cant check that ceacuse we must have a "admin" user
 	@Test
-	public void test_The_Database_Is_Empty_By_Default() throws Exception {
-		// GIVEN the server is up
-		
-		// WHEN I GET for all users
-		UserBoundary[] actual = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, "???", "??");
-
-		// THEN the returned value is an empty array
-		assertThat(actual).isEmpty();
-	}
-
-	
-	@Test
-	public void test_Init_Server_With_3_Users_When_We_Delete_all_Users_And_Than_Get_All_Users_We_Receive_empty_array()
+	public void test_Init_Server_With_4_Users_When_We_Delete_all_Users_And_Than_Get_All_Users_We_Receive_an_array_with_size_1()
 			throws Exception {
 		// GIVEN the server is up
 		// AND the server contains 3 users
@@ -280,17 +272,20 @@ public class UserTests {
 		UserBoundary userAdmin = this.restTemplate.postForObject(this.url + "/users",
 				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "sapir", "???"), UserBoundary.class);
 
-		
+		allUsersInDb.add(userAdmin);
 		// AND I delete all users
 		this.restTemplate.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}"
-				, userAdmin.getUserId().getDomain(), userAdmin.getUserId().getEmail());
+				, "??", "??");
 
+		UserBoundary userAdmin1 = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "sapir", "???"), UserBoundary.class);
+		allUsersInDb.add(userAdmin1);
 		// WHEN I GET for all users
 		UserBoundary[] actual = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, userAdmin.getUserId().getDomain(), userAdmin.getUserId().getEmail());
+				UserBoundary[].class, userAdmin1.getUserId().getDomain(), userAdmin1.getUserId().getEmail());
 
 		// THEN the returned value is an empty array
-		assertThat(actual).isEmpty();
+		assertThat(actual).hasSize(1);
 	}
 
 	
