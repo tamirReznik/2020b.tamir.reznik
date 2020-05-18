@@ -74,12 +74,13 @@ public class UserTests {
 		// do nothing
 
 		// WHEN I POST new user
-		this.restTemplate.postForObject(this.url + "/users",
-				new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.PLAYER, "sapir", ":-)"), UserBoundary.class);
+		UserBoundary actualUserBoundary = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.ADMIN, "sapir", ":-)"), UserBoundary.class);
 
 		// THEN the database contains a single message
 		assertThat(this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, "???", "??")).hasSize(1);
+				UserBoundary[].class, actualUserBoundary.getUserId().getDomain()
+				, actualUserBoundary.getUserId().getEmail())).hasSize(1);
 	}
 
 	@Test
@@ -90,15 +91,15 @@ public class UserTests {
 
 		// WHEN I POST new user with user role attribute: "PLAYER"
 
-		this.restTemplate.postForObject(this.url + "/users",
-				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER, "???", "???"), UserBoundary.class);
+		UserBoundary actualUserBoundary = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "???", "???"), UserBoundary.class);
 
-		// THEN the database contains a user with user role attribute "PLAYER"
+		// THEN the database contains a user with user role attribute "ADMIN"
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, "???", "??");
+				UserBoundary[].class, actualUserBoundary.getUserId().getDomain(), actualUserBoundary.getUserId().getEmail());
 		boolean containsPlayerRole = false;
 		for (UserBoundary m : allUsers) {
-			if (m.getRole().equals(UserRole.PLAYER)) {
+			if (m.getRole().equals(UserRole.ADMIN)) {
 				containsPlayerRole = true;
 			}
 		}
@@ -120,9 +121,14 @@ public class UserTests {
 		this.restTemplate.postForObject(this.url + "/users",
 				new NewUserDetailsBoundary("anna@gmail.com", UserRole.PLAYER, "anna", "???"), UserBoundary.class);
 
+		//crate user ADMIN
+		UserBoundary userAdmin = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "sapir", "???"), UserBoundary.class);
+		
 		// THEN the database contains a user with userName attribute "anna"
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, "???", "??");
+				UserBoundary[].class, userAdmin.getUserId().getDomain(), userAdmin.getUserId().getEmail());
+		
 		boolean containsUserNameAnna = false;
 		for (UserBoundary m : allUsers) {
 			if (m.getUsername().equals("anna")) {
@@ -144,12 +150,12 @@ public class UserTests {
 
 		// WHEN I POST new user with avatar attribute: ":-))"
 
-		this.restTemplate.postForObject(this.url + "/users",
-				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.PLAYER, "???", ":-))"), UserBoundary.class);
+		UserBoundary actualUser = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "???", ":-))"), UserBoundary.class);
 
 		// THEN the database contains a user with user avatar attribute ":-))"
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, "???", "??");
+				UserBoundary[].class, actualUser.getUserId().getDomain(), actualUser.getUserId().getEmail());
 		boolean containsAvatarAttribute = false;
 		for (UserBoundary m : allUsers) {
 			if (m.getAvatar().equals(":-))")) {
@@ -223,17 +229,25 @@ public class UserTests {
 				.map(email -> new NewUserDetailsBoundary(email, UserRole.PLAYER, "sapir", ":-)"))
 				.map(boundary -> this.restTemplate.postForObject(this.url + "/users", boundary, UserBoundary.class))
 				.collect(Collectors.toList());
+		
+		UserBoundary userAdmin = this.restTemplate.postForObject(this.url + "/users",
+						new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "sapir", "???"), UserBoundary.class);
+	
+		allUsersInDb.add(userAdmin);
+		
 		for (UserBoundary userBoundary : allUsersInDb) {
 			System.out.println("before" + userBoundary);
 		}
-
+		
+		
 		// WHEN I GET /admin/users/{adminDomain}/{adminEmail}
 		UserBoundary[] allUsers = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, "???", "??");
+				UserBoundary[].class, userAdmin.getUserId().getDomain(), userAdmin.getUserId().getEmail());
 
 		for (UserBoundary userBoundary : allUsers) {
 			System.out.println("after" + userBoundary);
 		}
+		
 		// THEN The server returns the same 3 users initialized
 		assertThat(allUsers).hasSize(allUsersInDb.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allUsersInDb);
@@ -242,7 +256,7 @@ public class UserTests {
 	@Test
 	public void test_The_Database_Is_Empty_By_Default() throws Exception {
 		// GIVEN the server is up
-
+		
 		// WHEN I GET for all users
 		UserBoundary[] actual = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
 				UserBoundary[].class, "???", "??");
@@ -251,25 +265,34 @@ public class UserTests {
 		assertThat(actual).isEmpty();
 	}
 
+	
 	@Test
 	public void test_Init_Server_With_3_Users_When_We_Delete_all_Users_And_Than_Get_All_Users_We_Receive_empty_array()
 			throws Exception {
 		// GIVEN the server is up
 		// AND the server contains 3 users
-//		List<UserBoundary> allUsersInDb = IntStream.range(1, 4).mapToObj(i -> ("email" + i))
-//				.map(email -> new NewUserDetailsBoundary(email, UserRole.PLAYER, "anna", ":-)"))
-//				.map(boundary -> this.restTemplate.postForObject(this.url + "/users", boundary, UserBoundary.class))
-//				.collect(Collectors.toList());
+		List<UserBoundary> allUsersInDb = IntStream.range(1, 4).mapToObj(i -> ("email" + i +"@gmail.com"))
+				.map(email -> new NewUserDetailsBoundary(email, UserRole.PLAYER, "myusername", ":-)"))
+				.map(boundary -> this.restTemplate.postForObject(this.url + "/users", boundary, UserBoundary.class))
+				.collect(Collectors.toList());
 
+		//create user Admin 
+		UserBoundary userAdmin = this.restTemplate.postForObject(this.url + "/users",
+				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "sapir", "???"), UserBoundary.class);
+
+		
 		// AND I delete all users
-		this.restTemplate.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}", "???", "??");
+		this.restTemplate.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}"
+				, userAdmin.getUserId().getDomain(), userAdmin.getUserId().getEmail());
 
 		// WHEN I GET for all users
 		UserBoundary[] actual = this.restTemplate.getForObject(this.url + "/admin/users/{adminDomain}/{adminEmail}",
-				UserBoundary[].class, "???", "??");
+				UserBoundary[].class, userAdmin.getUserId().getDomain(), userAdmin.getUserId().getEmail());
 
 		// THEN the returned value is an empty array
 		assertThat(actual).isEmpty();
 	}
 
+	
 }
+
