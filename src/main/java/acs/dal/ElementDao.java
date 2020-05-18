@@ -11,11 +11,8 @@ import acs.data.ElementIdEntity;
 //Create Read Update Delete - CRUD
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity> {
 
-	// CrudRepository<ElementEntity, ElementIdEntity>
-
-//	public List<DummyEntity> findAllByType(
-//			@Param("type") TypeEntityEnum type, 
-//			Pageable pageable);	
+	public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_Domain(@Param("id") String id,
+			@Param("domain") String domain, Pageable pageable);
 
 	public List<ElementEntity> findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(
 			@Param("minLat") Double minLat, @Param("maxLat") Double maxLat, @Param("minLng") Double minLng,
@@ -25,8 +22,6 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 			@Param("maxLat") double maxLat, @Param("minLng") double minLng, @Param("maxLng") double maxLng,
 			Pageable pageable);
 
-	// CrudRepository<ElementEntity, ElementIdEntity>
-
 	public List<ElementEntity> findAllByNameAndActive(@Param("name") String name, @Param("active") Boolean active,
 			Pageable pageable);
 
@@ -34,5 +29,10 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 
 	// SELECT ... FROM ELEMENTS WHERE ACTIVE=?
 	public List<ElementEntity> findAllByActive(@Param("active") boolean active, Pageable pageable);
+
+	public List<ElementEntity> findAllByType(@Param("type") String type, Pageable pageable);
+
+	public List<ElementEntity> findAllByTypeAndActive(@Param("type") String type, @Param("active") boolean active,
+			Pageable pageable);
 
 }

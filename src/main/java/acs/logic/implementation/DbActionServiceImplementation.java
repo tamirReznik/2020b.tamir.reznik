@@ -13,28 +13,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
-
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
-
 import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
-import acs.data.UserRole;
-import acs.logic.ActionService;
-
 import acs.logic.EnhancedActionService;
-
 import acs.logic.ObjectNotFoundException;
-
 import acs.logic.ServiceTools;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
-import acs.rest.boundaries.user.UserBoundary;
-import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
 public class DbActionServiceImplementation implements EnhancedActionService {
@@ -65,13 +54,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		} else {
 
-			/*for (Object user : action.getInvokedBy().values()) {
-				UserBoundary userB = (UserBoundary) user;
-				if (!userB.getRole().equals(UserRole.PLAYER))
-					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-							"Admin User Can't Search Elements By Location");
-			}*/
-		//	UserIdBoundary ub = (UserIdBoundary)action.getInvokedBy().values().toArray()[0];
+			/*
+			 * for (Object user : action.getInvokedBy().values()) { UserBoundary userB =
+			 * (UserBoundary) user; if (!userB.getRole().equals(UserRole.PLAYER)) throw new
+			 * ResponseStatusException(HttpStatus.UNAUTHORIZED,
+			 * "Admin User Can't Search Elements By Location"); }
+			 */
+
 			ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
 			ElementEntity element = this.elementDao.findById(elementIdOfAction)
 					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"

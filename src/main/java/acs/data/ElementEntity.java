@@ -35,7 +35,6 @@ public class ElementEntity {
 	private Map<String, UserIdBoundary> createdBy;
 	private Location location;
 	private Map<String, Object> elemntAttributes;
-	//
 	private Set<ElementEntity> childrens;
 	private ElementEntity parent;
 
@@ -127,7 +126,7 @@ public class ElementEntity {
 		this.elemntAttributes = elemntAttributes;
 	}
 
-	@OneToMany(mappedBy = "origin", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
 	public Set<ElementEntity> getResponses() {
 		return childrens;
 	}
@@ -138,16 +137,16 @@ public class ElementEntity {
 
 	@Embedded
 	@ManyToOne(fetch = FetchType.LAZY)
-	public ElementEntity getOrigin() {
+	public ElementEntity getParent() {
 		return parent;
 	}
 
-	public void setOrigin(ElementEntity origin) {
-		this.parent = origin;
+	public void setParent(ElementEntity parent) {
+		this.parent = parent;
 	}
 
 	public void addResponse(ElementEntity response) {
 		this.childrens.add(response);
-		response.setOrigin(this);
+		response.setParent(this);
 	}
 }

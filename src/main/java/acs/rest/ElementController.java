@@ -119,5 +119,19 @@ public class ElementController {
 		return this.elementService.searchByLocation(userDomain, userEmail, lat, lng, distance, size, page)
 				.toArray(new ElementBoundary[0]);
 	}
+	
+	@RequestMapping(
+			path="/acs/elements/{userDomain}/{userEmail}/search/byType/{type}", 
+			method = RequestMethod.GET,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] getElementsByType (@PathVariable("userDomain") String userDomain,
+			@PathVariable("userEmail") String userEmail,
+			@PathVariable("type") String type,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size, 
+			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
+		return this.elementService
+				.getElementsByType(userDomain, userEmail,type, size, page)
+				.toArray(new ElementBoundary[0]);
+	}
 
 }

@@ -220,10 +220,19 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
 
-		ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
-				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
-
-		return element.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());
+		/*
+		 * ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new
+		 * ObjectNotFoundException( "could not find origin by domain: " + elementDomain
+		 * + "and id: " + elementId));
+		 * 
+		 * return
+		 * element.getResponses().stream().map(this.converter::fromEntity).collect(
+		 * Collectors.toSet());
+		 */
+		return this.elementDao
+				.findAllByParent_ElementId_IdAndParent_ElementId_Domain(elementId, elementDomain,
+						PageRequest.of(page, size, Direction.DESC, "name"))
+				.stream().map(this.converter::fromEntity).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -233,17 +242,12 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find response by id:" + elementId));
 
-		/*
-		 * if (size < 1) { throw new RuntimeException("size must be not less than 1"); }
-		 * 
-		 * if (page < 0) { throw new RuntimeException("page must not be negative"); }
-		 */
-
 		ServiceTools.validatePaging(size, page);
 
-		ElementEntity origin = child.getOrigin();
+		ElementEntity origin = child.getParent();
 		Collection<ElementBoundary> rv = new HashSet<>();
-
+		if (page > 1)
+			return rv;
 		if (origin != null && page == 0) {
 			ElementBoundary rvBoundary = this.converter.fromEntity(origin);
 			rv.add(rvBoundary);
@@ -301,6 +305,30 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		if (uE.getRole() == UserRoleEntityEnum.admin)
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
 
+		return new ArrayList<>();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> getElementsByType(String userDomain, String userEmail, String type, int size,
+			int page) {
+
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
+
+		if (uE.getRole() == UserRoleEntityEnum.manager) {
+			return this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "name")).stream()
+					.map(this.converter::fromEntity).collect(Collectors.toList());
+		}
+		if (uE.getRole() == UserRoleEntityEnum.player)
+			return this.elementDao.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "name"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
+
+		if (uE.getRole() == UserRoleEntityEnum.admin) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Type");
+
+		}
 		return new ArrayList<>();
 	}
 
