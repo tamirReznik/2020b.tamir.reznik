@@ -475,6 +475,23 @@ public class ElementTests {
 //		Manager Can get specific element
 		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElement);
 	}
+	
+	@Test
+	public void test_Search_Element_by_Name() throws Exception {
+		//TODO create an element and search for it by name	
+	}
+	
+	@Test
+	public void test_get_children() throws Exception {
+		//TODO create a parent element and one or two children element and bind them.
+		//test if the getAllChildren method works on the parent.
+	}
+	
+	@Test
+	public void test_get_parent() throws Exception {
+		//TODO create a parent element and a children element and bind them.
+		//test if the getParent method works on the child.
+	}
 
 	@Test
 	public void testGetElementArrayViaPlayerUserAndGetOnlyActiveElements() {
@@ -528,4 +545,6 @@ public class ElementTests {
 //		.containsExactlyInAnyOrderElementsOf(postedElements);
 
 	}
+	
+	
 }
