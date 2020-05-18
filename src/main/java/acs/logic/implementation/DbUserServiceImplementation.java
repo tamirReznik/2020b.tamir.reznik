@@ -46,13 +46,6 @@ public class DbUserServiceImplementation implements UserService {
 		if (!(pat.matcher(user.getUserId().getEmail()).matches()))
 			throw new ObjectNotFoundException("Invalid email address");
 
-		// User name integrity check
-//		if (user.getUsername() == null)
-//			throw new ObjectNotFoundException("Username cannot be null");
-
-		// Avatar integrity check
-//		if (user.getAvatar() == null || user.getAvatar().trim().isEmpty())
-//			throw new ObjectNotFoundException("Avatar cannot be null or empty");
 		ServiceTools.stringValidation(user.getAvatar(), user.getUsername());
 
 		user.getUserId().setDomain(projectName);

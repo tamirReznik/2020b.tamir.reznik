@@ -1,8 +1,6 @@
 package acs.dal;
 
-
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -13,15 +11,8 @@ import acs.data.ElementIdEntity;
 //Create Read Update Delete - CRUD
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity> {
 
-
- 		//CrudRepository<ElementEntity, ElementIdEntity> 
-	
-	  
 	// CrudRepository<ElementEntity, ElementIdEntity>
-	// SELECT ... FROM ELEMENT WHERE ORIGIN_ID=?
-	//public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_Domain(@Param("id") String id,@Param("domain") String domain, Pageable pageable);
-////
-//	// SELECT ... FROM DUMMIES WHERE TYPE=?
+
 //	public List<DummyEntity> findAllByType(
 //			@Param("type") TypeEntityEnum type, 
 //			Pageable pageable);	
@@ -36,8 +27,10 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 
 	// CrudRepository<ElementEntity, ElementIdEntity>
 
-	public List<ElementEntity> findAllByNameAndActive(@Param("name") String name, @Param("active")Boolean active, Pageable pageable);	
-	public List<ElementEntity> findAllByName(@Param("name") String name, Pageable pageable);	
+	public List<ElementEntity> findAllByNameAndActive(@Param("name") String name, @Param("active") Boolean active,
+			Pageable pageable);
+
+	public List<ElementEntity> findAllByName(@Param("name") String name, Pageable pageable);
 
 	// SELECT ... FROM ELEMENTS WHERE ACTIVE=?
 	public List<ElementEntity> findAllByActive(@Param("active") boolean active, Pageable pageable);

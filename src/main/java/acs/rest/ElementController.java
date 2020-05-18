@@ -52,7 +52,6 @@ public class ElementController {
 			@PathVariable("userEmail") String userEmail,
 			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-		System.err.println("checkthisout\n\n\n\n");
 		return this.elementService.getAll(userDomain, userEmail, size, page).toArray(new ElementBoundary[0]);
 	}
 

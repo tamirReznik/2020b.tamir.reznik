@@ -31,7 +31,6 @@ import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
-import acs.rest.boundaries.user.UserBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
