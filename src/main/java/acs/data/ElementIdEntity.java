@@ -11,7 +11,7 @@ public class ElementIdEntity implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String domain;
+	private String elementDomain;
 	private String id;
 
 	public ElementIdEntity() {
@@ -20,16 +20,16 @@ public class ElementIdEntity implements Serializable {
 
 	public ElementIdEntity(String domain, String id) {
 		super();
-		this.domain = domain;
+		this.elementDomain = domain;
 		this.id = id;
 	}
 
-	public String getDomain() {
-		return domain;
+	public String getElementDomain() {
+		return elementDomain;
 	}
 
-	public void setDomain(String domain) {
-		this.domain = domain;
+	public void setElementDomain(String domain) {
+		this.elementDomain = domain;
 	}
 	
 	public String getId() {
@@ -44,7 +44,7 @@ public class ElementIdEntity implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((domain == null) ? 0 : domain.hashCode());
+		result = prime * result + ((elementDomain == null) ? 0 : elementDomain.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
@@ -58,10 +58,10 @@ public class ElementIdEntity implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ElementIdEntity other = (ElementIdEntity) obj;
-		if (domain == null) {
-			if (other.domain != null)
+		if (elementDomain == null) {
+			if (other.elementDomain != null)
 				return false;
-		} else if (!domain.equals(other.domain))
+		} else if (!elementDomain.equals(other.elementDomain))
 			return false;
 		if (id == null) {
 			if (other.id != null)
@@ -73,6 +73,6 @@ public class ElementIdEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return this.getDomain() + "#" + this.getId();
+		return this.getElementDomain() + "#" + this.getId();
 	}
 }

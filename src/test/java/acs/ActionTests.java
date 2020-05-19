@@ -19,6 +19,7 @@ import acs.data.UserRole;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.action.ElementOfAction;
+import acs.rest.boundaries.action.InvokingUser;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.element.Location;
@@ -104,10 +105,12 @@ public class ActionTests {
 	public void test_Init_Server_with_5_Actions_When_We_Get_All_Actions_We_Receive_The_Same_Actions() {
 
 		// GIVEN the server is up
-		Map<String, Object> invokedBy = new HashMap<>();
-		invokedBy.put("userId",
-				new UserIdBoundary(this.playerUser.getUserId().getDomain(), this.playerUser.getUserId().getEmail()));
+//		Map<String, Object> invokedBy = new HashMap<>();
+//		invokedBy.put("userId",
+//				new UserIdBoundary(this.playerUser.getUserId().getDomain(), this.playerUser.getUserId().getEmail()));
 
+		InvokingUser invokedBy = new InvokingUser();
+		invokedBy.setUserId(new UserIdBoundary(this.playerUser.getUserId().getDomain(), this.playerUser.getUserId().getEmail()));
 		List<Object> actionList = IntStream.range(0, 5)
 				.mapToObj(i -> new ActionBoundary(
 						new ActionIdBoundary("2020b.tamir.reznik", "random" + Integer.toString(i)),
@@ -128,5 +131,4 @@ public class ActionTests {
 		assertThat(results).isEmpty();
 
 	}
-
 }

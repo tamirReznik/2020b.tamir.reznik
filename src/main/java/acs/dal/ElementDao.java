@@ -11,8 +11,18 @@ import acs.data.ElementIdEntity;
 //Create Read Update Delete - CRUD
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity> {
 
-	public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_Domain(@Param("id") String id,
-			@Param("domain") String domain, Pageable pageable);
+
+ 		//CrudRepository<ElementEntity, ElementIdEntity> 
+	
+	 
+
+	// CrudRepository<ElementEntity, ElementIdEntity>
+	// SELECT ... FROM ELEMENT WHERE ORIGIN_ID=?
+	public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_ElementDomain(
+	@Param("id") String id,@Param("elementDomain") String domain, Pageable pageable);
+////
+	/*public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_Domain(@Param("id") String id,
+			@Param("domain") String domain, Pageable pageable);*/
 
 	public List<ElementEntity> findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(
 			@Param("minLat") Double minLat, @Param("maxLat") Double maxLat, @Param("minLng") Double minLng,

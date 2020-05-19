@@ -87,7 +87,7 @@ public class ElementController {
 	public void bindElements(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @PathVariable("elementDomain") String elementDomain,
 			@PathVariable("elementId") String elementId, @RequestBody ElementIdBoundary responseId) {
-		this.elementService.bindExistingElementToAnExsitingChildElement(new ElementIdBoundary(elementDomain, elementId),
+		this.elementService.bindExistingElementToAnExsitingChildElement(managerDomain, managerEmail,new ElementIdBoundary(elementDomain, elementId),
 				responseId);
 	}
 

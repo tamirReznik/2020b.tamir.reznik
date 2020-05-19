@@ -17,6 +17,7 @@ import acs.logic.ActionService;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.action.ElementOfAction;
+import acs.rest.boundaries.action.InvokingUser;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
@@ -38,13 +39,13 @@ public class ActionsCreator implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 //		Map<String, Object> element = new HashMap<String, Object>();
-		Map<String, Object> invokedBy = new HashMap<String, Object>();
+		InvokingUser invokedBy = new InvokingUser();
 		Map<String, Object> actionAttributes = new HashMap<String, Object>();
 		ElementOfAction element = new ElementOfAction(new ElementIdBoundary("tamir", null));
 //		element.put("domain", "tamir");
 //		element.put("id", "6464");
 
-		invokedBy.put("userId", new UserIdBoundary("2020b", "t@gmail.com"));
+		invokedBy.setUserId(new UserIdBoundary("2020b", "t@gmail.com"));
 
 		actionAttributes.put("key1", "value1");
 		actionAttributes.put("key2", "value2");
