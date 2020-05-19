@@ -196,14 +196,23 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional
-	public void bindExistingElementToAnExsitingChildElement(ElementIdBoundary originId, ElementIdBoundary responseId) {
+	public void bindExistingElementToAnExsitingChildElement(String managerDomain,String managerEmail,ElementIdBoundary originId, ElementIdBoundary responseId) {
 
+		UserEntity uE = this.userDao.findById(new UserIdEntity(managerDomain, managerEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + managerDomain + "and userEmail: " + managerEmail));
+		if (uE.getRole() != UserRoleEntityEnum.manager)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can bind elements");
+		
 		ElementEntity origin = this.elementDao.findById(converter.fromElementIdBoundary(originId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find origin by id:" + originId));
 
 		ElementEntity response = this.elementDao.findById(converter.fromElementIdBoundary(responseId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find origin by id:" + originId));
 
+		if(!origin.getActive() || !response.getActive())
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "both elemntes must be active!");
+		
 		origin.addResponse(response);
 		this.elementDao.save(origin);
 	}
@@ -219,7 +228,12 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ServiceTools.stringValidation(elementDomain, elementId, userDomain, userEmail);
 
 		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
-
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
+		if (uE.getRole() != UserRoleEntityEnum.manager)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can do that");
+		
 
 		/*ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new ObjectNotFoundException(
 				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
@@ -248,12 +262,22 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Transactional(readOnly = true)
 	public Collection<ElementBoundary> getAnArrayWithElementParent(String userDomain, String userEmail,
 			String elementDomain, String elementId, int size, int page) {
+		
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find response by id:" + elementId));
 
 		ServiceTools.validatePaging(size, page);
-
+		
+		ElementIdEntity eid = new ElementIdEntity(elementDomain, elementId);
+		
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
+		
+		if (uE.getRole() != UserRoleEntityEnum.manager)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can do that");
 		ElementEntity origin = child.getParent();
+		
 		Collection<ElementBoundary> rv = new HashSet<>();
 		if (page > 1)
 			return rv;

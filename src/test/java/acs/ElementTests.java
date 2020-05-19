@@ -201,36 +201,6 @@ public class ElementTests {
 			throw new Exception("error");
 	}
 
-//	//NOT WORK
-//	@Test
-//	public void test_Update_Element_And_User_Is_Not_Manager() throws Exception {
-//		
-//		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
-//		UserBoundary postedUB = this.restTemplate.postForObject(this.url +"/users", ub, UserBoundary.class);
-//		
-//		ElementBoundary eb = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
-//				new Date(), new Location(), null, null);
-//		
-////		UserIdBoundary manager = this.restTemplate.postForObject(this.url + "/users",
-////				new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.MANAGER, "sapir", ":-)"),UserBoundary.class).getUserId();	
-////			this.restTemplate.postForObject(this.url + "/elements/"+manager.getDomain()+"/"+manager.getEmail(), eb, ElementBoundary.class);
-//		
-//		//domain and id of element	
-//		String domain = eb.getElementId().getDomain();
-//		String id = eb.getElementId().getId();
-//	
-//		//ElementIdBoundary postedElementId = this.restTemplate
-//		//		.postForObject(this.url + "/elements/"+postedUB.getUserId().getDomain()+"/"+postedUB.getUserId().getEmail(), eb, ElementBoundary.class).getElementId();
-//		eb.setName("new_name");
-//
-//		//The server responds with status <> 2xx
-//		//exception because the user is PLAYER (and not MANAGER)
-//		
-//	assertThrows(Exception.class, ()->	
-//			this.restTemplate.put(this.url + "/elements/" + postedUB.getUserId().getDomain()+ "/"
-//					+postedUB.getUserId().getEmail() + "/{elementDomain}/{elementId}",
-//				 eb,domain, id));
-//	}
 
 	@Test
 	public void test_Create_Three_Elements_Bind_Them_And_Validate_Relation() throws Exception {
@@ -245,6 +215,9 @@ public class ElementTests {
 
 		NewUserDetailsBoundary ub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
 		UserBoundary postedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
+		
+		NewUserDetailsBoundary playerub = new NewUserDetailsBoundary("demo@us.er", UserRole.MANAGER, "demo1", ":(");
+		UserBoundary playerPostedUB = this.restTemplate.postForObject(this.url + "/users", ub, UserBoundary.class);
 		// post them
 		ElementBoundary postedChild1Element = this.restTemplate.postForObject(
 				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
@@ -266,25 +239,25 @@ public class ElementTests {
 		// bind children to the parent
 		this.restTemplate.put(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
-				postedChild1Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
+				postedChild1Element.getElementId(), postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail(), postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
 		this.restTemplate.put(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
-				postedChild2Element.getElementId(), "???", "???", postedParentElement.getElementId().getDomain(),
+				postedChild2Element.getElementId(), postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail(), postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
 
 		// AND get all children
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
-				ElementBoundary[].class, "???", "???", postedParentElement.getElementId().getDomain(),
+				ElementBoundary[].class,postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail(), postedParentElement.getElementId().getDomain(),
 				postedParentElement.getElementId().getId());
 
 		// AND get all parents
 		ElementBoundary[] allParents = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/parents",
-				ElementBoundary[].class, "???", "???", postedChild1Element.getElementId().getDomain(),
+				ElementBoundary[].class,postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail(), postedChild1Element.getElementId().getDomain(),
 				postedChild1Element.getElementId().getId());
-
+		
 		// THEN we get the same array with the childrens
 		assertThat(allChilds).hasSize(allChildBeforeBind.size()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allChildBeforeBind);
@@ -292,7 +265,6 @@ public class ElementTests {
 		// THEN we get the same array with the Parents
 		assertThat(allParents).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrderElementsOf(allParentsBeforeBind);
-
 	}
 
 	@Test
@@ -312,7 +284,7 @@ public class ElementTests {
 		// get all children of the element
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
-				ElementBoundary[].class, "???", "???", postedElement.getElementId().getDomain(),
+				ElementBoundary[].class, postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail(), postedElement.getElementId().getDomain(),
 				postedElement.getElementId().getId());
 
 		// THEN we get an empty array
@@ -336,7 +308,7 @@ public class ElementTests {
 		// get all parents of the element
 		ElementBoundary[] allParents = this.restTemplate.getForObject(
 				this.url + "/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents",
-				ElementBoundary[].class, "???", "???", postedElement.getElementId().getDomain(),
+				ElementBoundary[].class, postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail(), postedElement.getElementId().getDomain(),
 				postedElement.getElementId().getId());
 
 		// THEN we get an empty array
@@ -570,18 +542,6 @@ public class ElementTests {
 		assertThat(playerGetElements2).hasSize(1);
 		
 		
-	}
-
-	@Test
-	public void test_get_children() throws Exception {
-		// TODO create a parent element and one or two children element and bind them.
-		// test if the getAllChildren method works on the parent.
-	}
-
-	@Test
-	public void test_get_parent() throws Exception {
-		// TODO create a parent element and a children element and bind them.
-		// test if the getParent method works on the child.
 	}
 
 	@Test
