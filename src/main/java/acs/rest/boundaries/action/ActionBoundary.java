@@ -36,14 +36,14 @@ public class ActionBoundary {
 	private String type;
 	private ElementOfAction element;
 	private Date createdTimestamp;
-	private Map<String, Object> invokedBy;
+	private InvokingUser invokedBy;
 	private Map<String, Object> actionAttributes;
 
 	public ActionBoundary() {
 	}
 
 	public ActionBoundary(ActionIdBoundary actionId, String type, ElementOfAction element, Date createdTimestamp,
-			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
+			InvokingUser invokedBy, Map<String, Object> actionAttributes) {
 
 		this.actionId = actionId;
 		this.type = type;
@@ -69,11 +69,11 @@ public class ActionBoundary {
 		this.element = element;
 	}
 
-	public Map<String, Object> getInvokedBy() {
+	public InvokingUser getInvokedBy() {
 		return invokedBy;
 	}
 
-	public void setInvokedBy(Map<String, Object> invokedBy) {
+	public void setInvokedBy(InvokingUser invokedBy) {
 		this.invokedBy = invokedBy;
 	}
 

@@ -225,7 +225,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				"could not find origin by domain: " + elementDomain + "and id: " + elementId));
 
 		return element.getResponses().stream().map(this.converter::fromEntity).collect(Collectors.toSet());*/
-		return this.elementDao.findAllByParent_ElementId_IdAndParent_ElementId_Domain(elementId, elementDomain, 
+		return this.elementDao.findAllByParent_ElementId_IdAndParent_ElementId_ElementDomain(elementId, elementDomain, 
 				PageRequest.of(page, size, Direction.DESC, "name")).stream()
 				.map(this.converter::fromEntity).collect(Collectors.toSet());
 	}

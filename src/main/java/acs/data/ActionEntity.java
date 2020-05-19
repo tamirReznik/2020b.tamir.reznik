@@ -12,6 +12,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import acs.rest.boundaries.action.InvokingUser;
+
 @Entity
 @Table(name = "ACTIONS")
 public class ActionEntity {
@@ -19,14 +21,14 @@ public class ActionEntity {
 	private String type;
 	private ElementIdEntity element;
 	private Date createdTimestamp;
-	private Map<String, Object> invokedBy;
+	private UserIdEntity invokedBy;
 	private Map<String, Object> actionAttributes;
 
 	public ActionEntity() {
 	}
 
 	public ActionEntity(String actionId, String type, ElementIdEntity element, Date timestamp,
-			Map<String, Object> invokedBy, Map<String, Object> actionAttributes) {
+			UserIdEntity invokedBy, Map<String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
 		this.type = type;
@@ -71,13 +73,14 @@ public class ActionEntity {
 		this.createdTimestamp = timestamp;
 	}
 
-	@Convert(converter = acs.dal.MapToJsonConverter.class)
-	@Lob
-	public Map<String, Object> getInvokedBy() {
+	//@Convert(converter = acs.dal.MapToJsonConverter.class)
+	//@Lob
+	@Embedded
+	public UserIdEntity getInvokedBy() {
 		return invokedBy;
 	}
 
-	public void setInvokedBy(Map<String, Object> invokedBy) {
+	public void setInvokedBy(UserIdEntity invokedBy) {
 		this.invokedBy = invokedBy;
 	}
 

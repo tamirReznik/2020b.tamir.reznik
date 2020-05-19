@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.action.ElementOfAction;
+import acs.rest.boundaries.action.InvokingUser;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserBoundary;
@@ -13,7 +14,7 @@ import acs.rest.boundaries.user.UserIdBoundary;
 public class Converter {
 
 	public ElementBoundary fromEntity(ElementEntity entity) {
-		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().getDomain(),
+		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().getElementDomain(),
 				entity.getElementId().getId());
 		ElementBoundary eb = new ElementBoundary(elementIdBoundary, entity.getType(), entity.getName(),
 				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
@@ -112,9 +113,8 @@ public class Converter {
 		ElementIdEntity idEntity = new ElementIdEntity(actionBoundary.getElement().getElement().getDomain(),
 				actionBoundary.getElement().getElement().getId());
 		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, idEntity,
-				actionBoundary.getCreatedTimestamp(), actionBoundary.getInvokedBy(),
+				actionBoundary.getCreatedTimestamp(),toEntity(actionBoundary.getInvokedBy().getUserId()),
 				actionBoundary.getActionAttributes());
-
 	}
 
 	public ActionIdBoundary toActionIdBoundary(String entity) {
@@ -137,10 +137,10 @@ public class Converter {
 		ActionIdBoundary actionIdBoundary = toActionIdBoundary(entity.getActionId());
 
 		ElementOfAction element = new ElementOfAction(
-				new ElementIdBoundary(entity.getElement().getDomain(), entity.getElement().getId()));
+				new ElementIdBoundary(entity.getElement().getElementDomain(), entity.getElement().getId()));
 
 		ActionBoundary boundary = new ActionBoundary(actionIdBoundary, null, element, entity.getTimestamp(),
-				entity.getInvokedBy(), entity.getActionAttributes());
+				new InvokingUser(fromEntity(entity.getInvokedBy())) , entity.getActionAttributes());
 
 		if (entity.getType() != null)
 			boundary.setType(entity.getType());

@@ -19,12 +19,16 @@ import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
+import acs.dal.UserDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
 
 import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
+import acs.data.UserEntity;
+import acs.data.UserIdEntity;
 import acs.data.UserRole;
+import acs.data.UserRoleEntityEnum;
 import acs.logic.ActionService;
 
 import acs.logic.EnhancedActionService;
@@ -43,12 +47,14 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private ActionDao actionDao;
 	private Converter converter;
 	private ElementDao elementDao;
+	private UserDao userDao;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, Converter converter) {
+	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao,UserDao userDao, Converter converter) {
 		this.converter = converter;
 		this.actionDao = actionDao;
 		this.elementDao = elementDao;
+		this.userDao = userDao;
 
 	}
 
@@ -72,13 +78,20 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 							"Admin User Can't Search Elements By Location");
 			}*/
+//			String userDomain = ((Map<String, Object>)(((Map<String, Object>)action.getInvokedBy().get("invokedBy")).get("userId"))).get("domain").toString();
+//			String userEmail = ((Map<String, Object>)(((Map<String, Object>)action.getInvokedBy().get("invokedBy")).get("userId"))).get("email").toString();
+			
+			UserEntity ue = this.userDao.findById(this.converter.toEntity(action.getInvokedBy().getUserId()))
+					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
+							+ action.getInvokedBy().getUserId().getDomain() + " or ElementId:" +
+							action.getInvokedBy().getUserId().getEmail()));
 			
 			ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
 			ElementEntity element = this.elementDao.findById(elementIdOfAction)
 					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
-							+ elementIdOfAction.getDomain() + " or ElementId:" + elementIdOfAction.getId()));
+							+ elementIdOfAction.getElementDomain() + " or ElementId:" + elementIdOfAction.getId()));
 
-			if (element.getActive()) {
+			if (element.getActive()&&ue.getRole().equals(UserRoleEntityEnum.player)) {
 				ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
 				action.setCreatedTimestamp(new Date());
 				action.setActionId(aib);
@@ -87,7 +100,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				this.actionDao.save(entity);
 				return action;
 			}
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "can't invoke action");
 		}
 		/*
 		 * ActionIdBoundary aib = new ActionIdBoundary(projectName,
