@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import acs.logic.EnhancedUserService;
 import acs.logic.UserService;
 import acs.rest.boundaries.user.NewUserDetailsBoundary;
 import acs.rest.boundaries.user.UserBoundary;
@@ -16,19 +17,15 @@ import acs.rest.boundaries.user.UserIdBoundary;
 
 @RestController
 public class UserController {
-	private UserService userService;
+	private EnhancedUserService userService;
 
 	@Autowired
 	public UserController() {
 	}
 
-	public UserController(UserService userService) {
-		super();
-		this.userService = userService;
-	}
 
 	@Autowired
-	public void setUserService(UserService userService) {
+	public void setUserService(EnhancedUserService userService) {
 		this.userService = userService;
 	}
 
@@ -41,6 +38,7 @@ public class UserController {
 
 	@RequestMapping(path = "/acs/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary CreateNewUser(@RequestBody NewUserDetailsBoundary userDetails) {
+		
 		return this.userService.createUser(new UserBoundary(new UserIdBoundary("", userDetails.getEmail()),
 				userDetails.getRole(), userDetails.getUsername(), userDetails.getAvatar()));
 	}

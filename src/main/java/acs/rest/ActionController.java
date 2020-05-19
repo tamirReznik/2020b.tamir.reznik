@@ -30,8 +30,7 @@ public class ActionController {
 		this.actionService = actionService;
 	}
 
-	// This method need to return any object relate to the action... for now it
-	// returns message object notifying on invoke (temporary)
+	// This method need to return any object relate to the action...
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public Object invokeAnAction(@RequestBody ActionBoundary actionDetails) {
 

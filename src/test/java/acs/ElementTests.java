@@ -49,6 +49,18 @@ public class ElementTests {
 		this.restTemplate.delete(this.url + "/admin/elements/{adminDomain}/{adminEmail}", "???", "??");
 	}
 
+	@BeforeEach
+	public void initUsers() {
+		NewUserDetailsBoundary userDetails = new NewUserDetailsBoundary("manager1@afeka.ac.il", UserRole.MANAGER,
+				"managerTamir", ":>");
+
+		this.restTemplate.postForObject(this.url + "/users", userDetails, UserBoundary.class);
+
+		userDetails = new NewUserDetailsBoundary("player1@afeka.ac.il", UserRole.PLAYER, "playerTamir", ":<");
+
+		this.restTemplate.postForObject(this.url + "/users", userDetails, UserBoundary.class);
+	}
+
 	@Test
 	public void testContext() {
 
@@ -326,7 +338,7 @@ public class ElementTests {
 				this.url + "/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents",
 				ElementBoundary[].class, "???", "???", postedElement.getElementId().getDomain(),
 				postedElement.getElementId().getId());
-		
+
 		// THEN we get an empty array
 		assertThat(allParents).isEmpty();
 
@@ -475,22 +487,101 @@ public class ElementTests {
 //		Manager Can get specific element
 		assertThat(getElements).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(postElement);
 	}
-	
+
 	@Test
-	public void test_Search_Element_by_Name() throws Exception {
-		//TODO create an element and search for it by name	
+	public void test_Search_Element_by_Name_by_Player_Manager_Admin() throws Exception {
+		// create MANAGER user
+
+//		UserIdBoundary managerUser = this.restTemplate.postForObject(this.url + "/users",
+//				new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.MANAGER, "sapir", ":-)"), UserBoundary.class)
+//				.getUserId();
+		NewUserDetailsBoundary User = new NewUserDetailsBoundary("managerTamir@afeka.ac.il", UserRole.MANAGER,
+				"managerTamir", ":>");
+
+		UserBoundary managerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		UserIdBoundary managerID = managerUser.getUserId();
+
+		User = new NewUserDetailsBoundary("playerTamir@afeka.ac.il", UserRole.PLAYER, "playerTamir", ":<");
+
+		UserBoundary playerUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+		
+		User = new NewUserDetailsBoundary("adminTamir@afeka.ac.il", UserRole.ADMIN, "adminTamir", ":<");
+
+		UserBoundary adminUser = this.restTemplate.postForObject(this.url + "/users", User, UserBoundary.class);
+
+		// GIVEN the database contains 3 Element
+		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "name1", true,
+				new Date(), new Location(), null, null);
+		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "name1", true,
+				new Date(), new Location(), null, null);
+		ElementBoundary eb3 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "name2", true,
+				new Date(), new Location(), null, null);
+		ElementBoundary eb4 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "name2", false,
+				new Date(), new Location(), null, null);
+
+		this.restTemplate.postForObject(this.url + "/elements/" + managerID.getDomain() + "/" + managerID.getEmail(),
+				eb1, ElementBoundary.class);
+		this.restTemplate.postForObject(this.url + "/elements/" + managerID.getDomain() + "/" + managerID.getEmail(),
+				eb2, ElementBoundary.class);
+		this.restTemplate.postForObject(this.url + "/elements/" + managerID.getDomain() + "/" + managerID.getEmail(),
+				eb3, ElementBoundary.class);
+		this.restTemplate.postForObject(this.url + "/elements/" + managerID.getDomain() + "/" + managerID.getEmail(),
+				eb4, ElementBoundary.class);
+//		"/acs/elements/{UserDomain}/{UserEmail}/search/byName/{name}"
+		// WHEN I invoke GET /acs/elements/{userDomain}/{userEmail}?page=1&size=2
+		// THEN the server responds with status <> 2xx
+		ElementBoundary[] managerGetElements1 = this.restTemplate.getForObject(
+				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail()
+						+ "/search/byName/name1" + "?page=0&size=16",
+				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
+		
+		ElementBoundary[] managerGetElements2 = this.restTemplate.getForObject(
+				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail()
+						+ "/search/byName/name2" + "?page=0&size=16",
+				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
+		
+		ElementBoundary[] managerGetElements3 = this.restTemplate.getForObject(
+				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail()
+						+ "/search/byName/name1" + "?page=0&size=1",
+				ElementBoundary[].class, managerUser.getUserId().getDomain(), managerUser.getUserId().getEmail());
+		
+		ElementBoundary[] playerGetElements1 = this.restTemplate.getForObject(
+				this.url + "/elements/" + playerUser.getUserId().getDomain() + "/" + playerUser.getUserId().getEmail()
+						+"/search/byName/name1"+ "?page=0&size=16",
+				ElementBoundary[].class, playerUser.getUserId().getDomain(), playerUser.getUserId().getEmail());
+		ElementBoundary[] playerGetElements2 = this.restTemplate.getForObject(
+				this.url + "/elements/" + playerUser.getUserId().getDomain() + "/" + playerUser.getUserId().getEmail()
+						+"/search/byName/name2"+ "?page=0&size=16",
+				ElementBoundary[].class, playerUser.getUserId().getDomain(), playerUser.getUserId().getEmail());
+		
+
+//		Admin Cannot get element by search 
+		assertThrows(HttpClientErrorException.Unauthorized.class, () -> this.restTemplate.getForObject(
+				this.url + "/elements/" + adminUser.getUserId().getDomain() + "/" + adminUser.getUserId().getEmail()
+						+"/search/byName/name1"+ "?page=0&size=16",
+				ElementBoundary.class));
+
+//		manager get back all active and inactive elements array
+		assertThat(managerGetElements1).hasSize(2);
+		assertThat(managerGetElements2).hasSize(2);
+		assertThat(managerGetElements3).hasSize(1);
+		assertThat(playerGetElements1).hasSize(2);
+		assertThat(playerGetElements2).hasSize(1);
+		
+		
 	}
-	
+
 	@Test
 	public void test_get_children() throws Exception {
-		//TODO create a parent element and one or two children element and bind them.
-		//test if the getAllChildren method works on the parent.
+		// TODO create a parent element and one or two children element and bind them.
+		// test if the getAllChildren method works on the parent.
 	}
-	
+
 	@Test
 	public void test_get_parent() throws Exception {
-		//TODO create a parent element and a children element and bind them.
-		//test if the getParent method works on the child.
+		// TODO create a parent element and a children element and bind them.
+		// test if the getParent method works on the child.
 	}
 
 	@Test
@@ -545,6 +636,5 @@ public class ElementTests {
 //		.containsExactlyInAnyOrderElementsOf(postedElements);
 
 	}
-	
-	
+
 }

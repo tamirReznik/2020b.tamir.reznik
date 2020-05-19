@@ -3,7 +3,6 @@ package acs.logic.implementation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
-
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
 import acs.dal.UserDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
-
 import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
 import acs.data.UserEntity;
@@ -30,16 +25,11 @@ import acs.data.UserIdEntity;
 import acs.data.UserRole;
 import acs.data.UserRoleEntityEnum;
 import acs.logic.ActionService;
-
 import acs.logic.EnhancedActionService;
-
 import acs.logic.ObjectNotFoundException;
-
 import acs.logic.ServiceTools;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
-import acs.rest.boundaries.user.UserBoundary;
-import acs.rest.boundaries.user.UserIdBoundary;
 
 @Service
 public class DbActionServiceImplementation implements EnhancedActionService {
@@ -67,10 +57,15 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	@Override
 	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
-		if (action == null || action.getType() == null) {
+		if (action == null || action.getType() == null)
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 
-		} else {
+		/*
+		 * for (Object user : action.getInvokedBy().values()) { UserBoundary userB =
+		 * (UserBoundary) user; if (!userB.getRole().equals(UserRole.PLAYER)) throw new
+		 * ResponseStatusException(HttpStatus.UNAUTHORIZED,
+		 * "Admin User Can't Search Elements By Location"); }
+		 */
 
 			/*for (Object user : action.getInvokedBy().values()) {
 				UserBoundary userB = (UserBoundary) user;
@@ -90,6 +85,11 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			ElementEntity element = this.elementDao.findById(elementIdOfAction)
 					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
 							+ elementIdOfAction.getElementDomain() + " or ElementId:" + elementIdOfAction.getId()));
+			
+		/*ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
+		ElementEntity element = this.elementDao.findById(elementIdOfAction)
+				.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
+						+ elementIdOfAction.getDomain() + " or ElementId:" + elementIdOfAction.getId()));*/
 
 			if (element.getActive()&&ue.getRole().equals(UserRoleEntityEnum.player)) {
 				ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
@@ -101,7 +101,18 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				return action;
 			}
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "can't invoke action");
+
+		/*if (element.getActive()) {
+			ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
+			action.setCreatedTimestamp(new Date());
+			action.setActionId(aib);
+			ActionEntity entity = converter.toEntity(action);
+			// actionDao.put(action.getActionId().toString(), entity);
+			this.actionDao.save(entity);
+			return action;
 		}
+		throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "invoke action only on active element!");
+*/
 		/*
 		 * ActionIdBoundary aib = new ActionIdBoundary(projectName,
 		 * UUID.randomUUID().toString()); action.setCreatedTimestamp(new Date());
