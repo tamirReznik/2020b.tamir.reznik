@@ -12,8 +12,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="USERS")
 public class UserEntity {
-	//private String userId; // "Dmain#Email"
-	//private String role;
+	
 	private UserIdEntity userId;
 	private UserRoleEntityEnum role;
 	private String username;

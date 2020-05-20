@@ -95,7 +95,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ElementEntity existing = this.elementDao.findById(elementIdEntity)
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
-//TODO IF we want to update to null ?
+
 		if (update.getActive() != null)
 			existing.setActive(update.getActive());
 
@@ -227,7 +227,6 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		origin.addResponse(response);
 		this.elementDao.save(origin);
 	}
-	// TODO
 
 	@Override
 	@Transactional(readOnly = true)

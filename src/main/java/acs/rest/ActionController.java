@@ -33,8 +33,6 @@ public class ActionController {
 	// This method need to return any object relate to the action...
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public Object invokeAnAction(@RequestBody ActionBoundary actionDetails) {
-
-//		actionDetails.setActionId(new ActionIdBoundary(actionDetails.getActionId().getDomain(), null));
 		return actionService.invokeAction(actionDetails);
 
 	}

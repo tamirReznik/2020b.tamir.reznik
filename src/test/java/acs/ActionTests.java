@@ -1,6 +1,8 @@
 package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import acs.data.UserRole;
 import acs.rest.boundaries.action.ActionBoundary;
@@ -54,7 +57,7 @@ public class ActionTests {
 
 	@AfterEach
 	public void tear_down() {
-		this.restTemplate.delete(delete_And_Get_Url, "adminDomain", "adminEmail");
+		this.restTemplate.delete(delete_And_Get_Url);
 	}
 
 	@BeforeEach
@@ -104,13 +107,10 @@ public class ActionTests {
 	@Test
 	public void test_Init_Server_with_5_Actions_When_We_Get_All_Actions_We_Receive_The_Same_Actions() {
 
-		// GIVEN the server is up
-//		Map<String, Object> invokedBy = new HashMap<>();
-//		invokedBy.put("userId",
-//				new UserIdBoundary(this.playerUser.getUserId().getDomain(), this.playerUser.getUserId().getEmail()));
-
 		InvokingUser invokedBy = new InvokingUser();
-		invokedBy.setUserId(new UserIdBoundary(this.playerUser.getUserId().getDomain(), this.playerUser.getUserId().getEmail()));
+		invokedBy.setUserId(
+				new UserIdBoundary(this.playerUser.getUserId().getDomain(), this.playerUser.getUserId().getEmail()));
+
 		List<Object> actionList = IntStream.range(0, 5)
 				.mapToObj(i -> new ActionBoundary(
 						new ActionIdBoundary("2020b.tamir.reznik", "random" + Integer.toString(i)),
@@ -129,6 +129,47 @@ public class ActionTests {
 		results = this.restTemplate.getForObject(this.delete_And_Get_Url, ActionBoundary[].class,
 				adminUser.getUserId().getDomain(), adminUser.getUserId().getEmail());
 		assertThat(results).isEmpty();
+
+	}
+
+	@Test
+	public void test_Post_Action_Via_Manager_User_And_Get_UnauthorizedException() {
+
+		ActionBoundary boundary = new ActionBoundary(new ActionIdBoundary("2020b.tamir.reznik", "random"), "actionType",
+				new ElementOfAction(this.activeElement.getElementId()), new Date(),
+				new InvokingUser(this.managerUser.getUserId()), new HashMap<>());
+
+		assertThrows(HttpClientErrorException.Unauthorized.class, () -> this.restTemplate
+				.postForObject("http://localhost:" + this.port + "/acs/actions", boundary, ActionBoundary.class));
+
+	}
+
+	@Test
+	public void test_Post_Action_Via_Admin_User_And_Get_Unauthorized_Exception() {
+
+		ActionBoundary boundary = new ActionBoundary(new ActionIdBoundary("2020b.tamir.reznik", "random"), "actionType",
+				new ElementOfAction(this.activeElement.getElementId()), new Date(),
+				new InvokingUser(this.adminUser.getUserId()), new HashMap<>());
+
+		assertThrows(HttpClientErrorException.Unauthorized.class, () -> this.restTemplate
+				.postForObject("http://localhost:" + this.port + "/acs/actions", boundary, ActionBoundary.class));
+
+	}
+
+	@Test
+	public void test_Init_Server_with_5_Actions_Contains_InActive_Elements_When_We_Get_All_Actions_We_Receive_NotFound_Exception() {
+
+		InvokingUser invokedBy = new InvokingUser();
+		invokedBy.setUserId(
+				new UserIdBoundary(this.playerUser.getUserId().getDomain(), this.playerUser.getUserId().getEmail()));
+
+		assertThrows(HttpClientErrorException.NotFound.class, () -> IntStream.range(0, 5)
+				.mapToObj(i -> new ActionBoundary(
+						new ActionIdBoundary("2020b.tamir.reznik", "random" + Integer.toString(i)),
+						"actionType" + Integer.toString(i), new ElementOfAction(this.inActiveElement.getElementId()),
+						new Date(), invokedBy, new HashMap<>()))
+				.map(boundary -> this.restTemplate.postForObject(actionPostUrl, boundary, ActionBoundary.class))
+				.collect(Collectors.toList()));
 
 	}
 }

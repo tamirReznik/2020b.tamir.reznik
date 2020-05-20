@@ -1,6 +1,8 @@
 package acs.data;
 
 import org.springframework.stereotype.Component;
+
+import acs.logic.ServiceTools;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.action.ElementOfAction;
@@ -78,10 +80,11 @@ public class Converter {
 	}
 
 	public UserIdEntity toEntity(UserIdBoundary userId) {
-		if (userId != null)
-			return new UserIdEntity(userId.getDomain(), userId.getEmail());
-		else
-			return null;
+
+		ServiceTools.stringValidation(userId.getDomain(), userId.getEmail());
+
+		return new UserIdEntity(userId.getDomain(), userId.getEmail());
+
 	}
 
 	public String typeEnumToString(TypeEnum type) {
@@ -110,10 +113,12 @@ public class Converter {
 	public ActionEntity toEntity(ActionBoundary actionBoundary) {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType();
+
 		ElementIdEntity idEntity = new ElementIdEntity(actionBoundary.getElement().getElement().getDomain(),
 				actionBoundary.getElement().getElement().getId());
+
 		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, idEntity,
-				actionBoundary.getCreatedTimestamp(),toEntity(actionBoundary.getInvokedBy().getUserId()),
+				actionBoundary.getCreatedTimestamp(), toEntity(actionBoundary.getInvokedBy().getUserId()),
 				actionBoundary.getActionAttributes());
 	}
 
@@ -140,7 +145,7 @@ public class Converter {
 				new ElementIdBoundary(entity.getElement().getElementDomain(), entity.getElement().getId()));
 
 		ActionBoundary boundary = new ActionBoundary(actionIdBoundary, null, element, entity.getTimestamp(),
-				new InvokingUser(fromEntity(entity.getInvokedBy())) , entity.getActionAttributes());
+				new InvokingUser(fromEntity(entity.getInvokedBy())), entity.getActionAttributes());
 
 		if (entity.getType() != null)
 			boundary.setType(entity.getType());

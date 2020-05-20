@@ -40,7 +40,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private UserDao userDao;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao,UserDao userDao, Converter converter) {
+	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, UserDao userDao,
+			Converter converter) {
 		this.converter = converter;
 		this.actionDao = actionDao;
 		this.elementDao = elementDao;
@@ -60,66 +61,30 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (action == null || action.getType() == null)
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 
-		/*
-		 * for (Object user : action.getInvokedBy().values()) { UserBoundary userB =
-		 * (UserBoundary) user; if (!userB.getRole().equals(UserRole.PLAYER)) throw new
-		 * ResponseStatusException(HttpStatus.UNAUTHORIZED,
-		 * "Admin User Can't Search Elements By Location"); }
-		 */
+		UserEntity ue = this.userDao.findById(this.converter.toEntity(action.getInvokedBy().getUserId()))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find object by ElementDomain:" + action.getInvokedBy().getUserId().getDomain()
+								+ " or ElementId:" + action.getInvokedBy().getUserId().getEmail()));
 
-			/*for (Object user : action.getInvokedBy().values()) {
-				UserBoundary userB = (UserBoundary) user;
-				if (!userB.getRole().equals(UserRole.PLAYER))
-					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-							"Admin User Can't Search Elements By Location");
-			}*/
-//			String userDomain = ((Map<String, Object>)(((Map<String, Object>)action.getInvokedBy().get("invokedBy")).get("userId"))).get("domain").toString();
-//			String userEmail = ((Map<String, Object>)(((Map<String, Object>)action.getInvokedBy().get("invokedBy")).get("userId"))).get("email").toString();
-			
-			UserEntity ue = this.userDao.findById(this.converter.toEntity(action.getInvokedBy().getUserId()))
-					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
-							+ action.getInvokedBy().getUserId().getDomain() + " or ElementId:" +
-							action.getInvokedBy().getUserId().getEmail()));
-			
-			ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
-			ElementEntity element = this.elementDao.findById(elementIdOfAction)
-					.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
-							+ elementIdOfAction.getElementDomain() + " or ElementId:" + elementIdOfAction.getId()));
-			
-		/*ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
+		if (ue.getRole().name() != UserRoleEntityEnum.player.name())
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only player can invoke action");
+
+		ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
+
 		ElementEntity element = this.elementDao.findById(elementIdOfAction)
 				.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
-						+ elementIdOfAction.getDomain() + " or ElementId:" + elementIdOfAction.getId()));*/
+						+ elementIdOfAction.getElementDomain() + " or ElementId:" + elementIdOfAction.getId()));
 
-			if (element.getActive()&&ue.getRole().equals(UserRoleEntityEnum.player)) {
-				ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
-				action.setCreatedTimestamp(new Date());
-				action.setActionId(aib);
-				ActionEntity entity = converter.toEntity(action);
-				// actionDao.put(action.getActionId().toString(), entity);
-				this.actionDao.save(entity);
-				return action;
-			}
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "can't invoke action");
+		if (!element.getActive())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
-		/*if (element.getActive()) {
-			ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
-			action.setCreatedTimestamp(new Date());
-			action.setActionId(aib);
-			ActionEntity entity = converter.toEntity(action);
-			// actionDao.put(action.getActionId().toString(), entity);
-			this.actionDao.save(entity);
-			return action;
-		}
-		throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "invoke action only on active element!");
-*/
-		/*
-		 * ActionIdBoundary aib = new ActionIdBoundary(projectName,
-		 * UUID.randomUUID().toString()); action.setCreatedTimestamp(new Date());
-		 * action.setActionId(aib); ActionEntity entity = converter.toEntity(action); //
-		 * actionDao.put(action.getActionId().toString(), entity);
-		 * this.actionDao.save(entity); return action;
-		 */
+		ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
+		action.setCreatedTimestamp(new Date());
+		action.setActionId(aib);
+		ActionEntity entity = converter.toEntity(action);
+		this.actionDao.save(entity);
+		return action;
+
 	}
 
 	@Override
@@ -127,11 +92,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail) {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
+
 		Iterable<ActionEntity> allActions = this.actionDao.findAll();
+
 		List<ActionBoundary> rv = new ArrayList<>();
 		for (ActionEntity ent : allActions)
 			rv.add(this.converter.fromEntity(ent));
-//			return this.actionDao.values().stream().map(this.converter::fromEntity).collect(Collectors.toList());
+
 		return rv;
 
 	}
@@ -141,6 +108,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public void deleteAllActions(String adminDomain, String adminEmail) {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
+		
 		this.actionDao.deleteAll();
 
 	}
