@@ -13,7 +13,6 @@ import acs.logic.EnhancedElementService;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 
-
 @RestController
 public class ElementController {
 	private EnhancedElementService elementService;
@@ -78,36 +77,26 @@ public class ElementController {
 			@PathVariable("elementId") String elementId,
 			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-		return this.elementService
-				.getAnArrayWithElementParent(userDomain, userEmail, elementDomain, String.valueOf(elementId),size,page)
-				.toArray(new ElementBoundary[0]);
+		return this.elementService.getAnArrayWithElementParent(userDomain, userEmail, elementDomain,
+				String.valueOf(elementId), size, page).toArray(new ElementBoundary[0]);
 	}
 
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void bindElements(@PathVariable("managerDomain") String managerDomain,
 			@PathVariable("managerEmail") String managerEmail, @PathVariable("elementDomain") String elementDomain,
 			@PathVariable("elementId") String elementId, @RequestBody ElementIdBoundary responseId) {
-		this.elementService.bindExistingElementToAnExsitingChildElement(managerDomain, managerEmail,new ElementIdBoundary(elementDomain, elementId),
-				responseId);
+		this.elementService.bindExistingElementToAnExsitingChildElement(managerDomain, managerEmail,
+				new ElementIdBoundary(elementDomain, elementId), responseId);
 	}
 
-	
-	@RequestMapping(path = "/acs/elements/{UserDomain}/{UserEmail}/search/byName/{name}",
-			method = RequestMethod.GET,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary[] searchElemntsByName(
-			@PathVariable("UserDomain") String userDomain,
-			@PathVariable("UserEmail") String userEmail,
-			@PathVariable("name") String name,
-			@RequestParam(name = "size", required = false, defaultValue = "10") int size, 
+	@RequestMapping(path = "/acs/elements/{UserDomain}/{UserEmail}/search/byName/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] searchElemntsByName(@PathVariable("UserDomain") String userDomain,
+			@PathVariable("UserEmail") String userEmail, @PathVariable("name") String name,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-		return this.elementService
-		.getElementsByName(userDomain, userEmail, name, size, page)
-		.stream()
-		.collect(Collectors.toList())
-		.toArray(new ElementBoundary[0]);
+		return this.elementService.getElementsByName(userDomain, userEmail, name, size, page).stream()
+				.collect(Collectors.toList()).toArray(new ElementBoundary[0]);
 	}
-
 
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/search/near/{lat}/{lng}/{distance}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary[] searchByLocation(@PathVariable("userDomain") String userDomain,
@@ -119,18 +108,13 @@ public class ElementController {
 		return this.elementService.searchByLocation(userDomain, userEmail, lat, lng, distance, size, page)
 				.toArray(new ElementBoundary[0]);
 	}
-	
-	@RequestMapping(
-			path="/acs/elements/{userDomain}/{userEmail}/search/byType/{type}", 
-			method = RequestMethod.GET,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary[] getElementsByType (@PathVariable("userDomain") String userDomain,
-			@PathVariable("userEmail") String userEmail,
-			@PathVariable("type") String type,
-			@RequestParam(name = "size", required = false, defaultValue = "10") int size, 
+
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/search/byType/{type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] getElementsByType(@PathVariable("userDomain") String userDomain,
+			@PathVariable("userEmail") String userEmail, @PathVariable("type") String type,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-		return this.elementService
-				.getElementsByType(userDomain, userEmail,type, size, page)
+		return this.elementService.getElementsByType(userDomain, userEmail, type, size, page)
 				.toArray(new ElementBoundary[0]);
 	}
 

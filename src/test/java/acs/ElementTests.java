@@ -462,9 +462,6 @@ public class ElementTests {
 	public void test_Search_Element_by_Name_by_Player_Manager_Admin() throws Exception {
 		// create MANAGER user
 
-//		UserIdBoundary managerUser = this.restTemplate.postForObject(this.url + "/users",
-//				new NewUserDetailsBoundary("Sapir@gmail.com", UserRole.MANAGER, "sapir", ":-)"), UserBoundary.class)
-//				.getUserId();
 		NewUserDetailsBoundary User = new NewUserDetailsBoundary("managerTamir@afeka.ac.il", UserRole.MANAGER,
 				"managerTamir", ":>");
 
@@ -498,9 +495,7 @@ public class ElementTests {
 				eb3, ElementBoundary.class);
 		this.restTemplate.postForObject(this.url + "/elements/" + managerID.getDomain() + "/" + managerID.getEmail(),
 				eb4, ElementBoundary.class);
-//		"/acs/elements/{UserDomain}/{UserEmail}/search/byName/{name}"
-		// WHEN I invoke GET /acs/elements/{userDomain}/{userEmail}?page=1&size=2
-		// THEN the server responds with status <> 2xx
+
 		ElementBoundary[] managerGetElements1 = this.restTemplate.getForObject(
 				this.url + "/elements/" + managerUser.getUserId().getDomain() + "/" + managerUser.getUserId().getEmail()
 						+ "/search/byName/name1" + "?page=0&size=16",
@@ -581,10 +576,6 @@ public class ElementTests {
 //		each element that player got from db is active
 		for (ElementBoundary elementBoundary : playerGetElements)
 			assertThat(elementBoundary.getActive()).isTrue();
-
-//		TODO - tamir - check why assert below return different elements
-//		assertThat(managerGetElements).hasSize(postedElements.size()).usingRecursiveFieldByFieldElementComparator()
-//				.containsAll(postedElements);
 
 	}
 
