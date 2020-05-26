@@ -21,6 +21,7 @@ import acs.data.Converter;
 import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
 import acs.data.UserEntity;
+import acs.data.UserIdEntity;
 import acs.data.UserRoleEntityEnum;
 import acs.logic.EnhancedActionService;
 import acs.logic.ObjectNotFoundException;
@@ -63,7 +64,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 						"could not find object by ElementDomain:" + action.getInvokedBy().getUserId().getDomain()
 								+ " or ElementId:" + action.getInvokedBy().getUserId().getEmail()));
 
-		if (ue.getRole().name() != UserRoleEntityEnum.player.name())
+		if (!ue.getRole().equals(UserRoleEntityEnum.player))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only player can invoke action");
 
 		ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElementId());
@@ -106,6 +107,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
 
+		UserEntity uE = this.userDao.findById(new UserIdEntity(adminDomain, adminEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + adminDomain + "and userEmail: " + adminEmail));
+
+		if (!uE.getRole().equals(UserRoleEntityEnum.admin))
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only admin can delete all actions");
+
 		this.actionDao.deleteAll();
 
 	}
@@ -114,6 +122,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail, int size, int page) {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
+
+		UserEntity uE = this.userDao.findById(new UserIdEntity(adminDomain, adminEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + adminDomain + "and userEmail: " + adminEmail));
+
+		if (!uE.getRole().equals(UserRoleEntityEnum.admin))
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only admin can get all actions");
 
 		ServiceTools.validatePaging(size, page);
 

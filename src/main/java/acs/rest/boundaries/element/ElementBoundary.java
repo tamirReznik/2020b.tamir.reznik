@@ -108,11 +108,11 @@ public class ElementBoundary {
 		return location;
 	}
 
-	public Map<String, UserIdBoundary> getCreateBy() {
+	public Map<String, UserIdBoundary> getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreateBy(Map<String, UserIdBoundary> createBy) {
+	public void setCreatedBy(Map<String, UserIdBoundary> createBy) {
 		this.createdBy = createBy;
 	}
 

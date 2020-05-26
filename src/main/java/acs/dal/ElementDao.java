@@ -15,6 +15,10 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 	public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_ElementDomain(@Param("id") String id,
 			@Param("elementDomain") String domain, Pageable pageable);
 
+	public List<ElementEntity> findAllByParent_ElementId_IdAndParent_ElementId_ElementDomainAndActive(
+			@Param("id") String id, @Param("elementDomain") String domain, @Param("active") boolean active,
+			Pageable pageable);
+
 	public List<ElementEntity> findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(
 			@Param("minLat") Double minLat, @Param("maxLat") Double maxLat, @Param("minLng") Double minLng,
 			@Param("maxLng") Double maxLng, @Param("active") Boolean active, Pageable pageable);

@@ -28,7 +28,7 @@ public class Converter {
 		ElementEntity eE = new ElementEntity(
 				new ElementIdEntity(boundary.getElementId().getDomain(), boundary.getElementId().getId()),
 				boundary.getType(), boundary.getName(), boundary.getActive(), boundary.getCreatedTimestamp(),
-				boundary.getLocation(), boundary.getElementAttributes(), boundary.getCreateBy());
+				boundary.getLocation(), boundary.getElementAttributes(), boundary.getCreatedBy());
 		return eE;
 	}
 	// domain :abc id: 123 -- > abc#123

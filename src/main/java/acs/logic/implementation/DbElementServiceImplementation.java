@@ -159,7 +159,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 					.map(this.converter::fromEntity) // Stream<ElementBoundary>
 					.collect(Collectors.toList()); // List<ElementBoundary>
 
-		if (existingUser.getRole() == UserRoleEntityEnum.admin)
+		if (existingUser.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't get all Elements ");
 
 		return new ArrayList<>();
@@ -175,14 +175,14 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
-		if (uE.getRole() == UserRoleEntityEnum.admin)
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Get Specific Element");
 
 		ElementEntity existing = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find object by elementDomain: " + elementDomain + "or elementId: " + elementId));
 
-		if (uE.getRole() == UserRoleEntityEnum.player && !existing.getActive())
+		if (uE.getRole().equals(UserRoleEntityEnum.player) && !existing.getActive())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player User Can't Get Specific Inactive Element");
 
 		return this.converter.fromEntity(existing);
@@ -192,14 +192,16 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 	@Override
 	@Transactional
 	public void deleteAllElements(String adminDomain, String adminEmail) {
+
+		ServiceTools.stringValidation(adminDomain, adminEmail);
+
 		UserEntity uE = this.userDao.findById(new UserIdEntity(adminDomain, adminEmail))
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find user by userDomain: " + adminDomain + "and userEmail: " + adminEmail));
 
-		if (uE.getRole() != UserRoleEntityEnum.admin)
+		if (!uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only Admin can delete elements");
 
-		ServiceTools.stringValidation(adminDomain, adminEmail);
 		this.elementDao.deleteAll();
 	}
 
@@ -212,7 +214,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find user by userDomain: " + managerDomain + "and userEmail: " + managerEmail));
 
-		if (uE.getRole() != UserRoleEntityEnum.manager)
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can bind elements");
 
 		ElementEntity origin = this.elementDao.findById(converter.fromElementIdBoundary(originId))
@@ -221,8 +223,9 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		ElementEntity response = this.elementDao.findById(converter.fromElementIdBoundary(responseId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find origin by id:" + originId));
 
-		if (!origin.getActive() || !response.getActive())
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "both elemntes must be active!");
+		if ((!origin.getActive() || !response.getActive()) && uE.getRole().equals(UserRoleEntityEnum.player))
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"both elemntes must be active when A user player bind them!\n");
 
 		origin.addResponse(response);
 		this.elementDao.save(origin);
@@ -241,38 +244,21 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find user by userDomain: " + userDomain + "and userEmail: " + userEmail));
 
-		if (uE.getRole() != UserRoleEntityEnum.manager)
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can do that");
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin can't get all element children \n");
 
-		/*
-		 * ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new
-		 * ObjectNotFoundException( "could not find origin by domain: " + elementDomain
-		 * + "and id: " + elementId));
-		 * 
-		 * return
-		 * element.getResponses().stream().map(this.converter::fromEntity).collect(
-		 * Collectors.toSet());
-		 */
-		return this.elementDao
-				.findAllByParent_ElementId_IdAndParent_ElementId_ElementDomain(elementId, elementDomain,
-						PageRequest.of(page, size, Direction.DESC, "name"))
-				.stream().map(this.converter::fromEntity).collect(Collectors.toSet());
+		if (uE.getRole().equals(UserRoleEntityEnum.manager))
+			return this.elementDao
+					.findAllByParent_ElementId_IdAndParent_ElementId_ElementDomain(elementId, elementDomain,
+							PageRequest.of(page, size, Direction.DESC, "elementId"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toSet());
+		if (uE.getRole().equals(UserRoleEntityEnum.player))
+			return this.elementDao
+					.findAllByParent_ElementId_IdAndParent_ElementId_ElementDomainAndActive(elementId, elementDomain,
+							true, PageRequest.of(page, size, Direction.DESC, "elementId"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toSet());
 
-		/*
-		 * ElementEntity element = this.elementDao.findById(eid).orElseThrow(() -> new
-		 * ObjectNotFoundException( "could not find origin by domain: " + elementDomain
-		 * + "and id: " + elementId));
-		 * 
-		 * return
-		 * element.getResponses().stream().map(this.converter::fromEntity).collect(
-		 * Collectors.toSet());
-		 */
-		/*
-		 * return this.elementDao
-		 * .findAllByParent_ElementId_IdAndParent_ElementId_Domain(elementId,
-		 * elementDomain, PageRequest.of(page, size, Direction.DESC, "name"))
-		 * .stream().map(this.converter::fromEntity).collect(Collectors.toSet());
-		 */
+		return new HashSet<ElementBoundary>();
 	}
 
 	@Override
@@ -286,7 +272,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
 						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
 
-		if (uE.getRole() != UserRoleEntityEnum.manager)
+		if (!uE.getRole().equals(UserRoleEntityEnum.manager))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can do that");
 
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
@@ -314,13 +300,13 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
 						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
-		if (uE.getRole() == UserRoleEntityEnum.admin)
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
-		if (uE.getRole() == UserRoleEntityEnum.player)
+		if (uE.getRole().equals(UserRoleEntityEnum.player))
 			return this.elementDao
 					.findAllByNameAndActive(name, true, PageRequest.of(page, size, Direction.DESC, "name")).stream()
 					.map(this.converter::fromEntity).collect(Collectors.toList());
-		if (uE.getRole() == UserRoleEntityEnum.manager)
+		if (uE.getRole().equals(UserRoleEntityEnum.manager))
 			return this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.DESC, "name")).stream()
 					.map(this.converter::fromEntity).collect(Collectors.toList());
 		return new ArrayList<>();
@@ -339,19 +325,19 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
 						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
 
-		if (uE.getRole() == UserRoleEntityEnum.manager)
+		if (uE.getRole().equals(UserRoleEntityEnum.manager))
 			return this.elementDao
 					.findAllByLocation_LatBetweenAndLocation_LngBetween(lat - distance, lat + distance, lng - distance,
 							lng + distance, PageRequest.of(page, size, Direction.ASC, "name"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 
-		if (uE.getRole() == UserRoleEntityEnum.player)
+		if (uE.getRole().equals(UserRoleEntityEnum.player))
 			return this.elementDao
 					.findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(lat - distance, lat + distance,
 							lng - distance, lng + distance, true, PageRequest.of(page, size, Direction.ASC, "name"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 
-		if (uE.getRole() == UserRoleEntityEnum.admin)
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
 
 		return new ArrayList<>();
@@ -366,15 +352,15 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
 						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
 
-		if (uE.getRole() == UserRoleEntityEnum.manager)
+		if (uE.getRole().equals(UserRoleEntityEnum.manager))
 			return this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "name")).stream()
 					.map(this.converter::fromEntity).collect(Collectors.toList());
 
-		if (uE.getRole() == UserRoleEntityEnum.player)
+		if (uE.getRole().equals(UserRoleEntityEnum.player))
 			return this.elementDao.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "name"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 
-		if (uE.getRole() == UserRoleEntityEnum.admin)
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Type");
 
 		return new ArrayList<>();

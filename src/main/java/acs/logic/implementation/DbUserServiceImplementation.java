@@ -116,9 +116,8 @@ public class DbUserServiceImplementation implements EnhancedUserService {
 				.orElseThrow(() -> new ObjectNotFoundException(
 						"could not find user by userDomain: " + adminDomain + " and userEmail: " + adminEmail));
 
-		if (uE.getRole() != UserRoleEntityEnum.admin) {
+		if (!uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only Admin can get all users!");
-		}
 
 		return this.userDao.findAll(PageRequest.of(page, size, Direction.DESC, "userId"))// Page<UserEntity>
 				.getContent()// List<UserEntity>
@@ -147,6 +146,14 @@ public class DbUserServiceImplementation implements EnhancedUserService {
 	@Transactional // (readOnly = false)
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
 		ServiceTools.stringValidation(adminDomain, adminEmail);
+
+		UserEntity uE = this.userDao.findById(new UserIdEntity(adminDomain, adminEmail))
+				.orElseThrow(() -> new ObjectNotFoundException(
+						"could not find user by userDomain: " + adminDomain + "and userEmail: " + adminEmail));
+
+		if (uE.getRole() != UserRoleEntityEnum.admin)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only Admin can delete all users");
+
 		this.userDao.deleteAll();
 
 	}
