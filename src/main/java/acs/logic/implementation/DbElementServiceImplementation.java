@@ -146,7 +146,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		// if user is MANAGER : findAll
 		if (existingUser.getRole().equals(UserRoleEntityEnum.manager))
-			return this.elementDao.findAll(PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+			return this.elementDao.findAll(PageRequest.of(page, size, Direction.DESC, "elementId")) // Page<ElementEntity>
 					.getContent() // List<ElementEntity>
 					.stream() // Stream<ElementEntity>
 					.map(this.converter::fromEntity) // Stream<ElementBoundary>
@@ -154,7 +154,8 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		// if user = PLAYER : findAllByActive
 		if (existingUser.getRole().equals(UserRoleEntityEnum.player))
-			return this.elementDao.findAllByActive(Boolean.TRUE, PageRequest.of(page, size, Direction.DESC, "name")) // Page<ElementEntity>
+			return this.elementDao
+					.findAllByActive(Boolean.TRUE, PageRequest.of(page, size, Direction.DESC, "elementId")) // Page<ElementEntity>
 					.stream() // Stream<ElementEntity>
 					.map(this.converter::fromEntity) // Stream<ElementBoundary>
 					.collect(Collectors.toList()); // List<ElementBoundary>
@@ -304,10 +305,10 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
 		if (uE.getRole().equals(UserRoleEntityEnum.player))
 			return this.elementDao
-					.findAllByNameAndActive(name, true, PageRequest.of(page, size, Direction.DESC, "name")).stream()
-					.map(this.converter::fromEntity).collect(Collectors.toList());
+					.findAllByNameAndActive(name, true, PageRequest.of(page, size, Direction.DESC, "elementId"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 		if (uE.getRole().equals(UserRoleEntityEnum.manager))
-			return this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.DESC, "name")).stream()
+			return this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.DESC, "elementId")).stream()
 					.map(this.converter::fromEntity).collect(Collectors.toList());
 		return new ArrayList<>();
 	}
@@ -328,13 +329,14 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		if (uE.getRole().equals(UserRoleEntityEnum.manager))
 			return this.elementDao
 					.findAllByLocation_LatBetweenAndLocation_LngBetween(lat - distance, lat + distance, lng - distance,
-							lng + distance, PageRequest.of(page, size, Direction.ASC, "name"))
+							lng + distance, PageRequest.of(page, size, Direction.ASC, "elementId"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 
 		if (uE.getRole().equals(UserRoleEntityEnum.player))
 			return this.elementDao
 					.findAllByLocation_LatBetweenAndLocation_LngBetweenAndActive(lat - distance, lat + distance,
-							lng - distance, lng + distance, true, PageRequest.of(page, size, Direction.ASC, "name"))
+							lng - distance, lng + distance, true,
+							PageRequest.of(page, size, Direction.ASC, "elementId"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 
 		if (uE.getRole().equals(UserRoleEntityEnum.admin))
@@ -353,11 +355,11 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
 
 		if (uE.getRole().equals(UserRoleEntityEnum.manager))
-			return this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "name")).stream()
+			return this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "elementId")).stream()
 					.map(this.converter::fromEntity).collect(Collectors.toList());
 
 		if (uE.getRole().equals(UserRoleEntityEnum.player))
-			return this.elementDao.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "name"))
+			return this.elementDao.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "elementId"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 
 		if (uE.getRole().equals(UserRoleEntityEnum.admin))

@@ -278,7 +278,8 @@ public class UserTests {
 
 		allUsersInDb.add(userAdmin);
 		// AND I delete all users
-		this.restTemplate.delete(this.url + "/admin/users/{adminDomain}/{adminEmail}", "??", "??");
+		this.restTemplate.delete(this.url + "/admin/users/" + userAdmin.getUserId().getDomain() + "/"
+				+ userAdmin.getUserId().getEmail());
 
 		UserBoundary userAdmin1 = this.restTemplate.postForObject(this.url + "/users",
 				new NewUserDetailsBoundary("sapir@gmail.com", UserRole.ADMIN, "sapir", "???"), UserBoundary.class);
