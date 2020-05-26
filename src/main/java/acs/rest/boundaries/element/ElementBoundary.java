@@ -41,14 +41,14 @@ public class ElementBoundary {
 	private Map<String, Object> elementAttributes;
 
 	public ElementBoundary(ElementIdBoundary elementId, String type, String name, Boolean active, Date timeStamp,
-			Location location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
+			Location location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createdBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
 		this.name = name;
 		this.active = active;
 		this.createdTimestamp = timeStamp;
-		this.createdBy = createBy;
+		this.createdBy = createdBy;
 		this.location = location;
 		this.elementAttributes = elemntAttributes;
 	}

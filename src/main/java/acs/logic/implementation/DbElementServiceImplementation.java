@@ -359,8 +359,9 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 					.map(this.converter::fromEntity).collect(Collectors.toList());
 
 		if (uE.getRole().equals(UserRoleEntityEnum.player))
-			return this.elementDao.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "elementId"))
-					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
+			return this.elementDao
+					.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "elementId")).stream()
+					.map(this.converter::fromEntity).collect(Collectors.toList());
 
 		if (uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Type");
