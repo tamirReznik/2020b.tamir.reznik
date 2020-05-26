@@ -66,7 +66,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (ue.getRole().name() != UserRoleEntityEnum.player.name())
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only player can invoke action");
 
-		ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElement());
+		ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElementId());
 
 		ElementEntity element = this.elementDao.findById(elementIdOfAction)
 				.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
@@ -105,7 +105,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public void deleteAllActions(String adminDomain, String adminEmail) {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
-		
+
 		this.actionDao.deleteAll();
 
 	}

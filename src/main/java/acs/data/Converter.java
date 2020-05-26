@@ -114,8 +114,8 @@ public class Converter {
 
 		String type = actionBoundary.getType() == null ? null : actionBoundary.getType();
 
-		ElementIdEntity idEntity = new ElementIdEntity(actionBoundary.getElement().getElement().getDomain(),
-				actionBoundary.getElement().getElement().getId());
+		ElementIdEntity idEntity = new ElementIdEntity(actionBoundary.getElement().getElementId().getDomain(),
+				actionBoundary.getElement().getElementId().getId());
 
 		return new ActionEntity(fromIdBoundary(actionBoundary.getActionId()), type, idEntity,
 				actionBoundary.getCreatedTimestamp(), toEntity(actionBoundary.getInvokedBy().getUserId()),

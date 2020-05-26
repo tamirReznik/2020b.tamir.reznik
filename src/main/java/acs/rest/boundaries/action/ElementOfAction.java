@@ -14,11 +14,13 @@ public class ElementOfAction {
 
 	}
 
-	public ElementIdBoundary getElement() {
+	public ElementIdBoundary getElementId() {
 		return elementId;
 	}
 
-	public void setElement(ElementIdBoundary element) {
-		this.elementId = element;
+	public void setElementId(ElementIdBoundary elementId) {
+		this.elementId = elementId;
 	}
+
+
 }
