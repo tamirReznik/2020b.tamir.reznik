@@ -5,6 +5,8 @@ import java.util.Map;
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -24,8 +26,8 @@ public class ActionEntity {
 	public ActionEntity() {
 	}
 
-	public ActionEntity(String actionId, String type, ElementIdEntity element, Date timestamp,
-			UserIdEntity invokedBy, Map<String, Object> actionAttributes) {
+	public ActionEntity(String actionId, String type, ElementIdEntity element, Date timestamp, UserIdEntity invokedBy,
+			Map<String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
 		this.type = type;
@@ -70,8 +72,8 @@ public class ActionEntity {
 		this.createdTimestamp = timestamp;
 	}
 
-	//@Convert(converter = acs.dal.MapToJsonConverter.class)
-	//@Lob
+	// @Convert(converter = acs.dal.MapToJsonConverter.class)
+	// @Lob
 	@Embedded
 	public UserIdEntity getInvokedBy() {
 		return invokedBy;

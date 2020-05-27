@@ -26,9 +26,11 @@ import acs.data.ElementIdEntity;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
 import acs.data.UserRoleEntityEnum;
+import acs.logic.ElementService;
 import acs.logic.EnhancedElementService;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
+import acs.logic.UserService;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
@@ -341,6 +343,40 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 		if (uE.getRole().equals(UserRoleEntityEnum.admin))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin User Can't Search Elements By Location");
+
+		return new ArrayList<>();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection<ElementBoundary> searchByLocationAndType(String userDomain, String userEmail, double lat,
+			double lng, double distance, String type, int size, int page) {
+
+		ServiceTools.validatePaging(size, page);
+
+		ServiceTools.stringValidation(userDomain, userEmail);
+
+		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
+
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"Admin User Can't Search Elements By Location And Type");
+
+		if (uE.getRole().equals(UserRoleEntityEnum.manager))
+			return this.elementDao
+					.findAllByLocation_LatBetweenAndLocation_LngBetweenAndType(lat - distance, lat + distance,
+							lng - distance, lng + distance, type,
+							PageRequest.of(page, size, Direction.ASC, "elementId"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
+
+		if (uE.getRole().equals(UserRoleEntityEnum.player))
+			return this.elementDao
+					.findAllByLocation_LatBetweenAndLocation_LngBetweenAndActiveAndType(lat - distance, lat + distance,
+							lng - distance, lng + distance, true, type,
+							PageRequest.of(page, size, Direction.ASC, "elementId"))
+					.stream().map(this.converter::fromEntity).collect(Collectors.toList());
 
 		return new ArrayList<>();
 	}

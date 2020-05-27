@@ -12,11 +12,11 @@ public class UserIdEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String domain;
 	private String email;
-	
+
 	public UserIdEntity() {
-		
+
 	}
-	
+
 	public UserIdEntity(String domain, String email) {
 		super();
 		this.domain = domain;
@@ -74,6 +74,5 @@ public class UserIdEntity implements Serializable {
 			return false;
 		return true;
 	}
-	
-	
+
 }

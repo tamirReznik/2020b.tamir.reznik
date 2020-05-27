@@ -2,6 +2,7 @@ package acs.logic.implementation;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,11 +24,18 @@ import acs.data.ElementIdEntity;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
 import acs.data.UserRoleEntityEnum;
+import acs.logic.ElementService;
 import acs.logic.EnhancedActionService;
+import acs.logic.EnhancedElementService;
+import acs.logic.EnhancedUserService;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
+import acs.logic.UserService;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
+import acs.rest.boundaries.element.ElementBoundary;
+import acs.rest.boundaries.element.ElementIdBoundary;
+import acs.rest.boundaries.user.UserBoundary;
 
 @Service
 public class DbActionServiceImplementation implements EnhancedActionService {
@@ -36,15 +44,18 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private Converter converter;
 	private ElementDao elementDao;
 	private UserDao userDao;
+	private EnhancedUserService userService;
+	private EnhancedElementService elementService;
 
 	@Autowired
 	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, UserDao userDao,
-			Converter converter) {
+			Converter converter, EnhancedUserService userService, EnhancedElementService elementService) {
 		this.converter = converter;
 		this.actionDao = actionDao;
 		this.elementDao = elementDao;
 		this.userDao = userDao;
-
+		this.userService = userService;
+		this.elementService = elementService;
 	}
 
 	// injection of project name from the spring boot configuration
@@ -76,12 +87,97 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (!element.getActive())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
+		if (action.getType().toLowerCase().equals("park"))
+			parkOrDepart(element, ue, true);
+		if (action.getType().toLowerCase().equals("depart"))
+			parkOrDepart(element, ue, false);
+		if (action.getType().toLowerCase().equals("search"))
+			return search(element, ue);
+
 		ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
 		action.setCreatedTimestamp(new Date());
 		action.setActionId(aib);
 		ActionEntity entity = converter.toEntity(action);
 		this.actionDao.save(entity);
 		return action;
+
+	}
+
+	public ElementBoundary[] search(ElementEntity car, UserEntity user) {
+
+		return elementService
+				.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
+						car.getLocation().getLat(), car.getLocation().getLng(), 1500, "parking", 36, 0)
+				.toArray(new ElementBoundary[0]);
+
+	}
+
+	public void parkOrDepart(ElementEntity car, UserEntity user, boolean depart) {
+
+		ElementBoundary parkingBoundary = null;
+		ElementBoundary postedParking = null;
+		double distanceFromCar = 2;
+
+//Searching for nearby parking to occupy 
+		ElementBoundary[] parkingNearBy = this.elementService
+				.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
+						car.getLocation().getLat(), car.getLocation().getLng(), distanceFromCar, "parking", 16, 0)
+				.toArray(new ElementBoundary[0]);
+
+//		create a manager so we can update and creates elements
+		user.setRole(UserRoleEntityEnum.manager);
+
+		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
+				user.getUserId().getEmail(), this.converter.fromEntity(user));
+
+//		update attribute - date of last report + element boundary of last
+		HashMap<String, Object> currentParkingAttributes = new HashMap<>();
+		currentParkingAttributes.put("LastCarReport",
+				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+		currentParkingAttributes.put("lastReportTimestamp", new Date());
+
+//		if we didn't found parking nearby -> create new one
+		if (parkingNearBy.length == 0) {
+
+			parkingBoundary = new ElementBoundary(new ElementIdBoundary(), "parking", car.getElementId().getId(),
+					depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreateBy());
+
+			postedParking = this.elementService.create(user.getUserId().getDomain(), user.getUserId().getEmail(),
+					parkingBoundary);
+//		If we found parking nearby - we update it 
+		} else {
+			double minDistance = 100, tempDistance;
+			for (ElementBoundary elementBoundary : parkingNearBy) {
+				tempDistance = ServiceTools.distance(car.getLocation().getLat(), car.getLocation().getLng(),
+						elementBoundary.getLocation().getLat(), elementBoundary.getLocation().getLng());
+				if (tempDistance < minDistance) {
+					minDistance = tempDistance;
+					parkingBoundary = elementBoundary;
+				}
+
+			}
+
+			if (parkingBoundary.getType().equals("parking_lot"))
+				parkingBoundary.getElementAttributes().put("occupancy",
+						(Integer) parkingBoundary.getElementAttributes().get("occupancy") + 1);
+
+			parkingBoundary.setActive(depart);
+			parkingBoundary.setElementAttributes(currentParkingAttributes);
+			this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
+					parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(),
+					parkingBoundary);
+
+		}
+
+//		Bind each car to single parking
+//		this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
+//				user.getUserId().getEmail(), postedParking.getElementId(),
+//				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+//
+		user.setRole(UserRoleEntityEnum.player);
+
+		userBoundary = this.userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(),
+				this.converter.fromEntity(user));
 
 	}
 

@@ -1,18 +1,17 @@
 package acs.data;
 
-
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name="USERS")
+@Table(name = "USERS")
 public class UserEntity {
-	
+
 	private UserIdEntity userId;
 	private UserRoleEntityEnum role;
 	private String username;
@@ -28,7 +27,6 @@ public class UserEntity {
 		this.username = username;
 		this.avatar = avatar;
 	}
-	
 
 	@EmbeddedId
 	public UserIdEntity getUserId() {
@@ -38,17 +36,14 @@ public class UserEntity {
 	public void setUserId(UserIdEntity userId) {
 		this.userId = userId;
 	}
-	
 
-	
 	public String getUsername() {
 		return username;
 	}
-	
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
 
 	@Enumerated(EnumType.STRING)
 	public UserRoleEntityEnum getRole() {
@@ -59,8 +54,6 @@ public class UserEntity {
 		this.role = role;
 	}
 
-
-
 	public String getAvatar() {
 		return avatar;
 	}
@@ -68,6 +61,5 @@ public class UserEntity {
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
-
 
 }

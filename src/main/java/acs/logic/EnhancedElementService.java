@@ -9,7 +9,7 @@ import acs.rest.boundaries.element.ElementIdBoundary;
 public interface EnhancedElementService extends ElementService {
 	//
 
-	public void bindExistingElementToAnExsitingChildElement(String managerDomain,String managerEmail,
+	public void bindExistingElementToAnExsitingChildElement(String managerDomain, String managerEmail,
 			ElementIdBoundary originId, ElementIdBoundary responseId);
 
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
@@ -25,6 +25,9 @@ public interface EnhancedElementService extends ElementService {
 
 	public Collection<ElementBoundary> searchByLocation(String userDomain, String userEmail, double lat, double lng,
 			double distance, int size, int page);
+
+	public Collection<ElementBoundary> searchByLocationAndType(String userDomain, String userEmail, double lat,
+			double lng, double distance, String type, int size, int page);
 
 	List<ElementBoundary> getElementsByType(String userDomain, String userEmail, String type, int size, int page);
 
