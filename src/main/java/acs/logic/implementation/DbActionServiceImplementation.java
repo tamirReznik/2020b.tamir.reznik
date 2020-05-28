@@ -144,7 +144,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (parkingBoundary == null)
 			parkingBoundary = createParking(car, depart, userBoundary);
 
-//		Bind each car to single parking
+//		Bind each car to parking or parking-lot
 
 		this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
 				userBoundary.getUserId().getEmail(), parkingBoundary.getElementId(),
@@ -203,6 +203,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		parkingBoundary.setActive(depart);
 		this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
 				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
+
 		return parkingBoundary;
 
 	}
