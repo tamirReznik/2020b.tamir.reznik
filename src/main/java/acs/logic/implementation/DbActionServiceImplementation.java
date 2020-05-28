@@ -90,9 +90,12 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			return parkOrDepart(element, ue, true);
 		if (action.getType().toLowerCase().equals("depart"))
 			return parkOrDepart(element, ue, false);
-		if (action.getType().toLowerCase().equals("search"))
-			return search(element, ue);
-
+		if (action.getType().toLowerCase().equals("search")) {
+			double distance = action.getActionAttributes().containsKey("distance")
+					? (double) action.getActionAttributes().get("distance")
+					: 1600;
+			return search(element, ue, distance);
+		}
 		ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
 		action.setCreatedTimestamp(new Date());
 		action.setActionId(aib);
@@ -102,11 +105,11 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-	public ElementBoundary[] search(ElementEntity car, UserEntity user) {
+	public ElementBoundary[] search(ElementEntity car, UserEntity user, double distance) {
 
 		return elementService
 				.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
-						car.getLocation().getLat(), car.getLocation().getLng(), 1500, "parking", 36, 0)
+						car.getLocation().getLat(), car.getLocation().getLng(), distance, "parking", 36, 0)
 				.toArray(new ElementBoundary[0]);
 
 	}
