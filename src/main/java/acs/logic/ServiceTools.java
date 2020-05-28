@@ -1,5 +1,8 @@
 package acs.logic;
 
+import acs.data.ElementEntity;
+import acs.rest.boundaries.element.ElementBoundary;
+
 public class ServiceTools {
 	private static final int EARTH_RADIUS = 6371; // Approx Earth radius in KM
 
@@ -36,4 +39,20 @@ public class ServiceTools {
 			throw new RuntimeException("page must not be negative");
 
 	}
+
+	static public ElementBoundary getClosest(ElementEntity car, ElementBoundary... parkingNearBy) {
+		double minDistance = 100, tempDistance;
+		ElementBoundary parkingBoundary = null;
+		for (ElementBoundary elementBoundary : parkingNearBy) {
+			tempDistance = distance(car.getLocation().getLat(), car.getLocation().getLng(),
+					elementBoundary.getLocation().getLat(), elementBoundary.getLocation().getLng());
+			if (tempDistance < minDistance) {
+				minDistance = tempDistance;
+				parkingBoundary = elementBoundary;
+			}
+
+		}
+		return parkingBoundary;
+	}
+
 }

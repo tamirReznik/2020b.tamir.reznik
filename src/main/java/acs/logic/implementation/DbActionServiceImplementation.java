@@ -24,13 +24,11 @@ import acs.data.ElementIdEntity;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
 import acs.data.UserRoleEntityEnum;
-import acs.logic.ElementService;
 import acs.logic.EnhancedActionService;
 import acs.logic.EnhancedElementService;
 import acs.logic.EnhancedUserService;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
-import acs.logic.UserService;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.element.ElementBoundary;
@@ -88,9 +86,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
 		if (action.getType().toLowerCase().equals("park"))
-			parkOrDepart(element, ue, true);
+			return parkOrDepart(element, ue, true);
 		if (action.getType().toLowerCase().equals("depart"))
-			parkOrDepart(element, ue, false);
+			return parkOrDepart(element, ue, false);
 		if (action.getType().toLowerCase().equals("search"))
 			return search(element, ue);
 
@@ -112,10 +110,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-	public void parkOrDepart(ElementEntity car, UserEntity user, boolean depart) {
+	public boolean parkOrDepart(ElementEntity car, UserEntity user, boolean depart) {
 
 		ElementBoundary parkingBoundary = null;
-		ElementBoundary postedParking = null;
 		double distanceFromCar = 2;
 
 //Searching for nearby parking to occupy 
@@ -124,60 +121,88 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 						car.getLocation().getLat(), car.getLocation().getLng(), distanceFromCar, "parking", 16, 0)
 				.toArray(new ElementBoundary[0]);
 
+		ElementBoundary[] parkingLotNearBy = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
+				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(),
+				distanceFromCar * 4, "parking_lot", 16, 0).toArray(new ElementBoundary[0]);
+
 //		create a manager so we can update and creates elements
 		user.setRole(UserRoleEntityEnum.manager);
 
 		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
 				user.getUserId().getEmail(), this.converter.fromEntity(user));
 
-//		update attribute - date of last report + element boundary of last
-		HashMap<String, Object> currentParkingAttributes = new HashMap<>();
-		currentParkingAttributes.put("LastCarReport",
-				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
-		currentParkingAttributes.put("lastReportTimestamp", new Date());
+		if (parkingLotNearBy.length > 0)
+			parkingBoundary = updateParkingLot(parkingBoundary, car, depart, userBoundary, parkingLotNearBy);
+
+		else if (parkingNearBy.length > 0)
+			parkingBoundary = updateParking(parkingBoundary, car, depart, userBoundary, parkingLotNearBy);
 
 //		if we didn't found parking nearby -> create new one
-		if (parkingNearBy.length == 0) {
-
-			parkingBoundary = new ElementBoundary(new ElementIdBoundary(), "parking", car.getElementId().getId(),
-					depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreateBy());
-
-			postedParking = this.elementService.create(user.getUserId().getDomain(), user.getUserId().getEmail(),
-					parkingBoundary);
-//		If we found parking nearby - we update it 
-		} else {
-			double minDistance = 100, tempDistance;
-			for (ElementBoundary elementBoundary : parkingNearBy) {
-				tempDistance = ServiceTools.distance(car.getLocation().getLat(), car.getLocation().getLng(),
-						elementBoundary.getLocation().getLat(), elementBoundary.getLocation().getLng());
-				if (tempDistance < minDistance) {
-					minDistance = tempDistance;
-					parkingBoundary = elementBoundary;
-				}
-
-			}
-
-			if (parkingBoundary.getType().equals("parking_lot"))
-				parkingBoundary.getElementAttributes().put("occupancy",
-						(Integer) parkingBoundary.getElementAttributes().get("occupancy") + 1);
-
-			parkingBoundary.setActive(depart);
-			parkingBoundary.setElementAttributes(currentParkingAttributes);
-			this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
-					parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(),
-					parkingBoundary);
-
-		}
+		if (parkingBoundary.equals(null))
+			parkingBoundary = createParking(car, depart, user);
 
 //		Bind each car to single parking
-//		this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
-//				user.getUserId().getEmail(), postedParking.getElementId(),
-//				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+		this.elementService.bindExistingElementToAnExsitingChildElement(user.getUserId().getDomain(),
+				user.getUserId().getEmail(),
+				new ElementIdBoundary(parkingBoundary.getElementId().getDomain(),
+						parkingBoundary.getElementId().getId()),
+				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
 //
 		user.setRole(UserRoleEntityEnum.player);
 
 		userBoundary = this.userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(),
 				this.converter.fromEntity(user));
+		return true;
+	}
+
+	public ElementBoundary updateParking(ElementBoundary parkingBoundary, ElementEntity car, boolean depart,
+			UserBoundary userBoundary, ElementBoundary... parkingNearBy) {
+
+		parkingBoundary = ServiceTools.getClosest(car, parkingNearBy);
+
+		parkingBoundary.getElementAttributes().put("LastCarReport",
+				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
+		parkingBoundary.setActive(depart);
+		this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
+				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
+		return parkingBoundary;
+	}
+
+	public ElementBoundary createParking(ElementEntity car, boolean depart, UserEntity user) {
+
+		HashMap<String, Object> currentParkingAttributes = new HashMap<>();
+		currentParkingAttributes.put("LastCarReport",
+				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+		currentParkingAttributes.put("lastReportTimestamp", new Date());
+
+		ElementBoundary parkingBoundary = new ElementBoundary(new ElementIdBoundary(), "parking",
+				car.getElementId().getId(), depart, new Date(), car.getLocation(), currentParkingAttributes,
+				car.getCreateBy());
+
+		return this.elementService.create(user.getUserId().getDomain(), user.getUserId().getEmail(), parkingBoundary);
+	}
+
+	public ElementBoundary updateParkingLot(ElementBoundary parkingBoundary, ElementEntity car, boolean depart,
+			UserBoundary userBoundary, ElementBoundary... parkingLotNearBy) {
+
+		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
+
+		List<ElementIdBoundary> carList = (List<ElementIdBoundary>) parkingBoundary.getElementAttributes()
+				.get("carList");
+
+		int capacitiy = (int) parkingBoundary.getElementAttributes().get("capacity");
+		int counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
+		if (counter + 1 > capacitiy)
+			return null;
+
+		carList.add(new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+		parkingBoundary.getElementAttributes().put("capacity", counter + 1);
+		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
+		parkingBoundary.setActive(depart);
+		this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
+				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
+		return parkingBoundary;
 
 	}
 
