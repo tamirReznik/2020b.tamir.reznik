@@ -18,6 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import acs.aop.MyLogger;
+import acs.aop.PerformanceMeasuring;
+import acs.aop.PerformenceUnits;
 import acs.dal.ElementDao;
 import acs.dal.UserDao;
 import acs.data.Converter;
@@ -26,14 +30,13 @@ import acs.data.ElementIdEntity;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
 import acs.data.UserRoleEntityEnum;
-import acs.logic.ElementService;
 import acs.logic.EnhancedElementService;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
-import acs.logic.UserService;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
+
 
 @Service
 public class DbElementServiceImplementation implements EnhancedElementService {
@@ -57,6 +60,8 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional
+	@MyLogger
+	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 
 		ServiceTools.stringValidation(managerDomain, managerEmail);
@@ -80,6 +85,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional
+	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 
@@ -119,6 +125,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail) {
 
 		ServiceTools.stringValidation(userDomain, userEmail);
@@ -136,6 +143,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail, int size, int page) {
 
 		ServiceTools.stringValidation(userDomain, userEmail);
@@ -170,6 +178,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain,
 			String elementId) {
 
@@ -194,6 +203,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional
+	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public void deleteAllElements(String adminDomain, String adminEmail) {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
@@ -210,6 +220,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional
+	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public void bindExistingElementToAnExsitingChildElement(String managerDomain, String managerEmail,
 			ElementIdBoundary originId, ElementIdBoundary responseId) {
 
@@ -236,6 +247,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring
 	public Set<ElementBoundary> getAllChildrenOfAnExsitingElement(String userDomain, String userEmail,
 			String elementDomain, String elementId, int size, int page) {
 
@@ -266,6 +278,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring
 	public Collection<ElementBoundary> getAnArrayWithElementParent(String userDomain, String userEmail,
 			String elementDomain, String elementId, int size, int page) {
 
@@ -296,6 +309,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring
 	public List<ElementBoundary> getElementsByName(String userDomain, String userEmail, String name, int size,
 			int page) {
 		ServiceTools.stringValidation(userDomain, userEmail, name);
@@ -317,6 +331,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring
 	public Collection<ElementBoundary> searchByLocation(String userDomain, String userEmail, double lat, double lng,
 			double distance, int size, int page) {
 
@@ -349,6 +364,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring
 	public Collection<ElementBoundary> searchByLocationAndType(String userDomain, String userEmail, double lat,
 			double lng, double distance, String type, int size, int page) {
 
@@ -383,6 +399,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@PerformanceMeasuring
 	public List<ElementBoundary> getElementsByType(String userDomain, String userEmail, String type, int size,
 			int page) {
 
