@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import acs.aop.MyLogger;
 import acs.aop.PerformanceMeasuring;
 import acs.aop.PerformenceUnits;
 import acs.dal.ElementDao;
@@ -59,6 +60,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 
 	@Override
 	@Transactional
+	@MyLogger
 	@PerformanceMeasuring(units = PerformenceUnits.ns)
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary elementDetails) {
 

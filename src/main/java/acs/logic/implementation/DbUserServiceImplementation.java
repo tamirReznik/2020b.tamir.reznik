@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import acs.aop.MyLogger;
+import acs.aop.PerformanceMeasuring;
 import acs.dal.UserDao;
 import acs.data.Converter;
 import acs.data.UserEntity;
@@ -44,6 +46,8 @@ public class DbUserServiceImplementation implements EnhancedUserService {
 
 	@Override
 	@Transactional // (readOnly = false)
+	@MyLogger
+	@PerformanceMeasuring
 	public UserBoundary createUser(UserBoundary user) {
 
 		// Email integrity check
