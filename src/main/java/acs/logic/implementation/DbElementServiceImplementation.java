@@ -37,7 +37,6 @@ import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.user.UserIdBoundary;
 
-
 @Service
 public class DbElementServiceImplementation implements EnhancedElementService {
 	private ElementDao elementDao;

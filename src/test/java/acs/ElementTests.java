@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -159,7 +158,6 @@ public class ElementTests {
 	public void test_Create_Two_Elements_Delete_All_Elements_And_Check_If_Delete_Succeeded() throws Exception {
 		ElementBoundary eb1 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "moshe", true,
 				new Date(), new Location(), null, null);
-
 
 		ElementBoundary eb2 = new ElementBoundary(new ElementIdBoundary(), TypeEnum.actionType.name(), "david", true,
 				new Date(), new Location(), null, null);
