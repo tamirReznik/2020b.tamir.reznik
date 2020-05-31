@@ -33,6 +33,7 @@ import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
+import acs.rest.boundaries.element.Location;
 import acs.rest.boundaries.user.UserBoundary;
 
 @Service
@@ -87,16 +88,16 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
 		if (action.getType().toLowerCase().equals("park"))
-			parkOrDepart(element, ue, true);
+			parkOrDepart(element, ue, true, action);
 
 		if (action.getType().toLowerCase().equals("depart"))
-			parkOrDepart(element, ue, false);
+			parkOrDepart(element, ue, false, action);
 
 		if (action.getType().toLowerCase().equals("search")) {
 			double distance = action.getActionAttributes().containsKey("distance")
 					? (double) action.getActionAttributes().get("distance")
 					: 1600;
-			ElementBoundary elementArr[] = search(element, ue, distance);
+			ElementBoundary elementArr[] = search(element, ue, distance, action);
 			saveAction(action);
 			return elementArr;
 		}
@@ -114,7 +115,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		this.actionDao.save(entity);
 	}
 
-	public ElementBoundary[] search(ElementEntity car, UserEntity user, double distance) {
+	public ElementBoundary[] search(ElementEntity car, UserEntity user, double distance, ActionBoundary action) {
+
+		updateCarLocation(car, action, user);
 
 		return elementService
 				.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
@@ -123,7 +126,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-	public boolean parkOrDepart(ElementEntity car, UserEntity user, boolean depart) {
+	public boolean parkOrDepart(ElementEntity car, UserEntity user, boolean depart, ActionBoundary action) {
 
 		ElementBoundary parkingBoundary = null;
 		double distanceFromCar = 2;
@@ -139,10 +142,18 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				distanceFromCar * 4, "parking_lot", 16, 0).toArray(new ElementBoundary[0]);
 
 //		create a manager so we can update and creates elements
-		user.setRole(UserRoleEntityEnum.manager);
+//		user.setRole(UserRoleEntityEnum.manager);
+//
+//		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
+//				user.getUserId().getEmail(), this.converter.fromEntity(user));
+//
+//		Location location = (Location) action.getActionAttributes().get("location");
+//
+//		car.setLocation(location);
+//		elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
+//				car.getElementId().getElementDomain(), car.getElementId().getId(), converter.fromEntity(car));
 
-		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
-				user.getUserId().getEmail(), this.converter.fromEntity(user));
+		UserBoundary userBoundary = updateCarLocation(car, action, user);
 
 		if (parkingLotNearBy.length > 0)
 			parkingBoundary = updateParkingLot(parkingBoundary, car, depart, userBoundary, parkingLotNearBy);
@@ -164,6 +175,21 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		userBoundary = this.userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(),
 				this.converter.fromEntity(user));
 		return true;
+	}
+
+	public UserBoundary updateCarLocation(ElementEntity car, ActionBoundary action, UserEntity user) {
+		user.setRole(UserRoleEntityEnum.manager);
+
+		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
+				user.getUserId().getEmail(), this.converter.fromEntity(user));
+
+		Location location = (Location) action.getActionAttributes().get("location");
+
+		car.setLocation(location);
+		elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
+				car.getElementId().getElementDomain(), car.getElementId().getId(), converter.fromEntity(car));
+
+		return userBoundary;
 	}
 
 	public ElementBoundary updateParking(ElementBoundary parkingBoundary, ElementEntity car, boolean depart,
