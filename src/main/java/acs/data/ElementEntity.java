@@ -1,6 +1,9 @@
 package acs.data;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,6 +56,8 @@ public class ElementEntity {
 		this.createdBy = createBy;
 		this.location = location;
 		this.elemntAttributes = elemntAttributes;
+		this.childrens = new HashSet<ElementEntity>();
+		this.parent = null;
 	}
 
 	@Embedded
@@ -146,6 +151,6 @@ public class ElementEntity {
 
 	public void addResponse(ElementEntity response) {
 		this.childrens.add(response);
-		response.setParent(this);
+//		response.setParent(this);
 	}
 }

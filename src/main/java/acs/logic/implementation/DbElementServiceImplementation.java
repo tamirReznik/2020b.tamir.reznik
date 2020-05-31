@@ -240,8 +240,12 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 					"both elemntes must be active when A user player bind them!\n");
 
+		response.setParent(origin);
 		origin.addResponse(response);
+
 		this.elementDao.save(origin);
+		this.elementDao.save(response);
+
 	}
 
 	@Override

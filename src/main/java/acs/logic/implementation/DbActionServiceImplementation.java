@@ -86,16 +86,12 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (!element.getActive())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
-		if (action.getType().toLowerCase().equals("park")) {
+		if (action.getType().toLowerCase().equals("park"))
 			parkOrDepart(element, ue, true);
-			saveAction(action);
 
-		}
-		if (action.getType().toLowerCase().equals("depart")) {
+		if (action.getType().toLowerCase().equals("depart"))
 			parkOrDepart(element, ue, false);
-			saveAction(action);
 
-		}
 		if (action.getType().toLowerCase().equals("search")) {
 			double distance = action.getActionAttributes().containsKey("distance")
 					? (double) action.getActionAttributes().get("distance")
@@ -104,11 +100,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			saveAction(action);
 			return elementArr;
 		}
-//		ActionIdBoundary aib = new ActionIdBoundary(projectName, UUID.randomUUID().toString());
-//		action.setCreatedTimestamp(new Date());
-//		action.setActionId(aib);
-//		ActionEntity entity = converter.toEntity(action);
-//		this.actionDao.save(entity);
+
+		saveAction(action);
 		return action;
 
 	}
@@ -162,9 +155,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 //		Bind each car to parking or parking-lot
 
-//		this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
-//				userBoundary.getUserId().getEmail(), parkingBoundary.getElementId(),
-//				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+		this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
+				userBoundary.getUserId().getEmail(), parkingBoundary.getElementId(),
+				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+
 		user.setRole(UserRoleEntityEnum.player);
 
 		userBoundary = this.userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(),
