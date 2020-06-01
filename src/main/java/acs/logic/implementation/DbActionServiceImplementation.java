@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.hamcrest.core.IsInstanceOf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -89,16 +91,16 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
 		if (action.getType().toLowerCase().equals("park"))
-			parkOrDepart(element, ue, true, action);
-
-		if (action.getType().toLowerCase().equals("depart"))
 			parkOrDepart(element, ue, false, action);
 
+		if (action.getType().toLowerCase().equals("depart"))
+			parkOrDepart(element, ue, true, action);
+
 		if (action.getType().toLowerCase().equals("search")) {
-			double distance = action.getActionAttributes().containsKey("distance")
-					? (double) action.getActionAttributes().get("distance")
-					: 1600;
-			ElementBoundary elementArr[] = search(element, ue, distance, action);
+//			double distance = action.getActionAttributes().containsKey("distance")
+//					? (double) action.getActionAttributes().get("distance")
+//					: 1600;
+			ElementBoundary elementArr[] = search(element, ue, 45.5, action);
 			saveAction(action);
 			return elementArr;
 		}
@@ -119,6 +121,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public ElementBoundary[] search(ElementEntity car, UserEntity user, double distance, ActionBoundary action) {
 
 		updateCarLocation(car, action, user);
+		user.setRole(UserRoleEntityEnum.player);
+
+		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
+				user.getUserId().getEmail(), this.converter.fromEntity(user));
 
 		return elementService.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
 				car.getLocation().getLat(), car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
@@ -183,8 +189,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				user.getUserId().getEmail(), this.converter.fromEntity(user));
 
 		Location location = (Location) action.getActionAttributes().get("location");
+		if (location instanceof Location) {
+			car.setLocation(location);
+		}
 
-		car.setLocation(location);
 		elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
 				car.getElementId().getElementDomain(), car.getElementId().getId(), converter.fromEntity(car));
 
