@@ -15,19 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import acs.dal.ActionDao;
-import acs.dal.ElementDao;
-import acs.dal.UserDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
-import acs.data.ElementEntity;
-import acs.data.ElementIdEntity;
-import acs.data.UserEntity;
-import acs.data.UserIdEntity;
-import acs.data.UserRoleEntityEnum;
+import acs.data.UserRole;
 import acs.logic.EnhancedActionService;
 import acs.logic.EnhancedElementService;
 import acs.logic.EnhancedUserService;
-import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
@@ -43,18 +36,16 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private Converter converter;
-	private ElementDao elementDao;
-	private UserDao userDao;
 	private EnhancedElementService elementService;
+	private EnhancedUserService userService;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, UserDao userDao,
-			Converter converter, EnhancedUserService userService, EnhancedElementService elementService) {
+	public DbActionServiceImplementation(ActionDao actionDao, Converter converter, EnhancedUserService userService,
+			EnhancedElementService elementService) {
 		this.converter = converter;
 		this.actionDao = actionDao;
-		this.elementDao = elementDao;
-		this.userDao = userDao;
 		this.elementService = elementService;
+		this.userService = userService;
 	}
 
 	// injection of project name from the spring boot configuration
@@ -70,39 +61,35 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (action == null || action.getType() == null)
 			throw new RuntimeException("ActionBoundary received in invokeAction method can't be null\n");
 
-		UserEntity ue = this.userDao.findById(this.converter.toEntity(action.getInvokedBy().getUserId()))
-				.orElseThrow(() -> new ObjectNotFoundException(
-						"could not find object by ElementDomain:" + action.getInvokedBy().getUserId().getDomain()
-								+ " or ElementId:" + action.getInvokedBy().getUserId().getEmail()));
+		UserBoundary userBoundary = this.userService.login(action.getInvokedBy().getUserId().getDomain(),
+				action.getInvokedBy().getUserId().getEmail());
 
-		if (!ue.getRole().equals(UserRoleEntityEnum.player))
+		if (!userBoundary.getRole().equals(UserRole.PLAYER))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only player can invoke action");
 
-		ElementIdEntity elementIdOfAction = this.converter.fromElementIdBoundary(action.getElement().getElementId());
-
-		ElementEntity element = this.elementDao.findById(elementIdOfAction)
-				.orElseThrow(() -> new ObjectNotFoundException("could not find object by ElementDomain:"
-						+ elementIdOfAction.getElementDomain() + " or ElementId:" + elementIdOfAction.getId()));
+		ElementBoundary element = this.elementService.getSpecificElement(action.getInvokedBy().getUserId().getDomain(),
+				action.getInvokedBy().getUserId().getEmail(), action.getElement().getElementId().getDomain(),
+				action.getElement().getElementId().getId());
 
 		if (!element.getActive())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
 		if (element.getType().equals(ElementType.car.name()))
-			updateCarLocation(action, ue, element);
+			updateCarLocation(action, userBoundary, element);
 
 		if (action.getType().toLowerCase().equals(ActionType.park.name())) {
-			ElementBoundary parkingElement = parkOrDepart(element, ue, false, action);
+			ElementBoundary parkingElement = parkOrDepart(element, userBoundary, false, action);
 			saveAction(action);
 			return parkingElement;
 		}
 		if (action.getType().toLowerCase().equals(ActionType.depart.name())) {
-			ElementBoundary parkingElement = parkOrDepart(element, ue, true, action);
+			ElementBoundary parkingElement = parkOrDepart(element, userBoundary, true, action);
 			saveAction(action);
 			return parkingElement;
 		}
 
 		if (action.getType().toLowerCase().equals(ActionType.search.name())) {
-			ElementBoundary elementArr[] = search(element, ue, 45.5, action);
+			ElementBoundary elementArr[] = search(element, userBoundary, 45.5, action);
 			saveAction(action);
 			return elementArr;
 		}
@@ -112,16 +99,15 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-	public void updateCarLocation(ActionBoundary action, UserEntity ue, ElementEntity element) {
+	public void updateCarLocation(ActionBoundary action, UserBoundary ue, ElementBoundary element) {
 		HashMap<String, Double> location = action.getActionAttributes().containsKey("location")
 				? (HashMap<String, Double>) action.getActionAttributes().get("location")
 				: new HashMap<>();
 		element.setLocation(new Location(location.get("lat"), location.get("lng")));
 
 		toManager(ue);
-		elementService.update(ue.getUserId().getDomain(), ue.getUserId().getEmail(),
-				element.getElementId().getElementDomain(), element.getElementId().getId(),
-				converter.fromEntity(element));
+		elementService.update(ue.getUserId().getDomain(), ue.getUserId().getEmail(), element.getElementId().getDomain(),
+				element.getElementId().getId(), element);
 		toPlayer(ue);
 	}
 
@@ -133,7 +119,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		this.actionDao.save(entity);
 	}
 
-	public ElementBoundary[] search(ElementEntity car, UserEntity user, double distance, ActionBoundary action) {
+	public ElementBoundary[] search(ElementBoundary car, UserBoundary user, double distance, ActionBoundary action) {
 
 		return elementService.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
 				car.getLocation().getLat(), car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
@@ -141,7 +127,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-	public ElementBoundary parkOrDepart(ElementEntity car, UserEntity user, boolean depart, ActionBoundary action) {
+	public ElementBoundary parkOrDepart(ElementBoundary car, UserBoundary user, boolean depart, ActionBoundary action) {
 
 		ElementBoundary parkingBoundary = null;
 		double distanceFromCar = 2;
@@ -170,33 +156,33 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
 				userBoundary.getUserId().getEmail(), parkingBoundary.getElementId(),
-				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+				new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 
 		toPlayer(user);
 
 		return parkingBoundary;
 	}
 
-	public UserBoundary toPlayer(UserEntity user) {
-		user.setRole(UserRoleEntityEnum.player);
-
-		return converter.fromEntity(this.userDao.save(user));
-
-	}
-
-	public UserBoundary toManager(UserEntity user) {
-		user.setRole(UserRoleEntityEnum.manager);
-
-		return converter.fromEntity(this.userDao.save(user));
+	public UserBoundary toPlayer(UserBoundary user) {
+		user.setRole(UserRole.PLAYER);
+		return userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(), user);
+//		return converter.fromEntity(this.userDao.save(user));
 
 	}
 
-	public ElementBoundary updateParking(ElementBoundary parkingBoundary, ElementEntity car, boolean depart,
+	public UserBoundary toManager(UserBoundary user) {
+		user.setRole(UserRole.MANAGER);
+
+		return userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(), user);
+
+	}
+
+	public ElementBoundary updateParking(ElementBoundary parkingBoundary, ElementBoundary car, boolean depart,
 			UserBoundary userBoundary, ElementBoundary... parkingNearby) {
 		parkingBoundary = ServiceTools.getClosest(car, parkingNearby);
 
 		parkingBoundary.getElementAttributes().put("LastCarReport",
-				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+				new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 
 		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
 		parkingBoundary.setActive(depart);
@@ -205,21 +191,21 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		return parkingBoundary;
 	}
 
-	public ElementBoundary createParking(ElementEntity car, boolean depart, UserBoundary userBoundary) {
+	public ElementBoundary createParking(ElementBoundary car, boolean depart, UserBoundary userBoundary) {
 
 		HashMap<String, Object> currentParkingAttributes = new HashMap<>();
 		currentParkingAttributes.put("LastCarReport",
-				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+				new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 		currentParkingAttributes.put("lastReportTimestamp", new Date());
 
 		ElementBoundary parkingBoundary = new ElementBoundary(new ElementIdBoundary("", ""), ElementType.parking.name(),
-				"parking_name", depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreateBy());
+				"parking_name", depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreatedBy());
 
 		return this.elementService.create(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
 				parkingBoundary);
 	}
 
-	public ElementBoundary updateParkingLot(ElementBoundary parkingBoundary, ElementEntity car, boolean depart,
+	public ElementBoundary updateParkingLot(ElementBoundary parkingBoundary, ElementBoundary car, boolean depart,
 			UserBoundary userBoundary, ElementBoundary... parkingLotNearBy) {
 
 		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
@@ -232,7 +218,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (counter + 1 > capacitiy)
 			return null;
 
-		carList.add(new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
+		carList.add(new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 		parkingBoundary.getElementAttributes().put("capacity", counter + 1);
 		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
 		parkingBoundary.setActive(depart);
@@ -265,11 +251,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
 
-		UserEntity uE = this.userDao.findById(new UserIdEntity(adminDomain, adminEmail))
-				.orElseThrow(() -> new ObjectNotFoundException(
-						"could not find user by userDomain: " + adminDomain + "and userEmail: " + adminEmail));
+		UserBoundary uE = this.userService.login(adminDomain, adminEmail);
 
-		if (!uE.getRole().equals(UserRoleEntityEnum.admin))
+		if (!uE.getRole().equals(UserRole.ADMIN))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only admin can delete all actions");
 
 		this.actionDao.deleteAll();
@@ -281,11 +265,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		ServiceTools.stringValidation(adminDomain, adminEmail);
 
-		UserEntity uE = this.userDao.findById(new UserIdEntity(adminDomain, adminEmail))
-				.orElseThrow(() -> new ObjectNotFoundException(
-						"could not find user by userDomain: " + adminDomain + "and userEmail: " + adminEmail));
+		UserBoundary uE = this.userService.login(adminDomain, adminEmail);
 
-		if (!uE.getRole().equals(UserRoleEntityEnum.admin))
+		if (!uE.getRole().equals(UserRole.ADMIN))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only admin can get all actions");
 
 		ServiceTools.validatePaging(size, page);
