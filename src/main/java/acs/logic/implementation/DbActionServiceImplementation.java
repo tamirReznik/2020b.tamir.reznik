@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.hamcrest.core.IsInstanceOf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +31,7 @@ import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
+import acs.rest.boundaries.action.ActionType;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.element.ElementType;
@@ -46,7 +45,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private Converter converter;
 	private ElementDao elementDao;
 	private UserDao userDao;
-	private EnhancedUserService userService;
 	private EnhancedElementService elementService;
 
 	@Autowired
@@ -56,7 +54,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		this.actionDao = actionDao;
 		this.elementDao = elementDao;
 		this.userDao = userDao;
-		this.userService = userService;
 		this.elementService = elementService;
 	}
 
@@ -90,16 +87,21 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (!element.getActive())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
-		if (action.getType().toLowerCase().equals("park"))
-			parkOrDepart(element, ue, false, action);
+		if (element.getType().equals(ElementType.car.name()))
+			updateCarLocation(action, ue, element);
 
-		if (action.getType().toLowerCase().equals("depart"))
-			parkOrDepart(element, ue, true, action);
+		if (action.getType().toLowerCase().equals(ActionType.park.name())) {
+			ElementBoundary parkingElement = parkOrDepart(element, ue, false, action);
+			saveAction(action);
+			return parkingElement;
+		}
+		if (action.getType().toLowerCase().equals(ActionType.depart.name())) {
+			ElementBoundary parkingElement = parkOrDepart(element, ue, true, action);
+			saveAction(action);
+			return parkingElement;
+		}
 
-		if (action.getType().toLowerCase().equals("search")) {
-//			double distance = action.getActionAttributes().containsKey("distance")
-//					? (double) action.getActionAttributes().get("distance")
-//					: 1600;
+		if (action.getType().toLowerCase().equals(ActionType.search.name())) {
 			ElementBoundary elementArr[] = search(element, ue, 45.5, action);
 			saveAction(action);
 			return elementArr;
@@ -108,6 +110,19 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		saveAction(action);
 		return action;
 
+	}
+
+	public void updateCarLocation(ActionBoundary action, UserEntity ue, ElementEntity element) {
+		HashMap<String, Double> location = action.getActionAttributes().containsKey("location")
+				? (HashMap<String, Double>) action.getActionAttributes().get("location")
+				: new HashMap<>();
+		element.setLocation(new Location(location.get("lat"), location.get("lng")));
+
+		toManager(ue);
+		elementService.update(ue.getUserId().getDomain(), ue.getUserId().getEmail(),
+				element.getElementId().getElementDomain(), element.getElementId().getId(),
+				converter.fromEntity(element));
+		toPlayer(ue);
 	}
 
 	public void saveAction(ActionBoundary action) {
@@ -120,19 +135,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	public ElementBoundary[] search(ElementEntity car, UserEntity user, double distance, ActionBoundary action) {
 
-		updateCarLocation(car, action, user);
-		user.setRole(UserRoleEntityEnum.player);
-
-		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
-				user.getUserId().getEmail(), this.converter.fromEntity(user));
-
 		return elementService.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
 				car.getLocation().getLat(), car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
 				.toArray(new ElementBoundary[0]);
 
 	}
 
-	public boolean parkOrDepart(ElementEntity car, UserEntity user, boolean depart, ActionBoundary action) {
+	public ElementBoundary parkOrDepart(ElementEntity car, UserEntity user, boolean depart, ActionBoundary action) {
 
 		ElementBoundary parkingBoundary = null;
 		double distanceFromCar = 2;
@@ -146,19 +155,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(),
 				distanceFromCar * 4, ElementType.parking_lot.name(), 16, 0).toArray(new ElementBoundary[0]);
 
-//		create a manager so we can update and creates elements
-//		user.setRole(UserRoleEntityEnum.manager);
-//
-//		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
-//				user.getUserId().getEmail(), this.converter.fromEntity(user));
-//
-//		Location location = (Location) action.getActionAttributes().get("location");
-//
-//		car.setLocation(location);
-//		elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
-//				car.getElementId().getElementDomain(), car.getElementId().getId(), converter.fromEntity(car));
-
-		UserBoundary userBoundary = updateCarLocation(car, action, user);
+		UserBoundary userBoundary = toManager(user);
 
 		if (parkingLotNearBy.length > 0)
 			parkingBoundary = updateParkingLot(parkingBoundary, car, depart, userBoundary, parkingLotNearBy);
@@ -175,28 +172,23 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				userBoundary.getUserId().getEmail(), parkingBoundary.getElementId(),
 				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
 
-		user.setRole(UserRoleEntityEnum.player);
+		toPlayer(user);
 
-		userBoundary = this.userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(),
-				this.converter.fromEntity(user));
-		return true;
+		return parkingBoundary;
 	}
 
-	public UserBoundary updateCarLocation(ElementEntity car, ActionBoundary action, UserEntity user) {
+	public UserBoundary toPlayer(UserEntity user) {
+		user.setRole(UserRoleEntityEnum.player);
+
+		return converter.fromEntity(this.userDao.save(user));
+
+	}
+
+	public UserBoundary toManager(UserEntity user) {
 		user.setRole(UserRoleEntityEnum.manager);
 
-		UserBoundary userBoundary = this.userService.updateUser(user.getUserId().getDomain(),
-				user.getUserId().getEmail(), this.converter.fromEntity(user));
+		return converter.fromEntity(this.userDao.save(user));
 
-		Location location = (Location) action.getActionAttributes().get("location");
-		if (location instanceof Location) {
-			car.setLocation(location);
-		}
-
-		elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
-				car.getElementId().getElementDomain(), car.getElementId().getId(), converter.fromEntity(car));
-
-		return userBoundary;
 	}
 
 	public ElementBoundary updateParking(ElementBoundary parkingBoundary, ElementEntity car, boolean depart,
