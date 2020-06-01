@@ -33,6 +33,7 @@ import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
+import acs.rest.boundaries.element.ElementType;
 import acs.rest.boundaries.element.Location;
 import acs.rest.boundaries.user.UserBoundary;
 
@@ -119,9 +120,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		updateCarLocation(car, action, user);
 
-		return elementService
-				.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
-						car.getLocation().getLat(), car.getLocation().getLng(), distance, "parking", 36, 0)
+		return elementService.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
+				car.getLocation().getLat(), car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
 				.toArray(new ElementBoundary[0]);
 
 	}
@@ -132,14 +132,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		double distanceFromCar = 2;
 
 //Searching for nearby parking to occupy 
-		ElementBoundary[] parkingNearby = this.elementService
-				.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
-						car.getLocation().getLat(), car.getLocation().getLng(), distanceFromCar, "parking", 16, 0)
-				.toArray(new ElementBoundary[0]);
+		ElementBoundary[] parkingNearby = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
+				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(), distanceFromCar,
+				ElementType.parking.name(), 16, 0).toArray(new ElementBoundary[0]);
 
 		ElementBoundary[] parkingLotNearBy = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
 				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(),
-				distanceFromCar * 4, "parking_lot", 16, 0).toArray(new ElementBoundary[0]);
+				distanceFromCar * 4, ElementType.parking_lot.name(), 16, 0).toArray(new ElementBoundary[0]);
 
 //		create a manager so we can update and creates elements
 //		user.setRole(UserRoleEntityEnum.manager);
@@ -213,8 +212,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				new ElementIdBoundary(car.getElementId().getElementDomain(), car.getElementId().getId()));
 		currentParkingAttributes.put("lastReportTimestamp", new Date());
 
-		ElementBoundary parkingBoundary = new ElementBoundary(new ElementIdBoundary("", ""), "parking", "parking_name",
-				depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreateBy());
+		ElementBoundary parkingBoundary = new ElementBoundary(new ElementIdBoundary("", ""), ElementType.parking.name(),
+				"parking_name", depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreateBy());
 
 		return this.elementService.create(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
 				parkingBoundary);
