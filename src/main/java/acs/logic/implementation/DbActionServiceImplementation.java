@@ -89,7 +89,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		}
 
 		if (action.getType().toLowerCase().equals(ActionType.search.name())) {
-			ElementBoundary elementArr[] = search(element, userBoundary, 45.5, action);
+			ElementBoundary elementArr[] = search(element, userBoundary, 5, action);
 			saveAction(action);
 			return elementArr;
 		}
@@ -103,7 +103,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		HashMap<String, Double> location = action.getActionAttributes().containsKey("location")
 				? (HashMap<String, Double>) action.getActionAttributes().get("location")
 				: new HashMap<>();
-		element.setLocation(new Location(location.get("lat"), location.get("lng")));
+
+		if (!location.isEmpty())
+			element.setLocation(new Location(location.get("lat"), location.get("lng")));
 
 		toManager(ue);
 		elementService.update(ue.getUserId().getDomain(), ue.getUserId().getEmail(), element.getElementId().getDomain(),
@@ -131,6 +133,27 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		ElementBoundary parkingBoundary = null;
 		double distanceFromCar = 2;
+
+		toManager(user);
+		ElementBoundary[] parking = elementService
+				.getAnArrayWithElementParent(user.getUserId().getDomain(), user.getUserId().getEmail(),
+						car.getElementId().getDomain(), car.getElementId().getId(), 1, 0)
+				.toArray(new ElementBoundary[0]);
+
+//		check if user already parking - not allowed 
+		if (parking.length > 0 && depart == false)
+			if (!parking[0].getActive())
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+						"You cannot park when you are already parked ;<");
+
+//		check if user need to depart specific parking
+		if (parking.length > 0 && depart == true)
+			if (!parking[0].getActive()) {
+
+				parkingBoundary = updateParking(parkingBoundary, car, depart, user, parking[0]);
+				toPlayer(user);
+				return parkingBoundary;
+			}
 
 //Searching for nearby parking to occupy 
 		ElementBoundary[] parkingNearby = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),

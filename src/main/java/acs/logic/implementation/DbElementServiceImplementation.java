@@ -292,7 +292,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
 
 		if (!uE.getRole().equals(UserRoleEntityEnum.manager))
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can do that");
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can get all parents ");
 
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find response by id:" + elementId));
