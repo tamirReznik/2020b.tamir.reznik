@@ -40,7 +40,7 @@ public class ServiceTools {
 
 	}
 
-	static public ElementBoundary getClosest(ElementEntity car, ElementBoundary... parkingNearBy) {
+	static public ElementBoundary getClosest(ElementBoundary car, ElementBoundary... parkingNearBy) {
 		double minDistance = 100, tempDistance;
 		ElementBoundary parkingBoundary = null;
 		for (ElementBoundary elementBoundary : parkingNearBy) {
