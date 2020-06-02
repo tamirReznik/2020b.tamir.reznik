@@ -1,11 +1,15 @@
 package acs.logic.implementation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -123,10 +127,25 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	public ElementBoundary[] search(ElementBoundary car, UserBoundary user, double distance, ActionBoundary action) {
 
-		return elementService.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
-				car.getLocation().getLat(), car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
-				.toArray(new ElementBoundary[0]);
+//		ElementBoundary[] parkings = elementService.searchByLocationAndType(user.getUserId().getDomain(),
+//				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(), distance,
+//				ElementType.parking.name(), 36, 0).toArray(new ElementBoundary[0]);
 
+//		return  elementService.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
+//				car.getLocation().getLat(), car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
+//				.toArray(new ElementBoundary[0]);
+
+		return Stream
+				.concat(Arrays.stream(elementService.searchByLocationAndType(user.getUserId().getDomain(),
+						user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(), distance,
+						ElementType.parking.name(), 36, 0).toArray(new ElementBoundary[0])),
+						Arrays.stream(
+								elementService
+										.searchByLocationAndType(user.getUserId().getDomain(),
+												user.getUserId().getEmail(), car.getLocation().getLat(),
+												car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
+										.toArray(new ElementBoundary[0])))
+				.toArray(ElementBoundary[]::new);
 	}
 
 	public ElementBoundary parkOrDepart(ElementBoundary car, UserBoundary user, boolean depart, ActionBoundary action) {
