@@ -30,6 +30,8 @@ import acs.rest.boundaries.user.UserIdBoundary;
     }
 }
  */
+
+//Types : Parking , parking_lot , 
 public class ElementBoundary {
 	private ElementIdBoundary elementId;
 	private String type;

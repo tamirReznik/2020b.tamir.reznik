@@ -11,7 +11,7 @@ import java.util.Map;
     },
     "type": "actionType",
     "element": {
-        "element": {
+        "elementId": {
             "domain": "tamir",
             "id": null
         }
