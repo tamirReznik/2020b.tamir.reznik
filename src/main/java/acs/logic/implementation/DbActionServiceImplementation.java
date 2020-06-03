@@ -139,12 +139,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				.concat(Arrays.stream(elementService.searchByLocationAndType(user.getUserId().getDomain(),
 						user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(), distance,
 						ElementType.parking.name(), 36, 0).toArray(new ElementBoundary[0])),
-						Arrays.stream(
-								elementService
-										.searchByLocationAndType(user.getUserId().getDomain(),
-												user.getUserId().getEmail(), car.getLocation().getLat(),
-												car.getLocation().getLng(), distance, ElementType.parking_lot.name(), 36, 0)
-										.toArray(new ElementBoundary[0])))
+						Arrays.stream(elementService.searchByLocationAndType(user.getUserId().getDomain(),
+								user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(),
+								distance, ElementType.parking_lot.name(), 36, 0).toArray(new ElementBoundary[0])))
 				.toArray(ElementBoundary[]::new);
 	}
 
