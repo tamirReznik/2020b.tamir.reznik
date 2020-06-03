@@ -183,7 +183,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		UserBoundary userBoundary = toManager(user);
 
 		if (parkingLotNearBy.length > 0)
-			parkingBoundary = updateParkingLot(parkingBoundary, car, depart, userBoundary, parkingLotNearBy);
+			parkingBoundary = updateParkingLot(parkingBoundary, car, userBoundary, parkingLotNearBy);
 		else if (parkingNearby.length > 0)
 			parkingBoundary = updateParking(parkingBoundary, car, depart, userBoundary, parkingNearby);
 
@@ -244,7 +244,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				parkingBoundary);
 	}
 
-	public ElementBoundary updateParkingLot(ElementBoundary parkingBoundary, ElementBoundary car, boolean depart,
+	public ElementBoundary updateParkingLot(ElementBoundary parkingBoundary, ElementBoundary car,
 			UserBoundary userBoundary, ElementBoundary... parkingLotNearBy) {
 
 		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
@@ -257,22 +257,32 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		} else
 			carList = new ArrayList<>();
 
-		if (!parkingBoundary.getElementAttributes().containsKey("capacity")) {
+//		project require parking lots to have capacity
+		if (!parkingBoundary.getElementAttributes().containsKey("capacity"))
 			parkingBoundary.getElementAttributes().put("capacity", 80);
-		}
-		parkingBoundary.getElementAttributes().put("capacity", 1);
 
-		if (parkingBoundary.getElementAttributes().containsKey("carCounter")) {
+		if (parkingBoundary.getElementAttributes().containsKey("carCounter"))
 			counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
-			parkingBoundary.getElementAttributes().put("carCounter", counter + 1);
-		} else
+
+		else
 			parkingBoundary.getElementAttributes().put("carCounter", 1);
 
 		carList.add(new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
+
 		parkingBoundary.getElementAttributes().put("carList", carList);
-		parkingBoundary.getElementAttributes().put("capacity", counter + 1);
+
+		if ((int) parkingBoundary.getElementAttributes().get("carCounter")
+				+ 1 > (int) parkingBoundary.getElementAttributes().get("capacity"))
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "this parking lot is full");
+
+//		parking lot is full - not active
+		if ((int) parkingBoundary.getElementAttributes().get("carCounter")
+				+ 2 > (int) parkingBoundary.getElementAttributes().get("capacity"))
+			parkingBoundary.setActive(false);
+
+		parkingBoundary.getElementAttributes().put("carCounter", counter + 1);
+
 		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
-		parkingBoundary.setActive(depart);
 		this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
 				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
 
