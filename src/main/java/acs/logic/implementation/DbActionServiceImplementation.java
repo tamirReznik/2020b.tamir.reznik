@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.yaml.snakeyaml.util.ArrayUtils;
+
 import acs.dal.ActionDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
@@ -166,7 +168,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (parking.length > 0 && depart == true)
 			if (!parking[0].getActive()) {
 
-				parkingBoundary = updateParking(parkingBoundary, car, depart, user, parking[0]);
+				if (parking[0].getType().equals(ElementType.parking.name()))
+					parkingBoundary = updateParking(parkingBoundary, car, depart, user, parking[0]);
+
 				toPlayer(user);
 				return parkingBoundary;
 			}
@@ -183,7 +187,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		UserBoundary userBoundary = toManager(user);
 
 		if (parkingLotNearBy.length > 0)
-			parkingBoundary = updateParkingLot(parkingBoundary, car, userBoundary, parkingLotNearBy);
+			parkingBoundary = updateParkingLot(depart, parkingBoundary, car, userBoundary, parkingLotNearBy);
 		else if (parkingNearby.length > 0)
 			parkingBoundary = updateParking(parkingBoundary, car, depart, userBoundary, parkingNearby);
 
@@ -244,7 +248,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				parkingBoundary);
 	}
 
-	public ElementBoundary updateParkingLot(ElementBoundary parkingBoundary, ElementBoundary car,
+	public ElementBoundary updateParkingLot(Boolean depart, ElementBoundary parkingBoundary, ElementBoundary car,
 			UserBoundary userBoundary, ElementBoundary... parkingLotNearBy) {
 
 		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
@@ -263,10 +267,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		if (parkingBoundary.getElementAttributes().containsKey("carCounter"))
 			counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
 
-		else
+		else if (depart) {
+			parkingBoundary.getElementAttributes().put("carCounter", 0);
+			carList = new ElementIdBoundary[0];
+		} else {
 			parkingBoundary.getElementAttributes().put("carCounter", 1);
-
-		carList[counter] = new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId());
+			carList[counter] = new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId());
+		}
 
 		parkingBoundary.getElementAttributes().put("carList", carList);
 
