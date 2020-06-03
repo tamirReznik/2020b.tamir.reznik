@@ -271,11 +271,27 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 							PageRequest.of(page, size, Direction.DESC, "elementId"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toSet());
 		if (uE.getRole().equals(UserRoleEntityEnum.player))
-			return this.elementDao
-					.findAllByParent_ElementId_IdAndParent_ElementId_ElementDomainAndActive(elementId, elementDomain,
-							true, PageRequest.of(page, size, Direction.DESC, "elementId"))
+		{
+			//getting the parent
+			ElementEntity parent = this.elementDao.findById(new ElementIdEntity(elementDomain,elementId))
+					.orElseThrow(() -> new ObjectNotFoundException(
+							"could not find user by elementDomain: " + elementDomain + "and elementId: " + elementId));
+			//check if the parent is active
+			if(!parent.getActive())
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "for player, the parent must be active \n");
+			//getting all children
+			Set<ElementBoundary> children = this.elementDao
+					.findAllByParent_ElementId_IdAndParent_ElementId_ElementDomain(elementId, elementDomain,
+							PageRequest.of(page, size, Direction.DESC, "elementId"))
 					.stream().map(this.converter::fromEntity).collect(Collectors.toSet());
-
+			//check if all children are active
+			
+			for (ElementBoundary elementBoundary : children) {
+				if(!elementBoundary.getActive())
+					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "for player, all children must be active\n");
+			}
+			return children;
+		}
 		return new HashSet<ElementBoundary>();
 	}
 
@@ -290,15 +306,24 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 		UserEntity uE = this.userDao.findById(new UserIdEntity(userDomain, userEmail))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
 						"could not find user by userDomain: " + userDomain + " and userEmail: " + userEmail));
+		
+		if (uE.getRole().equals(UserRoleEntityEnum.admin))
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin can't get all element children \n");
 
-		if (!uE.getRole().equals(UserRoleEntityEnum.manager))
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can get all parents ");
+		//this is not needed, manager can 
+		/*if (!uE.getRole().equals(UserRoleEntityEnum.manager))
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only manager can get all parents ");*/
 
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
 				.orElseThrow(() -> new ObjectNotFoundException("could not find response by id:" + elementId));
 
 		ElementEntity origin = child.getParent();
 
+		if(uE.getRole().equals(UserRoleEntityEnum.player)) {
+			if(!child.getActive()||!origin.getActive())
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "for player, both parent and child must be active\n");
+		}
+		
 		Collection<ElementBoundary> rv = new HashSet<>();
 		if (page > 1)
 			return rv;
