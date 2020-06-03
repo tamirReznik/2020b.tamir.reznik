@@ -252,9 +252,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		ElementIdBoundary[] carList = null;
 		int counter = 0;
 
-		if (parkingBoundary.getElementAttributes().containsKey("carList"))
-			carList = (ElementIdBoundary[]) parkingBoundary.getElementAttributes().get("carList");
-		else
+		if (!parkingBoundary.getElementAttributes().isEmpty()) {
+			if (parkingBoundary.getElementAttributes().containsKey("carList"))
+				carList = (ElementIdBoundary[]) parkingBoundary.getElementAttributes().get("carList");
+		} else
 			carList = new ElementIdBoundary[80];
 
 //		project require parking lots to have capacity
