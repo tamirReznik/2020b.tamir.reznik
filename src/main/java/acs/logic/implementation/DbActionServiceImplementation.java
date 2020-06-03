@@ -151,7 +151,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public ElementBoundary parkOrDepart(ElementBoundary car, UserBoundary user, boolean depart, ActionBoundary action) {
 
 		ElementBoundary parkingBoundary = null;
-		double distanceFromCar = 2;
+		double distanceFromCar = 0.0002;
 
 		toManager(user);
 		ElementBoundary[] parking = elementService
@@ -177,11 +177,11 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 //Searching for nearby parking to occupy 
 		ElementBoundary[] parkingNearby = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
 				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(), distanceFromCar,
-				ElementType.parking.name(), 16, 0).toArray(new ElementBoundary[0]);
+				ElementType.parking.name(), 20, 0).toArray(new ElementBoundary[0]);
 
 		ElementBoundary[] parkingLotNearBy = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
 				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(),
-				distanceFromCar * 4, ElementType.parking_lot.name(), 16, 0).toArray(new ElementBoundary[0]);
+				distanceFromCar * 4, ElementType.parking_lot.name(), 20, 0).toArray(new ElementBoundary[0]);
 
 		UserBoundary userBoundary = toManager(user);
 
@@ -252,15 +252,27 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
 
-		List<ElementIdBoundary> carList = (List<ElementIdBoundary>) parkingBoundary.getElementAttributes()
-				.get("carList");
+		List<ElementIdBoundary> carList = null;
+		int counter = 0;
 
-		int capacitiy = (int) parkingBoundary.getElementAttributes().get("capacity");
-		int counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
-		if (counter + 1 > capacitiy)
-			return null;
+		if (parkingBoundary.getElementAttributes().containsKey("carList")) {
+			carList = (ArrayList<ElementIdBoundary>) parkingBoundary.getElementAttributes().get("carList");
+		} else
+			carList = new ArrayList<>();
+
+		if (!parkingBoundary.getElementAttributes().containsKey("capacity")) {
+			parkingBoundary.getElementAttributes().put("capacity", 80);
+		}
+		parkingBoundary.getElementAttributes().put("capacity", 1);
+
+		if (parkingBoundary.getElementAttributes().containsKey("carCounter")) {
+			counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
+			parkingBoundary.getElementAttributes().put("carCounter", counter + 1);
+		} else
+			parkingBoundary.getElementAttributes().put("carCounter", 1);
 
 		carList.add(new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
+		parkingBoundary.getElementAttributes().put("carList", carList);
 		parkingBoundary.getElementAttributes().put("capacity", counter + 1);
 		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
 		parkingBoundary.setActive(depart);
