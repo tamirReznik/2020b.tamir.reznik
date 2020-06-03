@@ -19,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import acs.data.TypeEnum;
 import acs.data.UserRole;
+import acs.data.UserRoleEntityEnum;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.element.Location;
@@ -246,6 +247,13 @@ public class ElementTests {
 				postedChild2Element.getElementId(), postedUB.getUserId().getDomain(), postedUB.getUserId().getEmail(),
 				postedParentElement.getElementId().getDomain(), postedParentElement.getElementId().getId());
 
+		/*
+		NOTE: for player -> the parent and all of the children must be active!
+		*/
+		/*postedUB.setRole(UserRole.ADMIN);
+		this.restTemplate.put(this.url + "/users/{userDomain}/{userEmail}", postedUB, postedUB.getUserId().getDomain(),
+				postedUB.getUserId().getEmail());*/
+		
 		// AND get all children
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
@@ -281,6 +289,7 @@ public class ElementTests {
 				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
 				element, ElementBoundary.class);
 
+		
 		// get all children of the element
 		ElementBoundary[] allChilds = this.restTemplate.getForObject(
 				this.url + "/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
@@ -305,6 +314,7 @@ public class ElementTests {
 				this.url + "/elements/" + postedUB.getUserId().getDomain() + "/" + postedUB.getUserId().getEmail(),
 				element, ElementBoundary.class);
 
+		
 		// get all parents of the element
 		ElementBoundary[] allParents = this.restTemplate.getForObject(
 				this.url + "/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents",
