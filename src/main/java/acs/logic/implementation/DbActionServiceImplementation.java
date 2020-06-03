@@ -249,7 +249,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
 
-		ElementIdBoundary[] carList = new ElementIdBoundary[80];
+		ElementIdBoundary[] carList = new ElementIdBoundary[1];
 		int counter = 0;
 
 		if (!parkingBoundary.getElementAttributes().isEmpty())
@@ -258,7 +258,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 //		project require parking lots to have capacity
 		if (!parkingBoundary.getElementAttributes().containsKey("capacity"))
-			parkingBoundary.getElementAttributes().put("capacity", 80);
+			parkingBoundary.getElementAttributes().put("capacity", 1);
 
 		if (parkingBoundary.getElementAttributes().containsKey("carCounter"))
 			counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
@@ -266,7 +266,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		else
 			parkingBoundary.getElementAttributes().put("carCounter", 1);
 
-		carList[counter + 1] = new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId());
+		carList[counter] = new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId());
 
 		parkingBoundary.getElementAttributes().put("carList", carList);
 
