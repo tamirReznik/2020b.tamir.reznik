@@ -249,7 +249,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
 
-		List<ElementIdBoundary> carList = null;
+		ArrayList<ElementIdBoundary> carList = null;
 		int counter = 0;
 
 		if (parkingBoundary.getElementAttributes().containsKey("carList")) {
