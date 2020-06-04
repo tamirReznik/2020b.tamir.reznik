@@ -1,27 +1,20 @@
 package acs.data;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.persistence.Convert;
-import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
 import acs.dal.MapToJsonConverter;
 import acs.rest.boundaries.element.Location;
 import acs.rest.boundaries.user.UserIdBoundary;
@@ -37,7 +30,7 @@ public class ElementEntity {
 	private Date createdTimestamp;
 	private Map<String, UserIdBoundary> createdBy;
 	private Location location;
-	private Map<String, Object> elemntAttributes;
+	private Map<String, Object> elementAttributes;
 	private Set<ElementEntity> childrens;
 	private ElementEntity parent;
 
@@ -46,7 +39,7 @@ public class ElementEntity {
 	}
 
 	public ElementEntity(ElementIdEntity elementId, String type, String name, Boolean active, Date timeStamp,
-			Location location, Map<String, Object> elemntAttributes, Map<String, UserIdBoundary> createBy) {
+			Location location, Map<String, Object> elementAttributes, Map<String, UserIdBoundary> createBy) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -55,7 +48,7 @@ public class ElementEntity {
 		this.createdTimestamp = timeStamp;
 		this.createdBy = createBy;
 		this.location = location;
-		this.elemntAttributes = elemntAttributes;
+		this.elementAttributes = elementAttributes;
 		this.childrens = new HashSet<ElementEntity>();
 		this.parent = null;
 	}
@@ -123,12 +116,12 @@ public class ElementEntity {
 
 	@Convert(converter = MapToJsonConverter.class)
 	@Lob
-	public Map<String, Object> getElemntAttributes() {
-		return elemntAttributes;
+	public Map<String, Object> getElementAttributes() {
+		return elementAttributes;
 	}
 
-	public void setElemntAttributes(Map<String, Object> elemntAttributes) {
-		this.elemntAttributes = elemntAttributes;
+	public void setElementAttributes(Map<String, Object> elementAttributes) {
+		this.elementAttributes = elementAttributes;
 	}
 
 	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)

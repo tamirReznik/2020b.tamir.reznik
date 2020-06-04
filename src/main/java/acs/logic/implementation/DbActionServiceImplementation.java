@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,12 +23,19 @@ import org.springframework.web.server.ResponseStatusException;
 import org.yaml.snakeyaml.util.ArrayUtils;
 
 import acs.dal.ActionDao;
+import acs.dal.ElementDao;
+import acs.dal.UserDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
+import acs.data.ElementEntity;
+import acs.data.ElementIdEntity;
+import acs.data.UserEntity;
+import acs.data.UserIdEntity;
 import acs.data.UserRole;
 import acs.logic.EnhancedActionService;
 import acs.logic.EnhancedElementService;
 import acs.logic.EnhancedUserService;
+import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
@@ -41,15 +50,19 @@ import acs.rest.boundaries.user.UserBoundary;
 public class DbActionServiceImplementation implements EnhancedActionService {
 	private String projectName;
 	private ActionDao actionDao;
+	private ElementDao elementDao;
+	private UserDao userDao;
 	private Converter converter;
 	private EnhancedElementService elementService;
 	private EnhancedUserService userService;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao, Converter converter, EnhancedUserService userService,
-			EnhancedElementService elementService) {
+	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, UserDao userDao,
+			Converter converter, EnhancedUserService userService, EnhancedElementService elementService) {
 		this.converter = converter;
 		this.actionDao = actionDao;
+		this.userDao = userDao;
+		this.elementDao = elementDao;
 		this.elementService = elementService;
 		this.userService = userService;
 	}
@@ -72,16 +85,19 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		if (!userBoundary.getRole().equals(UserRole.PLAYER))
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "only player can invoke action");
-
+		System.out.println("testitbefore!!");
 		ElementBoundary element = this.elementService.getSpecificElement(action.getInvokedBy().getUserId().getDomain(),
 				action.getInvokedBy().getUserId().getEmail(), action.getElement().getElementId().getDomain(),
 				action.getElement().getElementId().getId());
+		System.out.println("testit");
 
 		if (!element.getActive())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "element of action must be active");
 
-		if (element.getType().equals(ElementType.car.name()))
-			updateCarLocation(action, userBoundary, element);
+		checkAction(action, element);
+
+//		update location of car in db
+		updateCarLocation(action, userBoundary, element);
 
 		if (action.getType().toLowerCase().equals(ActionType.park.name())) {
 			ElementBoundary parkingElement = parkOrDepart(element, userBoundary, false, action);
@@ -95,7 +111,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		}
 
 		if (action.getType().toLowerCase().equals(ActionType.search.name())) {
-			ElementBoundary elementArr[] = search(element, userBoundary, 5, action);
+			ElementBoundary elementArr[] = search(element, userBoundary, 0.02, action);
 			saveAction(action);
 			return elementArr;
 		}
@@ -129,14 +145,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	public ElementBoundary[] search(ElementBoundary car, UserBoundary user, double distance, ActionBoundary action) {
 
-//		ElementBoundary[] parkings = elementService.searchByLocationAndType(user.getUserId().getDomain(),
-//				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(), distance,
-//				ElementType.parking.name(), 36, 0).toArray(new ElementBoundary[0]);
-
-//		return  elementService.searchByLocationAndType(user.getUserId().getDomain(), user.getUserId().getEmail(),
-//				car.getLocation().getLat(), car.getLocation().getLng(), distance, ElementType.parking.name(), 36, 0)
-//				.toArray(new ElementBoundary[0]);
-
 		return Stream
 				.concat(Arrays.stream(elementService.searchByLocationAndType(user.getUserId().getDomain(),
 						user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(), distance,
@@ -147,33 +155,33 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				.toArray(ElementBoundary[]::new);
 	}
 
+	public void checkAction(ActionBoundary action, ElementBoundary element) {
+
+		if (!element.getType().equals(ElementType.car.name())
+				&& (action.getType().equals(ActionType.search.name()) || action.getType().equals(ActionType.park.name())
+						|| action.getType().equals(ActionType.depart.name())))
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
+					"park /search/ deprat can only invoke on car element");
+
+	}
+
 	public ElementBoundary parkOrDepart(ElementBoundary car, UserBoundary user, boolean depart, ActionBoundary action) {
 
 		ElementBoundary parkingBoundary = null;
 		double distanceFromCar = 0.0002;
 
-		toManager(user);
+		UserBoundary userBoundary = toManager(user);
+
 		ElementBoundary[] parking = elementService
 				.getAnArrayWithElementParent(user.getUserId().getDomain(), user.getUserId().getEmail(),
 						car.getElementId().getDomain(), car.getElementId().getId(), 1, 0)
 				.toArray(new ElementBoundary[0]);
 
-//		check if user already parking - not allowed 
-		if (parking.length > 0 && depart == false)
-			if (!parking[0].getActive())
-				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-						"You cannot park when you are already parked ;<");
+//		if parking exist and no need in creating new parking representation 
+		parkingBoundary = parkOrDepartValidation(depart, parking, car, user);
 
-//		check if user need to depart specific parking
-		if (parking.length > 0 && depart == true)
-			if (!parking[0].getActive()) {
-
-				if (parking[0].getType().equals(ElementType.parking.name()))
-					parkingBoundary = updateParking(parkingBoundary, car, depart, user, parking[0]);
-
-				toPlayer(user);
-				return parkingBoundary;
-			}
+		if (parkingBoundary != null)
+			return parkingBoundary;
 
 //Searching for nearby parking to occupy 
 		ElementBoundary[] parkingNearby = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
@@ -184,26 +192,132 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(),
 				distanceFromCar * 4, ElementType.parking_lot.name(), 20, 0).toArray(new ElementBoundary[0]);
 
-		UserBoundary userBoundary = toManager(user);
-
 		if (parkingLotNearBy.length > 0)
-			parkingBoundary = updateParkingLot(depart, parkingBoundary, car, userBoundary, parkingLotNearBy);
+			parkingBoundary = updateParkingLot(depart, car, userBoundary, parkingLotNearBy);
 		else if (parkingNearby.length > 0)
-			parkingBoundary = updateParking(parkingBoundary, car, depart, userBoundary, parkingNearby);
+			parkingBoundary = updateParking(car, depart, userBoundary, parkingNearby);
 
 //		if we didn't found parking nearby -> create new one
 		if (parkingBoundary == null)
 			parkingBoundary = createParking(car, depart, userBoundary);
 
 //		Bind each car to parking or parking-lot
+//TODO - bind only on park in case of parking lot
+//
+//		if (depart) {
+//			ElementEntity carEntity = elementDao
+//					.findById(new ElementIdEntity(car.getElementId().getDomain(), car.getElementId().getId()))
+//					.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
+//							+ car.getElementId().getDomain() + "or elementId: " + car.getElementId().getId()));
+//
+//			HashSet<ElementEntity> allCars = (HashSet<ElementEntity>) parkingEntity.getResponses();
+//			allCars.remove(carEntity);
+//			parkingEntity.setResponses(allCars);
+//			carEntity.setParent(null);
+//			this.elementDao.save(carEntity);
+//		}
+//		ElementEntity carEntity = elementDao
+//				.findById(new ElementIdEntity(car.getElementId().getDomain(), car.getElementId().getId()))
+//				.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
+//						+ car.getElementId().getDomain() + "or elementId: " + car.getElementId().getId()));
+//
+//		ElementEntity parkingEntity = elementDao
+//				.findById(new ElementIdEntity(parkingBoundary.getElementId().getDomain(),
+//						parkingBoundary.getElementId().getId()))
+//				.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
+//						+ car.getElementId().getDomain() + "or elementId: " + car.getElementId().getId()));
+//
+//		if (depart) {
+//
+//			HashSet<ElementEntity> allCars = (HashSet<ElementEntity>) parkingEntity.getResponses();
+//			allCars.remove(carEntity);
+//			parkingEntity.setResponses(allCars);
+//			carEntity.setParent(null);
+//			this.elementDao.save(carEntity);
+//
+//		} else {
+//
+//			this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
+//					userBoundary.getUserId().getEmail(), parkingBoundary.getElementId(),
+//					new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
+//		}
 
-		this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
-				userBoundary.getUserId().getEmail(), parkingBoundary.getElementId(),
-				new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
-
+		unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
 		toPlayer(user);
 
 		return parkingBoundary;
+	}
+
+	public void unBindOrBindElements(ElementIdBoundary parking, ElementIdBoundary car, boolean depart,
+			UserBoundary userBoundary) {
+//  	depart == true --> unbind
+		if (depart) {
+			ElementEntity carEntity = elementDao.findById(new ElementIdEntity(car.getDomain(), car.getId()))
+					.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
+							+ car.getDomain() + "or elementId: " + car.getId()));
+
+			ElementEntity parkingEntity = elementDao.findById(new ElementIdEntity(parking.getDomain(), parking.getId()))
+					.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
+							+ parking.getDomain() + "or elementId: " + parking.getId()));
+
+			Set<ElementEntity> allCars = (Set<ElementEntity>) parkingEntity.getResponses();
+			allCars.remove(carEntity);
+			parkingEntity.setResponses(allCars);
+			carEntity.setParent(null);
+			this.elementDao.save(carEntity);
+
+//		depart == false --> bind
+		} else
+			this.elementService.bindExistingElementToAnExsitingChildElement(userBoundary.getUserId().getDomain(),
+					userBoundary.getUserId().getEmail(), parking, car);
+
+	}
+
+	public ElementBoundary parkOrDepartValidation(boolean depart, ElementBoundary[] parking, ElementBoundary car,
+			UserBoundary user) {
+		ElementIdBoundary lastCar = null;
+		ElementBoundary parkingBoundary = null;
+
+		if (parking.length <= 0)
+			return null;
+
+//		TODO - check if the car bind to parking
+		if (parking[0].getElementAttributes().containsKey("LastCarReport")) {
+			HashMap<String, String> myMap;
+			myMap = (HashMap<String, String>) parking[0].getElementAttributes().get("LastCarReport");
+
+			lastCar = new ElementIdBoundary(myMap.get("domain"), myMap.get("id"));
+		}
+//		check if user already parking - not allowed 
+		if (parking.length > 0 && !depart)
+			if (!parking[0].getActive())
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+						"You cannot park when you are already parked ;<");
+
+//		check if user need to depart specific parking
+		if (parking.length > 0 && depart)
+			if (!parking[0].getActive() && areEqual(car.getElementId(), lastCar)) {
+
+				if (parking[0].getType().equals(ElementType.parking.name())) {
+					parkingBoundary = updateParking(car, depart, user, parking[0]);
+					unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, user);
+				}
+				toPlayer(user);
+				return parkingBoundary;
+			}
+		return parkingBoundary;
+	}
+
+	public boolean areEqual(ElementIdBoundary elementId_1, ElementIdBoundary elementId_2) {
+
+		if (elementId_1 == null || elementId_2 == null)
+			return false;
+
+		if (elementId_1.getDomain() != elementId_2.getDomain() || elementId_1.getId() != elementId_2.getId())
+			return false;
+
+		return true;
+
 	}
 
 	public UserBoundary toPlayer(UserBoundary user) {
@@ -220,18 +334,27 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-	public ElementBoundary updateParking(ElementBoundary parkingBoundary, ElementBoundary car, boolean depart,
-			UserBoundary userBoundary, ElementBoundary... parkingNearby) {
-		parkingBoundary = ServiceTools.getClosest(car, parkingNearby);
+	public ElementBoundary updateParking(ElementBoundary car, boolean depart, UserBoundary userBoundary,
+			ElementBoundary... parkingNearby) {
 
-		parkingBoundary.getElementAttributes().put("LastCarReport",
+		ElementBoundary parkingBoundary = ServiceTools.getClosest(car, parkingNearby);
+
+		ElementEntity parkingEntity = elementDao
+				.findById(new ElementIdEntity(parkingBoundary.getElementId().getDomain(),
+						parkingBoundary.getElementId().getId()))
+				.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
+						+ car.getElementId().getDomain() + "or elementId: " + car.getElementId().getId()));
+
+		parkingEntity.getElementAttributes().put("LastCarReport",
 				new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 
-		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
-		parkingBoundary.setActive(depart);
-		this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
-				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
-		return parkingBoundary;
+		parkingEntity.getElementAttributes().put("lastReportTimestamp", new Date());
+
+		parkingEntity.setActive(depart);
+
+//		this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
+//				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
+		return converter.fromEntity(this.elementDao.save(parkingEntity));
 	}
 
 	public ElementBoundary createParking(ElementBoundary car, boolean depart, UserBoundary userBoundary) {
@@ -248,34 +371,61 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				parkingBoundary);
 	}
 
-	public ElementBoundary updateParkingLot(Boolean depart, ElementBoundary parkingBoundary, ElementBoundary car,
-			UserBoundary userBoundary, ElementBoundary... parkingLotNearBy) {
+	public ElementBoundary updateParkingLot(Boolean depart, ElementBoundary car, UserBoundary userBoundary,
+			ElementBoundary... parkingLotNearBy) {
 
-		parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
+		ElementBoundary parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
 
-		ElementIdBoundary[] carList = new ElementIdBoundary[1];
+		ElementIdBoundary[] carArray = new ElementIdBoundary[1];
+		ArrayList<ElementIdBoundary> carList = new ArrayList<>();
 		int counter = 0;
 
-		if (!parkingBoundary.getElementAttributes().isEmpty())
-			if (parkingBoundary.getElementAttributes().containsKey("carList"))
-				carList = (ElementIdBoundary[]) parkingBoundary.getElementAttributes().get("carList");
+		if (parkingBoundary.getElementAttributes().isEmpty()) {
+			HashMap<String, Object> myMap = new HashMap<>();
+			myMap.put("carList", carArray);
+			myMap.put("capacity", 80);
+			myMap.put("carCounter", 0);
+			carList.add(car.getElementId());
+			myMap.put("carList", carList.toArray(new ElementIdBoundary[0]));
+			parkingBoundary.setElementAttributes(myMap);
+
+		}
+
+		if (parkingBoundary.getElementAttributes().containsKey("carList")) {
+
+			carArray = (ElementIdBoundary[]) parkingBoundary.getElementAttributes().get("carList");
+			if (carArray.length > 0) {
+				carList.add(carArray[0]);
+			}
+
+		} else {
+			carList.add(car.getElementId());
+			parkingBoundary.getElementAttributes().put("carList", carList.toArray(new ElementIdBoundary[0]));
+		}
+
+		List<ElementIdBoundary> tempList = Arrays.asList(carArray);
+		carList.addAll(tempList);
 
 //		project require parking lots to have capacity
 		if (!parkingBoundary.getElementAttributes().containsKey("capacity"))
-			parkingBoundary.getElementAttributes().put("capacity", 1);
+			parkingBoundary.getElementAttributes().put("capacity", 80);
 
 		if (parkingBoundary.getElementAttributes().containsKey("carCounter"))
 			counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
 
 		else if (depart) {
-			parkingBoundary.getElementAttributes().put("carCounter", 0);
-			carList = new ElementIdBoundary[0];
+			if (counter > 0 && carList.contains(car.getElementId())) {
+				parkingBoundary.getElementAttributes().put("carCounter", counter - 1);
+
+				carList.remove(car.getElementId());
+			}
+
 		} else {
 			parkingBoundary.getElementAttributes().put("carCounter", 1);
-			carList[counter] = new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId());
+			carList.add(new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 		}
 
-		parkingBoundary.getElementAttributes().put("carList", carList);
+		parkingBoundary.getElementAttributes().put("carList", carList.toArray(new ElementBoundary[0]));
 
 		if ((int) parkingBoundary.getElementAttributes().get("carCounter")
 				+ 1 > (int) parkingBoundary.getElementAttributes().get("capacity"))
@@ -289,10 +439,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		parkingBoundary.getElementAttributes().put("carCounter", counter + 1);
 
 		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
-		this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
-				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
 
-		return parkingBoundary;
+		return this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
+				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
 
 	}
 

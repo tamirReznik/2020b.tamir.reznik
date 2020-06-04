@@ -116,7 +116,7 @@ public class DbElementServiceImplementation implements EnhancedElementService {
 			existing.setType(update.getType());
 
 		if (update.getElementAttributes() != null)
-			existing.setElemntAttributes(update.getElementAttributes());
+			existing.setElementAttributes(update.getElementAttributes());
 
 		return this.converter.fromEntity(this.elementDao.save(existing));
 

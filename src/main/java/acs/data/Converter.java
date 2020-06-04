@@ -19,7 +19,7 @@ public class Converter {
 		ElementIdBoundary elementIdBoundary = new ElementIdBoundary(entity.getElementId().getElementDomain(),
 				entity.getElementId().getId());
 		ElementBoundary eb = new ElementBoundary(elementIdBoundary, entity.getType(), entity.getName(),
-				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElemntAttributes(),
+				entity.getActive(), entity.getTimeStamp(), entity.getLocation(), entity.getElementAttributes(),
 				entity.getCreateBy());
 		return eb;
 	}

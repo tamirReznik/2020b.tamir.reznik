@@ -88,7 +88,7 @@ public class ActionTests {
 		createBy.put("userId",
 				new UserIdBoundary(this.managerUser.getUserId().getDomain(), this.managerUser.getUserId().getEmail()));
 
-		this.activeElement = new ElementBoundary(new ElementIdBoundary("2020b.tamir.reznik", "random"), "uniq", "tamir",
+		this.activeElement = new ElementBoundary(new ElementIdBoundary("2020b.tamir.reznik", "random"), "car", "tamir",
 				true, new Date(), new Location(30.1, 42.4), null, createBy);
 
 		activeElement = this.restTemplate.postForObject(this.elementPostUrl + this.managerUser.getUserId().getDomain()
