@@ -392,11 +392,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		}
 
 		if (parkingBoundary.getElementAttributes().containsKey("carList")) {
-
 			carArray = (ElementIdBoundary[]) parkingBoundary.getElementAttributes().get("carList");
-			if (carArray.length > 0) {
-				carList.add(carArray[0]);
-			}
+			if (carArray.length > 0)
+				if (!carList.contains(carArray[0]))
+					carList.add(carArray[0]);
+				else
+					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+							"You cannot park when you are already parked ;<");
 
 		} else {
 			carList.add(car.getElementId());
@@ -424,8 +426,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			parkingBoundary.getElementAttributes().put("carCounter", 1);
 			carList.add(new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 		}
-
-		parkingBoundary.getElementAttributes().put("carList", carList.toArray(new ElementBoundary[0]));
+		if (!carList.isEmpty())
+			parkingBoundary.getElementAttributes().put("carList", carList.toArray(carArray));
 
 		if ((int) parkingBoundary.getElementAttributes().get("carCounter")
 				+ 1 > (int) parkingBoundary.getElementAttributes().get("capacity"))
