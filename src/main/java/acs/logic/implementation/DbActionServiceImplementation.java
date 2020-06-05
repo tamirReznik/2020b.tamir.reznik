@@ -169,12 +169,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 						car.getElementId().getDomain(), car.getElementId().getId(), 1, 0)
 				.toArray(new ElementBoundary[0]);
 
-//		if parking exist and no need in creating new parking representation 
-//		parkingBoundary = parkOrDepartValidation(depart, parking, car, user);
-//
-//		if (parkingBoundary != null)
-//			return parkingBoundary;
-
 		if (allreadyPark.length > 0) {
 
 			if (allreadyPark[0].getType().equals(ElementType.parking.toString()))
@@ -393,17 +387,19 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 			carList.add(car.getElementId().toString());
 
-			parkingBoundary.getElementAttributes().put("carCounter", counter + 1);
+			parkingBoundary.getElementAttributes().put("carCounter", counter++);
 
 		}
 //		want to depart and currently parking at the parking lot
 		if (carList.contains(car.getElementId().toString()) && depart) {
 			carList.remove(car.getElementId().toString());
-			parkingBoundary.getElementAttributes().put("carCounter", counter - 1);
+			parkingBoundary.getElementAttributes().put("carCounter", counter--);
 
 			unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
 
 		}
+		if (!carList.contains(car.getElementId().toString()) && depart)
+			return null;
 
 //		parking lot is full - not active
 		if (counter >= capacity)
