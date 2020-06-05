@@ -1,9 +1,7 @@
 package acs.data;
 
 import java.io.Serializable;
-
 import javax.persistence.Embeddable;
-import javax.persistence.Id;
 
 @Embeddable
 public class ElementIdEntity implements Serializable {
@@ -31,7 +29,7 @@ public class ElementIdEntity implements Serializable {
 	public void setElementDomain(String domain) {
 		this.elementDomain = domain;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
