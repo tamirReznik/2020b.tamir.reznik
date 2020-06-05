@@ -231,40 +231,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-//	public ElementBoundary parkOrDepartValidation(boolean depart, ElementBoundary[] parking, ElementBoundary car,
-//			UserBoundary user) {
-//		ElementIdBoundary lastCar = null;
-//		ElementBoundary parkingBoundary = null;
-//
-//		if (parking.length <= 0)
-//			return null;
-//
-//		if (parking[0].getElementAttributes().containsKey("LastCarReport")) {
-//			HashMap<String, String> myMap;
-//			myMap = (HashMap<String, String>) parking[0].getElementAttributes().get("LastCarReport");
-//
-//			lastCar = new ElementIdBoundary(myMap.get("domain"), myMap.get("id"));
-//		}
-////		check if user already parking - not allowed 
-//		if (parking.length > 0 && !depart)
-//			if (!parking[0].getActive() && parking[0].getType().equals(ElementType.parking.name()))
-//				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-//						"You cannot park when you are already parked ;<");
-//
-////		check if user need to depart specific parking
-//		if (parking.length > 0 && depart)
-//			if (!parking[0].getActive() && areEqual(car.getElementId(), lastCar)) {
-//
-//				if (parking[0].getType().equals(ElementType.parking.name())) {
-//					parkingBoundary = updateParking(car, depart, user, parking[0]);
-//					unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, user);
-//				}
-//				toPlayer(user);
-//				return parkingBoundary;
-//			}
-//		return parkingBoundary;
-//	}
-
 	public boolean areEqual(ElementIdBoundary elementId_1, ElementIdBoundary elementId_2) {
 
 		if (elementId_1 == null || elementId_2 == null)
@@ -311,11 +277,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 					"You cannot park when you are already parked ;<");
 
-		if (depart && parkingEntity.getActive())
-			if (car.getLocation().getLat() != parkingEntity.getLocation().getLat()
-					|| car.getLocation().getLng() != parkingEntity.getLocation().getLng()) {
-				return null;
-			}
+//		if (depart && parkingEntity.getActive())
+//			if (!car.getLocation().equals(parkingBoundary.getLocation())) {
+//				System.out.println("create new parking");
+//				return null;
+//			} else {
+//				System.out.println("don't create new parking");
+//			}
 
 		if (depart && !parkingEntity.getActive()) {
 
