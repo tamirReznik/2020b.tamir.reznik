@@ -357,10 +357,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		ElementBoundary parkingBoundary = new ElementBoundary(new ElementIdBoundary("", ""), ElementType.parking.name(),
 				"parking_name", depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreatedBy());
 
+		parkingBoundary = this.elementService.create(userBoundary.getUserId().getDomain(),
+				userBoundary.getUserId().getEmail(), parkingBoundary);
 		unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
-
-		return this.elementService.create(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
-				parkingBoundary);
+		return parkingBoundary;
 	}
 
 	public ElementBoundary updateParkingLot(ElementBoundary car, Boolean depart, UserBoundary userBoundary,
