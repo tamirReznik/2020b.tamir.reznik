@@ -1,6 +1,5 @@
 package acs.logic;
 
-import acs.data.ElementEntity;
 import acs.rest.boundaries.element.ElementBoundary;
 
 public class ServiceTools {

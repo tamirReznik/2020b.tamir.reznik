@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
-import acs.dal.UserDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
 import acs.data.ElementEntity;
@@ -44,17 +43,15 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private ElementDao elementDao;
-	private UserDao userDao;
 	private Converter converter;
 	private EnhancedElementService elementService;
 	private EnhancedUserService userService;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, UserDao userDao,
-			Converter converter, EnhancedUserService userService, EnhancedElementService elementService) {
+	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, Converter converter,
+			EnhancedUserService userService, EnhancedElementService elementService) {
 		this.converter = converter;
 		this.actionDao = actionDao;
-		this.userDao = userDao;
 		this.elementDao = elementDao;
 		this.elementService = elementService;
 		this.userService = userService;
@@ -234,40 +231,39 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	}
 
-	public ElementBoundary parkOrDepartValidation(boolean depart, ElementBoundary[] parking, ElementBoundary car,
-			UserBoundary user) {
-		ElementIdBoundary lastCar = null;
-		ElementBoundary parkingBoundary = null;
-
-		if (parking.length <= 0)
-			return null;
-
-//		TODO - check if the car bind to parking
-		if (parking[0].getElementAttributes().containsKey("LastCarReport")) {
-			HashMap<String, String> myMap;
-			myMap = (HashMap<String, String>) parking[0].getElementAttributes().get("LastCarReport");
-
-			lastCar = new ElementIdBoundary(myMap.get("domain"), myMap.get("id"));
-		}
-//		check if user already parking - not allowed 
-		if (parking.length > 0 && !depart)
-			if (!parking[0].getActive() && parking[0].getType().equals(ElementType.parking.name()))
-				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-						"You cannot park when you are already parked ;<");
-
-//		check if user need to depart specific parking
-		if (parking.length > 0 && depart)
-			if (!parking[0].getActive() && areEqual(car.getElementId(), lastCar)) {
-
-				if (parking[0].getType().equals(ElementType.parking.name())) {
-					parkingBoundary = updateParking(car, depart, user, parking[0]);
-					unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, user);
-				}
-				toPlayer(user);
-				return parkingBoundary;
-			}
-		return parkingBoundary;
-	}
+//	public ElementBoundary parkOrDepartValidation(boolean depart, ElementBoundary[] parking, ElementBoundary car,
+//			UserBoundary user) {
+//		ElementIdBoundary lastCar = null;
+//		ElementBoundary parkingBoundary = null;
+//
+//		if (parking.length <= 0)
+//			return null;
+//
+//		if (parking[0].getElementAttributes().containsKey("LastCarReport")) {
+//			HashMap<String, String> myMap;
+//			myMap = (HashMap<String, String>) parking[0].getElementAttributes().get("LastCarReport");
+//
+//			lastCar = new ElementIdBoundary(myMap.get("domain"), myMap.get("id"));
+//		}
+////		check if user already parking - not allowed 
+//		if (parking.length > 0 && !depart)
+//			if (!parking[0].getActive() && parking[0].getType().equals(ElementType.parking.name()))
+//				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+//						"You cannot park when you are already parked ;<");
+//
+////		check if user need to depart specific parking
+//		if (parking.length > 0 && depart)
+//			if (!parking[0].getActive() && areEqual(car.getElementId(), lastCar)) {
+//
+//				if (parking[0].getType().equals(ElementType.parking.name())) {
+//					parkingBoundary = updateParking(car, depart, user, parking[0]);
+//					unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, user);
+//				}
+//				toPlayer(user);
+//				return parkingBoundary;
+//			}
+//		return parkingBoundary;
+//	}
 
 	public boolean areEqual(ElementIdBoundary elementId_1, ElementIdBoundary elementId_2) {
 
@@ -305,10 +301,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
 						+ car.getElementId().getDomain() + "or elementId: " + car.getElementId().getId()));
 
-		HashMap<String, String> myMap;
-		myMap = (HashMap<String, String>) parkingEntity.getElementAttributes().get("LastCarReport");
-
-		ElementIdEntity currentCar = new ElementIdEntity(myMap.get("domain"), myMap.get("id"));
+//		HashMap<String, String> myMap;
+//		myMap = (HashMap<String, String>) parkingEntity.getElementAttributes().get("LastCarReport");
+//
+//		ElementIdEntity currentCar = new ElementIdEntity(myMap.get("domain"), myMap.get("id"));
 
 //		can't park where you already parking
 		if (!parkingEntity.getActive() && !depart)
