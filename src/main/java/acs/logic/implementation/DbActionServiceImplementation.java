@@ -323,26 +323,34 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
 						+ car.getElementId().getDomain() + "or elementId: " + car.getElementId().getId()));
 
-		ElementIdEntity currentCar = (ElementIdEntity) parkingBoundary.getElementAttributes().get("LastCarReport");
+		HashMap<String, String> myMap;
+		myMap = (HashMap<String, String>) parkingEntity.getElementAttributes().get("LastCarReport");
+
+		ElementIdEntity currentCar = new ElementIdEntity(myMap.get("domain"), myMap.get("id"));
+
+//		can't park where you already parking
+		if (!parkingEntity.getActive() && !depart)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"You cannot park when you are already parked ;<");
 
 		if (depart && areEqual(converter.toElementIdBoundary(currentCar.toString()), car.getElementId())
-				&& !parkingEntity.getActive()) {
-			parkingEntity.setActive(depart);
+				&& parkingEntity.getActive())
+			return null;
+
+		if (depart && !parkingEntity.getActive()) {
+
+			unBindOrBindElements(converter.toElementIdBoundary(parkingBoundary.getElementId().toString()),
+					converter.toElementIdBoundary(car.getElementId().toString()), depart, userBoundary);
+		}
+
+		if (!depart && parkingEntity.getActive()) {
+
 			unBindOrBindElements(converter.toElementIdBoundary(parkingBoundary.getElementId().toString()),
 					converter.toElementIdBoundary(car.getElementId().toString()), depart, userBoundary);
 
 		}
-		if (depart && areEqual(converter.toElementIdBoundary(currentCar.toString()), car.getElementId())
-				&& parkingEntity.getActive()) {
 
-		}
-
-//		can't park where you already parking
-		if (!parkingEntity.getActive() && !depart
-				&& areEqual(converter.toElementIdBoundary(currentCar.toString()), car.getElementId()))
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-					"You cannot park when you are already parked ;<");
-
+		parkingEntity.setActive(depart);
 		parkingEntity.getElementAttributes().put("lastReportTimestamp", new Date().toString());
 
 		parkingEntity.getElementAttributes().put("LastCarReport",
