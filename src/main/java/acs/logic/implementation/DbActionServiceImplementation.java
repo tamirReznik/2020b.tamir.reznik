@@ -378,6 +378,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 					"You cannot park when you are already parked ;<");
 
+		if (!carList.contains(car.getElementId().toString()) && depart)
+			return null;
+
 //		want to park and not register in parkinglot - allowed
 		if (!carList.contains(car.getElementId().toString()) && !depart) {
 			if (capacity < counter + 1)
@@ -398,8 +401,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
 
 		}
-		if (!carList.contains(car.getElementId().toString()) && depart)
-			return null;
 
 //		parking lot is full - not active
 		if (counter >= capacity)
