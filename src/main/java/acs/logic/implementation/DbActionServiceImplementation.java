@@ -177,18 +177,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		if (allreadyPark.length > 0) {
 
-//			parkingBoundary = allreadyPark[0];
-//			HashMap<String, String> myMap;
-//			myMap = (HashMap<String, String>) allreadyPark[0].getElementAttributes().get("LastCarReport");
-//			ElementIdBoundary lastParkingCar = new ElementIdBoundary(myMap.get("domain"), myMap.get("id"));
-
-//			if (!depart && parkingBoundary.getActive() && areEqual(lastParkingCar, car.getElementId())) {
-//				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-//						"You cannot park when you are already parked ;<");
-//			}
-//			if (depart && parkingBoundary.getActive() && areEqual(lastParkingCar, car.getElementId())) {
-////				unbind
-//			}
 			if (allreadyPark[0].getType().equals(ElementType.parking.toString()))
 				parkingBoundary = updateParking(car, depart, user, allreadyPark);
 			else if (allreadyPark[0].getType().equals(ElementType.parking_lot.toString()))
@@ -333,14 +321,14 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 					"You cannot park when you are already parked ;<");
 
-		if (depart && areEqual(converter.toElementIdBoundary(currentCar.toString()), car.getElementId())
-				&& parkingEntity.getActive())
+		if (depart && parkingEntity.getActive())
 			return null;
 
 		if (depart && !parkingEntity.getActive()) {
 
 			unBindOrBindElements(converter.toElementIdBoundary(parkingBoundary.getElementId().toString()),
 					converter.toElementIdBoundary(car.getElementId().toString()), depart, userBoundary);
+
 		}
 
 		if (!depart && parkingEntity.getActive()) {
