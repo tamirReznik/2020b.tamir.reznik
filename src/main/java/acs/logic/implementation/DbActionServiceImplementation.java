@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.yaml.snakeyaml.util.ArrayUtils;
 
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
@@ -29,8 +26,6 @@ import acs.data.ActionEntity;
 import acs.data.Converter;
 import acs.data.ElementEntity;
 import acs.data.ElementIdEntity;
-import acs.data.UserEntity;
-import acs.data.UserIdEntity;
 import acs.data.UserRole;
 import acs.logic.EnhancedActionService;
 import acs.logic.EnhancedElementService;
@@ -376,74 +371,66 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		ElementBoundary parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
 
-		ElementIdBoundary[] carArray = new ElementIdBoundary[1];
-		ArrayList<ElementIdBoundary> carList = new ArrayList<>();
-		int counter = 0;
+		List<String> carList = new ArrayList<>();
+		int counter = 0, capacity = 0;
 
-		if (parkingBoundary.getElementAttributes().isEmpty()) {
-			HashMap<String, Object> myMap = new HashMap<>();
-			myMap.put("carList", carArray);
-			myMap.put("capacity", 80);
-			myMap.put("carCounter", 0);
-			carList.add(car.getElementId());
-			myMap.put("carList", carList.toArray(new ElementIdBoundary[0]));
-			parkingBoundary.setElementAttributes(myMap);
+		parkingLotParkValidation(parkingBoundary);
+
+		counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
+
+		carList = (ArrayList<String>) parkingBoundary.getElementAttributes().get("carList");
+
+
+		capacity = (int) parkingBoundary.getElementAttributes().get("capacity");
+
+//		want to park but already parking
+		if (carList.contains(car.getElementId().toString()) && !depart)
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"You cannot park when you are already parked ;<");
+
+//		want to park and not register in parkinglot - allowed
+		if (!carList.contains(car.getElementId().toString()) && !depart) {
+			if (capacity < counter + 1)
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN, "this parking lot is full");
+
+			carList.add(car.getElementId().toString());
+			parkingBoundary.getElementAttributes().put("carCounter",
+					(int) parkingBoundary.getElementAttributes().get("carCounter") + 1);
 
 		}
+//		want to depart and currently parking at the parking lot
+		if (carList.contains(car.getElementId().toString()) && depart) {
+			carList.remove(car.getElementId().toString());
+			parkingBoundary.getElementAttributes().put("carCounter",
+					(int) parkingBoundary.getElementAttributes().get("carCounter") - 1);
 
-		if (parkingBoundary.getElementAttributes().containsKey("carList")) {
-			carArray = (ElementIdBoundary[]) parkingBoundary.getElementAttributes().get("carList");
-			if (carArray.length > 0)
-				if (!carList.contains(carArray[0]))
-					carList.add(carArray[0]);
-				else
-					throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-							"You cannot park when you are already parked ;<");
-
-		} else {
-			carList.add(car.getElementId());
-			parkingBoundary.getElementAttributes().put("carList", carList.toArray(new ElementIdBoundary[0]));
 		}
-
-		List<ElementIdBoundary> tempList = Arrays.asList(carArray);
-		carList.addAll(tempList);
-
-//		project require parking lots to have capacity
-		if (!parkingBoundary.getElementAttributes().containsKey("capacity"))
-			parkingBoundary.getElementAttributes().put("capacity", 80);
-
-		if (parkingBoundary.getElementAttributes().containsKey("carCounter"))
-			counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
-
-		else if (depart) {
-			if (counter > 0 && carList.contains(car.getElementId())) {
-				parkingBoundary.getElementAttributes().put("carCounter", counter - 1);
-
-				carList.remove(car.getElementId());
-			}
-
-		} else {
-			parkingBoundary.getElementAttributes().put("carCounter", 1);
-			carList.add(new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
-		}
-		if (!carList.isEmpty())
-			parkingBoundary.getElementAttributes().put("carList", carList.toArray(carArray));
-
-		if ((int) parkingBoundary.getElementAttributes().get("carCounter")
-				+ 1 > (int) parkingBoundary.getElementAttributes().get("capacity"))
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "this parking lot is full");
 
 //		parking lot is full - not active
-		if ((int) parkingBoundary.getElementAttributes().get("carCounter")
-				+ 2 > (int) parkingBoundary.getElementAttributes().get("capacity"))
+		if (counter >= capacity)
 			parkingBoundary.setActive(false);
-
-		parkingBoundary.getElementAttributes().put("carCounter", counter + 1);
+		else
+			parkingBoundary.setActive(true);
 
 		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
 
+		parkingBoundary.getElementAttributes().put("carCounter", counter);
+		parkingBoundary.getElementAttributes().put("carList", carList.toArray(new String[0]));
+
 		return this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
 				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
+
+	}
+
+	public void parkingLotParkValidation(ElementBoundary parkingBoundary) {
+		if (!parkingBoundary.getElementAttributes().containsKey("capacity"))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parking lot must have 'capacity' attribute");
+
+		if (!parkingBoundary.getElementAttributes().containsKey("carList"))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parking lot must have 'carList' attribute");
+
+		if (!parkingBoundary.getElementAttributes().containsKey("carCounter"))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parking lot must have 'carCounter' attribute");
 
 	}
 
