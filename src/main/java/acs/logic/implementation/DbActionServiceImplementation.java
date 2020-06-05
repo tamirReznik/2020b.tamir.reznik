@@ -312,9 +312,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 					"You cannot park when you are already parked ;<");
 
 		if (depart && parkingEntity.getActive())
-			if (car.getLocation().getLat() != parkingBoundary.getLocation().getLat()
-					&& car.getLocation().getLng() != parkingBoundary.getLocation().getLng())
+			if (car.getLocation().getLat() != parkingEntity.getLocation().getLat()
+					|| car.getLocation().getLng() != parkingEntity.getLocation().getLng()) {
 				return null;
+			}
 
 		if (depart && !parkingEntity.getActive()) {
 
