@@ -387,13 +387,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 			carList.add(car.getElementId().toString());
 
-			parkingBoundary.getElementAttributes().put("carCounter", counter++);
+			parkingBoundary.getElementAttributes().put("carCounter", ++counter);
 
 		}
 //		want to depart and currently parking at the parking lot
 		if (carList.contains(car.getElementId().toString()) && depart) {
 			carList.remove(car.getElementId().toString());
-			parkingBoundary.getElementAttributes().put("carCounter", counter--);
+			parkingBoundary.getElementAttributes().put("carCounter", --counter);
 
 			unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
 
