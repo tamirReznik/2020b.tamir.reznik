@@ -392,15 +392,14 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
 
 			carList.add(car.getElementId().toString());
-			parkingBoundary.getElementAttributes().put("carCounter",
-					(int) parkingBoundary.getElementAttributes().get("carCounter") + 1);
+
+			parkingBoundary.getElementAttributes().put("carCounter", counter + 1);
 
 		}
 //		want to depart and currently parking at the parking lot
 		if (carList.contains(car.getElementId().toString()) && depart) {
 			carList.remove(car.getElementId().toString());
-			parkingBoundary.getElementAttributes().put("carCounter",
-					(int) parkingBoundary.getElementAttributes().get("carCounter") - 1);
+			parkingBoundary.getElementAttributes().put("carCounter", counter - 1);
 
 			unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
 
@@ -414,7 +413,6 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
 
-		parkingBoundary.getElementAttributes().put("carCounter", counter);
 		parkingBoundary.getElementAttributes().put("carList", carList.toArray(new String[0]));
 
 		return this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
