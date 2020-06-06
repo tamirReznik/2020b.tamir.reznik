@@ -197,7 +197,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 			if (parkingLotNearBy.length > 0)
 				parkingBoundary = updateParkingLot(car, depart, user, parkingLotNearBy);
-			else if (parkingNearby.length > 0)
+
+			if (parkingNearby.length > 0 && parkingBoundary == null)
 				parkingBoundary = updateParking(car, depart, user, parkingNearby);
 
 //		if we didn't found parking nearby -> create new one
@@ -316,6 +317,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			ElementBoundary... parkingLotNearBy) {
 
 		ElementBoundary parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
+
+		if (!parkingBoundary.getActive())
+			return null;
 
 		List<String> carList = new ArrayList<>();
 		int counter = 0, capacity = 0;
