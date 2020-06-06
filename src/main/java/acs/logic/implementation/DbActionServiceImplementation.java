@@ -30,6 +30,7 @@ import acs.logic.EnhancedElementService;
 import acs.logic.EnhancedUserService;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
+import acs.rest.boundaries.action.ActionAttribute;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.action.ActionType;
@@ -116,12 +117,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	}
 
 	public void updateCarLocation(ActionBoundary action, UserBoundary ue, ElementBoundary element) {
-		HashMap<String, Double> location = action.getActionAttributes().containsKey("location")
-				? (HashMap<String, Double>) action.getActionAttributes().get("location")
+		HashMap<String, Double> location = action.getActionAttributes().containsKey(ActionAttribute.location.name())
+				? (HashMap<String, Double>) action.getActionAttributes().get(ActionAttribute.location.name())
 				: new HashMap<>();
 
 		if (!location.isEmpty())
-			element.setLocation(new Location(location.get("lat"), location.get("lng")));
+			element.setLocation(
+					new Location(location.get(ActionAttribute.lat.name()), location.get(ActionAttribute.lng.name())));
 
 		toManager(ue);
 		elementService.update(ue.getUserId().getDomain(), ue.getUserId().getEmail(), element.getElementId().getDomain(),
