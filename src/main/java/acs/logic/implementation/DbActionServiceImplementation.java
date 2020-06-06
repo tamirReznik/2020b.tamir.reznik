@@ -173,14 +173,11 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 						car.getElementId().getDomain(), car.getElementId().getId(), 1, 0)
 				.toArray(new ElementBoundary[0]);
 
-		if (allreadyPark.length > 0) {
-
+		if (allreadyPark.length > 0)
 			if (allreadyPark[0].getType().equals(ElementType.parking.toString()))
 				parkingBoundary = updateParking(car, depart, user, allreadyPark);
 			else if (allreadyPark[0].getType().equals(ElementType.parking_lot.toString()))
 				parkingBoundary = updateParkingLot(car, depart, user, allreadyPark);
-
-		}
 
 		user = toPlayer(user);
 		if (parkingBoundary == null) {
@@ -259,8 +256,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	public UserBoundary toManager(UserBoundary user) {
 		user.setRole(UserRole.MANAGER);
-
-		return userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(), user);
+		return converter.fromEntity(this.userDao.save(converter.toEntity(user)));
+//		return userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(), user);
 
 	}
 
@@ -274,42 +271,23 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				.orElseThrow(() -> new ObjectNotFoundException("could not find object by elementDomain: "
 						+ car.getElementId().getDomain() + "or elementId: " + car.getElementId().getId()));
 
-//		HashMap<String, String> myMap;
-//		myMap = (HashMap<String, String>) parkingEntity.getElementAttributes().get("LastCarReport");
-//
-//		ElementIdEntity currentCar = new ElementIdEntity(myMap.get("domain"), myMap.get("id"));
-
 //		can't park where you already parking
 		if (!parkingEntity.getActive() && !depart)
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 					"You cannot park when you are already parked ;<");
 
-//		if (depart && parkingEntity.getActive())
-//			if (!car.getLocation().equals(parkingBoundary.getLocation())) {
-//				System.out.println("create new parking");
-//				return null;
-//			} else {
-//				System.out.println("don't create new parking");
-//			}
-
-		if (depart && !parkingEntity.getActive()) {
-
+		if (depart && !parkingEntity.getActive())
 			unBindOrBindElements(converter.toElementIdBoundary(parkingBoundary.getElementId().toString()),
 					converter.toElementIdBoundary(car.getElementId().toString()), depart, userBoundary);
 
-		}
-
-		if (!depart && parkingEntity.getActive()) {
-
+		if (!depart && parkingEntity.getActive())
 			unBindOrBindElements(converter.toElementIdBoundary(parkingBoundary.getElementId().toString()),
 					converter.toElementIdBoundary(car.getElementId().toString()), depart, userBoundary);
-
-		}
 
 		parkingEntity.setActive(depart);
-		parkingEntity.getElementAttributes().put("lastReportTimestamp", new Date().toString());
+		parkingEntity.getElementAttributes().put(ParkingAttributes.lastReportTimestamp.name(), new Date().toString());
 
-		parkingEntity.getElementAttributes().put("LastCarReport",
+		parkingEntity.getElementAttributes().put(ParkingAttributes.LastCarReport.name(),
 				new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
 
 		return converter.fromEntity(this.elementDao.save(parkingEntity));
