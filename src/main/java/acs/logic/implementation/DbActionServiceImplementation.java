@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
+import acs.dal.UserDao;
 import acs.data.ActionEntity;
 import acs.data.Converter;
 import acs.data.ElementEntity;
@@ -29,13 +30,16 @@ import acs.logic.EnhancedElementService;
 import acs.logic.EnhancedUserService;
 import acs.logic.ObjectNotFoundException;
 import acs.logic.ServiceTools;
+import acs.rest.boundaries.action.ActionAttribute;
 import acs.rest.boundaries.action.ActionBoundary;
 import acs.rest.boundaries.action.ActionIdBoundary;
 import acs.rest.boundaries.action.ActionType;
+import acs.rest.boundaries.element.ParkingLotAttributes;
 import acs.rest.boundaries.element.ElementBoundary;
 import acs.rest.boundaries.element.ElementIdBoundary;
 import acs.rest.boundaries.element.ElementType;
 import acs.rest.boundaries.element.Location;
+import acs.rest.boundaries.element.ParkingAttributes;
 import acs.rest.boundaries.user.UserBoundary;
 
 @Service
@@ -43,16 +47,18 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private ElementDao elementDao;
+	private UserDao userDao;
 	private Converter converter;
 	private EnhancedElementService elementService;
 	private EnhancedUserService userService;
 
 	@Autowired
-	public DbActionServiceImplementation(ActionDao actionDao, ElementDao elementDao, Converter converter,
-			EnhancedUserService userService, EnhancedElementService elementService) {
+	public DbActionServiceImplementation(UserDao userDao, ActionDao actionDao, ElementDao elementDao,
+			Converter converter, EnhancedUserService userService, EnhancedElementService elementService) {
 		this.converter = converter;
 		this.actionDao = actionDao;
 		this.elementDao = elementDao;
+		this.userDao = userDao;
 		this.elementService = elementService;
 		this.userService = userService;
 	}
@@ -111,12 +117,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	}
 
 	public void updateCarLocation(ActionBoundary action, UserBoundary ue, ElementBoundary element) {
-		HashMap<String, Double> location = action.getActionAttributes().containsKey("location")
-				? (HashMap<String, Double>) action.getActionAttributes().get("location")
+		HashMap<String, Double> location = action.getActionAttributes().containsKey(ActionAttribute.location.name())
+				? (HashMap<String, Double>) action.getActionAttributes().get(ActionAttribute.location.name())
 				: new HashMap<>();
 
 		if (!location.isEmpty())
-			element.setLocation(new Location(location.get("lat"), location.get("lng")));
+			element.setLocation(
+					new Location(location.get(ActionAttribute.lat.name()), location.get(ActionAttribute.lng.name())));
 
 		toManager(ue);
 		elementService.update(ue.getUserId().getDomain(), ue.getUserId().getEmail(), element.getElementId().getDomain(),
@@ -200,7 +207,7 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			if (parkingBoundary == null)
 				parkingBoundary = createParking(car, depart, user);
 		}
-//		unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
+
 		toPlayer(user);
 
 		return parkingBoundary;
@@ -245,8 +252,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 	public UserBoundary toPlayer(UserBoundary user) {
 		user.setRole(UserRole.PLAYER);
-		return userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(), user);
-//		return converter.fromEntity(this.userDao.save(user));
+//		return userService.updateUser(user.getUserId().getDomain(), user.getUserId().getEmail(), user);
+		return converter.fromEntity(this.userDao.save(converter.toEntity(user)));
 
 	}
 
@@ -311,16 +318,19 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 	public ElementBoundary createParking(ElementBoundary car, boolean depart, UserBoundary userBoundary) {
 
 		HashMap<String, Object> currentParkingAttributes = new HashMap<>();
-		currentParkingAttributes.put("LastCarReport",
+
+		currentParkingAttributes.put(ParkingAttributes.LastCarReport.name(),
 				new ElementIdBoundary(car.getElementId().getDomain(), car.getElementId().getId()));
-		currentParkingAttributes.put("lastReportTimestamp", new Date().toString());
+		currentParkingAttributes.put(ParkingAttributes.lastReportTimestamp.name(), new Date().toString());
 
 		ElementBoundary parkingBoundary = new ElementBoundary(new ElementIdBoundary("", ""), ElementType.parking.name(),
 				"parking_name", depart, new Date(), car.getLocation(), currentParkingAttributes, car.getCreatedBy());
 
 		parkingBoundary = this.elementService.create(userBoundary.getUserId().getDomain(),
 				userBoundary.getUserId().getEmail(), parkingBoundary);
+
 		unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
+
 		return parkingBoundary;
 	}
 
@@ -334,11 +344,11 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		parkingLotParkValidation(parkingBoundary);
 
-		counter = (int) parkingBoundary.getElementAttributes().get("carCounter");
+		counter = (int) parkingBoundary.getElementAttributes().get(ParkingLotAttributes.carCounter.name());
 
-		carList = (ArrayList<String>) parkingBoundary.getElementAttributes().get("carList");
+		carList = (ArrayList<String>) parkingBoundary.getElementAttributes().get(ParkingLotAttributes.carList.name());
 
-		capacity = (int) parkingBoundary.getElementAttributes().get("capacity");
+		capacity = (int) parkingBoundary.getElementAttributes().get(ParkingLotAttributes.capacity.name());
 
 //		want to park but already parking
 		if (carList.contains(car.getElementId().toString()) && !depart)
@@ -357,13 +367,13 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 			carList.add(car.getElementId().toString());
 
-			parkingBoundary.getElementAttributes().put("carCounter", ++counter);
+			parkingBoundary.getElementAttributes().put(ParkingLotAttributes.carCounter.name(), ++counter);
 
 		}
 //		want to depart and currently parking at the parking lot
 		if (carList.contains(car.getElementId().toString()) && depart) {
 			carList.remove(car.getElementId().toString());
-			parkingBoundary.getElementAttributes().put("carCounter", --counter);
+			parkingBoundary.getElementAttributes().put(ParkingLotAttributes.carCounter.name(), --counter);
 
 			unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
 
@@ -375,9 +385,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		else
 			parkingBoundary.setActive(true);
 
-		parkingBoundary.getElementAttributes().put("lastReportTimestamp", new Date());
+		parkingBoundary.getElementAttributes().put(ParkingLotAttributes.lastReportTimestamp.name(),
+				(new Date()).toString());
 
-		parkingBoundary.getElementAttributes().put("carList", carList.toArray(new String[0]));
+		parkingBoundary.getElementAttributes().put(ParkingLotAttributes.carList.name(), carList.toArray(new String[0]));
 
 		return this.elementService.update(userBoundary.getUserId().getDomain(), userBoundary.getUserId().getEmail(),
 				parkingBoundary.getElementId().getDomain(), parkingBoundary.getElementId().getId(), parkingBoundary);
