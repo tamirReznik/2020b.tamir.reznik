@@ -286,8 +286,8 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 					converter.toElementIdBoundary(car.getElementId().toString()), depart, userBoundary);
 
 		if (depart && parkingEntity.getActive())
-			if (parkingEntity.getLocation().getLat() != car.getLocation().getLat()
-					|| parkingEntity.getLocation().getLng() != car.getLocation().getLng())
+			if (!(parkingEntity.getLocation().getLat().equals(car.getLocation().getLat()))
+					|| (!parkingEntity.getLocation().getLng().equals(car.getLocation().getLng())))
 				return null;
 
 		parkingEntity.setActive(depart);
