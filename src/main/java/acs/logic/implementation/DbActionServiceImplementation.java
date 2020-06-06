@@ -285,6 +285,11 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			unBindOrBindElements(converter.toElementIdBoundary(parkingBoundary.getElementId().toString()),
 					converter.toElementIdBoundary(car.getElementId().toString()), depart, userBoundary);
 
+		if (depart && parkingEntity.getActive())
+			if (parkingEntity.getLocation().getLat() != car.getLocation().getLat()
+					|| parkingEntity.getLocation().getLng() != car.getLocation().getLng())
+				return null;
+
 		parkingEntity.setActive(depart);
 		parkingEntity.getElementAttributes().put(ParkingAttributes.lastReportTimestamp.name(), new Date().toString());
 
