@@ -179,9 +179,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			else if (allreadyPark[0].getType().equals(ElementType.parking_lot.toString()))
 				parkingBoundary = updateParkingLot(car, depart, user, allreadyPark);
 
-		user = toPlayer(user);
 		if (parkingBoundary == null) {
 
+			user = toPlayer(user);
 //Searching for nearby parking to occupy 
 			ElementBoundary[] parkingNearby = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
 					user.getUserId().getEmail(), car.getLocation().getLat(), car.getLocation().getLng(),
@@ -323,7 +323,11 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 
 		ElementBoundary parkingBoundary = ServiceTools.getClosest(car, parkingLotNearBy);
 
-		if (!parkingBoundary.getActive())
+//		this included in the version of the project pass to eyal
+//		if (!parkingBoundary.getActive() )
+//			return null;
+
+		if (!parkingBoundary.getActive() && !depart)
 			return null;
 
 		List<String> carList = new ArrayList<>();
