@@ -174,13 +174,16 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 				.toArray(new ElementBoundary[0]);
 
 		if (allreadyPark.length > 0)
+
 			if (allreadyPark[0].getType().equals(ElementType.parking.toString()))
+
 				parkingBoundary = updateParking(car, depart, user, allreadyPark);
 			else if (allreadyPark[0].getType().equals(ElementType.parking_lot.toString()))
+
 				parkingBoundary = updateParkingLot(car, depart, user, allreadyPark);
 
 		if (parkingBoundary == null) {
-
+			System.err.println("test it 15");
 			user = toPlayer(user);
 //Searching for nearby parking to occupy 
 			ElementBoundary[] parkingNearby = this.elementService.searchByLocationAndType(user.getUserId().getDomain(),
@@ -327,8 +330,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 //		if (!parkingBoundary.getActive() )
 //			return null;
 
-		if (!parkingBoundary.getActive() && !depart)
+		if (!parkingBoundary.getActive() && !depart) {
+			System.err.println("test it 1");
 			return null;
+		}
 
 		List<String> carList = new ArrayList<>();
 		int counter = 0, capacity = 0;
@@ -346,8 +351,10 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
 					"You cannot park when you are already parked ;<");
 
-		if (!carList.contains(car.getElementId().toString()) && depart)
+		if (!carList.contains(car.getElementId().toString()) && depart) {
+			System.err.println("test it 89");
 			return null;
+		}
 
 //		want to park and not register in parkinglot - allowed
 		if (!carList.contains(car.getElementId().toString()) && !depart) {
@@ -363,7 +370,9 @@ public class DbActionServiceImplementation implements EnhancedActionService {
 		}
 //		want to depart and currently parking at the parking lot
 		if (carList.contains(car.getElementId().toString()) && depart) {
+
 			carList.remove(car.getElementId().toString());
+
 			parkingBoundary.getElementAttributes().put(ParkingLotAttributes.carCounter.name(), --counter);
 
 			unBindOrBindElements(parkingBoundary.getElementId(), car.getElementId(), depart, userBoundary);
